@@ -1,0 +1,45 @@
+name: Skill Frontmatter
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  skill-frontmatter:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Parse every SKILL.md frontmatter strictly
+        # Strict YAML parsers (the skills CLI, Codex) silently skip a skill whose
+        # frontmatter fails to parse, or whose description is over 1024 characters
+        # (Codex rejects it), so a bad description must fail the build.
+        run: |
+          pip install --quiet pyyaml
+          python3 - <<'EOF'
+          import pathlib, sys, yaml
+          bad = []
+          skills = sorted(pathlib.Path('.').glob('*/SKILL.md'))
+          for path in skills:
+              text = path.read_text()
+              if not text.startswith('---\n'):
+                  bad.append(f'{path}: no frontmatter')
+                  continue
+              try:
+                  meta = yaml.safe_load(text.split('\n---', 1)[0][4:])
+              except yaml.YAMLError as error:
+                  bad.append(f'{path}: {str(error).splitlines()[0]}')
+                  continue
+              if not isinstance(meta, dict):
+                  bad.append(f'{path}: frontmatter is not a mapping')
+              elif meta.get('name') != path.parent.name:
+                  bad.append(f'{path}: name does not match its directory')
+              elif not meta.get('description'):
+                  bad.append(f'{path}: missing description')
+              elif len(str(meta['description'])) > 1024:
+                  bad.append(f'{path}: description over 1024 characters')
+          print('\n'.join(bad) or f'{len(skills)} skills OK')
+          sys.exit(1 if bad else 0)
+          EOF

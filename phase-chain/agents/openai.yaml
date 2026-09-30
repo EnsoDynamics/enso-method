@@ -1,0 +1,4 @@
+interface:
+  display_name: "Phase Chain"
+  short_description: "Deliver planned phases across fresh Codex tasks"
+  default_prompt: "Use $phase-chain to implement this approved plan one phase per fresh Codex task, committing and pushing after required validation and reviews, then launching each successor until the requested scope is complete. Defer integration merges until the end of the sequence unless the user requires otherwise or an intermediate merge becomes essential."
