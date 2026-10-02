@@ -351,7 +351,7 @@ What happens after the documents are written depends on who invoked this skill. 
 
 ## Session Capacity Calibration
 
-The sizing test used throughout this skill — *can I hold the full design coherently while I build, test, and verify it in this run* — is deliberately model-relative, so it never needs revision as models improve. This section holds the part that **does** age: the concrete anchors for what "one session" reliably carries with current models. **When models and harnesses improve, this section is the only thing to revise; nothing else in this skill, and nothing in `implement-from-requirements`, states capacity numbers.** Anchors last revised: **October 2026**.
+The sizing test used throughout this skill — *can I hold the full design coherently while I build, test, and verify it in this run* — is deliberately model-relative, so it never needs revision as models improve. This section holds the part that **does** age: the concrete anchors for what "one session" reliably carries with current models. **When models and harnesses improve, this section is the only thing to revise; nothing else in this skill, and nothing in `implement-from-requirements`, states capacity numbers.**
 
 A phase sized for reliable single-session completion looks like:
 

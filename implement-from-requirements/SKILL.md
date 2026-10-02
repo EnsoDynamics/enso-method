@@ -152,7 +152,7 @@ Human-time framings ("a day's work," "a sprint," "a couple of days") measure som
 
 Walk through the implementation mentally. How many distinct capabilities does it hold? How many integration points? How many tests? How much investigation may be needed for edge cases discovered mid-implementation? The point is not a precise count — it's a gut check on whether the whole thing fits in one focused, coherent run.
 
-Then check that gut read against the **Session Capacity Calibration** section of the `phase-split` skill — the single, dated source of concrete anchors for what one session reliably carries with current models. Don't restate its numbers here; read it. It also records the bias to correct for: plans have been cut too fine far more often than phases have overrun, so a borderline read means the work fits.
+Then check that gut read against the **Session Capacity Calibration** section of the `phase-split` skill — the single source of concrete anchors for what one session reliably carries with current models. Don't restate its numbers here; read it. It also records the bias to correct for: plans have been cut too fine far more often than phases have overrun, so a borderline read means the work fits.
 
 **The decision:**
 
