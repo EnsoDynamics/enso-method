@@ -28,8 +28,8 @@ never looking.
 
 **The tripwire, in observable units:** a command the session runs more than a few times —
 a suite, a build, a lint-and-test loop, a rebuild that proves an output — takes **more than
-about two minutes**. Do the arithmetic once: runs per session × sessions per phase ×
-minutes each. If that is hours, it is the largest thing in the phase and it is not the code.
+about two minutes**. Do the arithmetic once: runs per phase × minutes each. If that is
+hours, it is the largest thing in the phase and it is not the code.
 
 ## Measure first — it is rarely where you think
 

@@ -142,7 +142,7 @@ This is the critical pre-implementation step. Before writing any code, decide wh
 
 **What "one session" means:**
 
-The work is happening **right now**, in this present AI session — typically a focused run on the order of minutes. "Single session" means this immediate run, not some abstract future unit of work being scheduled.
+The work is happening **right now**, in this present AI session — one chat, which may run for hours and fan work out to builder subagents. "Single session" means this immediate run, not some abstract future unit of work being scheduled.
 
 So the only sizing question worth asking is: *Can I, this AI, complete this whole thing end-to-end in this run without losing coherent context?* The constraint is your ability to hold the full design mentally as you build, test, and verify it — right here, right now.
 
@@ -150,16 +150,16 @@ Human-time framings ("a day's work," "a sprint," "a couple of days") measure som
 
 **How to size honestly:**
 
-Walk through the implementation mentally. Roughly how many files will be created or modified? How many distinct integration points? How many tests? How much investigation may be needed for edge cases discovered mid-implementation? The point is not a precise count — it's a gut check on whether the whole thing fits in one focused, coherent run.
+Walk through the implementation mentally. How many distinct capabilities does it hold? How many integration points? How many tests? How much investigation may be needed for edge cases discovered mid-implementation? The point is not a precise count — it's a gut check on whether the whole thing fits in one focused, coherent run.
 
-Then check that gut read against the **Session Capacity Calibration** section of the `phase-split` skill — the single, dated source of concrete anchors for what one session reliably carries with current models. Don't restate its numbers here; read it. It also records the systematic bias to correct for: sized-at-planning work underestimates far more often than not, so a borderline read means the work is too large.
+Then check that gut read against the **Session Capacity Calibration** section of the `phase-split` skill — the single, dated source of concrete anchors for what one session reliably carries with current models. Don't restate its numbers here; read it. It also records the bias to correct for: plans have been cut too fine far more often than phases have overrun, so a borderline read means the work fits.
 
 **The decision:**
 
 - **Fits in one session** → proceed to Phase 4 (Implementation). Phase 3 (Split, Then Keep Going) is skipped — it only applies when splitting is needed.
 - **Too large** → proceed to Phase 3 (Split, Then Keep Going). Do NOT start implementing until the split is written.
 
-**If you're uncertain**, lean toward splitting. The cost of an unnecessary split is small (the user can override). The cost of starting an oversized implementation is real — context fragmentation, half-built features, lost coherence.
+**If you're uncertain**, start building. Every extra phase carries a full session's fixed cost, and work that does turn out too large is split mid-implementation in this chat (Phase 3), keeping what is already built.
 
 ---
 
@@ -284,7 +284,7 @@ When everything is done (and at any other terminal state, append the session mar
 1. **Verify acceptance criteria coverage explicitly.** Walk through the list of acceptance criteria the work was supposed to cover (the full PRD list, or — if implementing a phase — the subset listed in the phase doc). For each one, confirm: is it implemented, and what passing automated test or recorded workflow verification proves it? A criterion does not require its own test, but it does require credible evidence. If any criterion is unmet or unverified, do NOT report the work as done — either close the gap or surface it explicitly to the user. **Also check the parent PRD (and the phase doc, if implementing a phase) for a `## Pending human actions` section** — every listed entry that hasn't happened is a known open item: name each in the wrap-up with its prepared draft/artifact. Listed entries are surfaced, not pulled into this session's scope — but the PRD as a whole isn't complete while that list is non-empty.
 2. **State whether the scoped work landed, in a sentence or two.** Not an inventory: no list of files created or modified, no test counts, no walk back through the acceptance criteria. Those live in the diff and in the commit message, and repeating them here is the "what landed" summary the continuation test at the end of this list exists to stop. The user asked you to implement something — what they need back is whether it is done.
 
-   **If this session split, state completion against the leaf you declared, not against the entry you were handed.** This covers all three ways it happens: Phase 2 sized the work and declared a split, the work split mid-implementation, or a phase of an already-split PRD turned out to need splitting again. One line for what landed (the leaf's id), one line naming the sibling leaves now written and the split record that lists them.
+   **If this session split, state completion against the leaf you declared, not against the entry you were handed.** This covers all three ways it happens: Phase 2 sized the work and declared a split, the work split mid-implementation, or a phase of an already-split PRD turned out to need splitting again. One line for what landed (the leaf's id), one line naming the sibling leaves now written and the plan table or split record that lists them.
 
    **When the leaf's criteria are all verified, write its closure line** — `**Closed:** YYYY-MM-DD` under the leaf's title, plus the commit hash when this session is the one committing (`phase-split`, "Closure is one line on the leaf"). That line is what the next session reads to find the first unfinished child, so a leaf without it is not closed no matter what the wrap-up says. **A session that scoped down and finished cleanly is COMPLETE, not partial** — splitting is a sizing decision the methodology asked you to make, so do not report it as a shortfall and do not go looking for its acceptance criteria in the original entry. The pull to justify a narrowed scope by listing everything you did is strong and it produces exactly the inventory this item forbids.
 3. **Note that deliverable review and test hardening were performed** — explicitly, so the user doesn't re-run either

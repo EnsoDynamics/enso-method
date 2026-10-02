@@ -38,7 +38,7 @@ Use this skill when:
 
 ## What This Skill Produces
 
-The output is a set of **phase documents** colocated with the PRD, one file per phase at every depth, all in the same flat directory:
+The output is a set of **phase documents** colocated with the PRD, one file per phase at every depth, all in the same flat directory. A fresh plan is just `phase-1` to `phase-N`; this example shows one after two later re-splits:
 
 ```
 docs/prds/{prd-name}/               ← or docs/changes/{prd-name}/ — a bounded delivery, identical layout
@@ -58,6 +58,7 @@ Hard rules about the output:
 
 - **The PRD is not split.** It stays whole. Phase docs reference its acceptance criteria by label; they never restate them.
 - **The technical design is not split.** There is exactly **one** technical design document per PRD, covering the whole system across all phases. Each phase doc *points into* the relevant sections of that single design — it never gets its own technical design. The shared data model and interfaces are cross-phase contracts; duplicating them per phase guarantees drift. (See `technical-design-writing-standards`.)
+- **Every phase is one session.** A phase is planned and sized as the work one implement chat builds — there is no separate "session" count. When a phase is split it stops being a phase: its file becomes a split record (a grouping that is never implemented), and each child is a phase. A plan's count is its phase documents that have no `## Split into` table; report it as that one number, never "N phases over M sessions."
 - **One file per phase, at every depth.** A phase that gets split produces one new file per child. A child is never a heading inside its parent's document, and a "plan" document never holds several phases as sections. When someone says "implement phase 2b1," that is one file, and `implement-from-requirements` is pointed at it and nothing else. (The measured failure this rule exists to stop: a long-running PRD grew per-track "plan" documents holding a dozen sub-phases as headings, each session had to be told which heading to read, and the headings were named inconsistently across tracks — see "Phase Identifiers and File Layout" below.)
 - **Phase identifiers are positional, and only positional.** `2`, `2a`, `2a1`. Never a mnemonic, an owner initial, or a subject code.
 
@@ -80,14 +81,14 @@ A phase id is its position in the tree, written by alternating digits and letter
 | 3 | digits + letter + digits | `2a1` | the first child of phase 2a |
 | 4 | + letter | `2a1a` | the first child of phase 2a1 |
 
-The alternation is what makes an id parse without separators: each run is one depth, and the id of any ancestor is a prefix of the id (`2` ⊂ `2a` ⊂ `2a1`). A run may be more than one character: `2a10` is the tenth child of `2a`, and it cannot be misread as `2a1` + `0` because depth 4 is a letter run. Depth 4 is rare and depth 5 should not happen — a plan that deep is a sign the level-1 phase was a whole program. Lifting its children up a level is the fix, and because that renumbers a referenced plan it is the user's deliberate reorganisation, never a session's. The id is short by construction — `2a1` is three characters — because it is the token that gets typed into prompts, chat names, commit messages, and grep, dozens of times.
+The alternation is what makes an id parse without separators: each run is one depth, and the id of any ancestor is a prefix of the id (`2` ⊂ `2a` ⊂ `2a1`). A run may be more than one character: `2a10` is the tenth child of `2a`, and it cannot be misread as `2a1` + `0` because depth 4 is a letter run. Depth 4 is rare and depth 5 should not happen — a plan that deep is a sign the top-level phase was a whole program. Lifting its children up a level is the fix, and because that renumbers a referenced plan it is the user's deliberate reorganisation, never a session's. The id is short by construction — `2a1` is three characters — because it is the token that gets typed into prompts, chat names, commit messages, and grep, dozens of times.
 
 In prose: "Phase 2a1". In a chat name (`continuation-prompt`): `ph2a1`. In a prompt's lineage block: `Phase 2a1 — <full title>`, em dash regardless of the H1's colon. In a commit message: `(Phase 2a1 of {PRD name})`, never a bare "Phase 2a1" or a bare "2a1" — the ordinal always travels with the name of the thing it is an ordinal of.
 
 **What never goes in the id:**
 
-- **Not the owner.** Two people each running a lane of the same PRD is a fact about who is doing the work, not about what the work is. It goes in an `Owner` column of the parent's children table. An id that encodes the owner (`S5`, `T-API`) goes wrong the day a lane changes hands, and it loses the ordering an id exists to carry.
-- **Not the subject.** A PRD whose phase 2 is "one sub-phase per table" is the common case for this rule, and the temptation is to name the children after the tables (`ORD`, `CUST`). The table name goes in the **short-name** part of the filename and in the title, where it is readable; the id stays `2a`, `2b`, `2c`, where it is short and sortable. `phase-2c-customers-table.md` carries both.
+- **Not the owner.** Two people each running a lane of the same PRD is a fact about who is doing the work, not about what the work is. It goes in an `Owner` column of the plan table, or of a split record's `## Split into` table. An id that encodes the owner (`S5`, `T-API`) goes wrong the day a lane changes hands, and it loses the ordering an id exists to carry.
+- **Not the subject.** A PRD built one table at a time is the common case for this rule, and the temptation is to name the phases after the tables (`ORD`, `CUST`). The table name goes in the **short-name** part of the filename and in the title, where it is readable; the id stays positional (`3`, `4`, or `2a`, `2b` after a re-split), where it is short and sortable. `phase-4-customers-table.md` carries both.
 - **Not a track or lane code, a date, or a status.**
 
 ### The filename
@@ -109,7 +110,7 @@ Rules the split record enforces:
 
 ### The cross-phase plan table
 
-If the PRD directory has a `project-plan.md` or any table that lists the phases, that table lists the **level-1 phases** with a **"What it does"** column of one plain-English sentence each. Each split parent's own `## Split into` table is the plan for its children. Do not flatten a deep tree into the top-level table; walking parent → child is how the tree is read. A reader who wants "the next runnable leaf" starts at the top table and follows the first unfinished row down.
+If the PRD directory has a `project-plan.md` or any table that lists the phases, that table lists the **top-level ids** (`1`, `2`, `3`, …) with a **"What it does"** column of one plain-English sentence each. On a fresh plan those are simply its phases; after a re-split, as in the example below, a row can be a split record, and its own `## Split into` table is the plan for its children. Do not flatten a deep tree into the top-level table; walking parent → child is how the tree is read. A reader who wants "the next runnable leaf" starts at the top table and follows the first unfinished row down.
 
 ```markdown
 | Phase | What it does |
@@ -128,7 +129,7 @@ Before splitting anything, confirm the work actually needs splitting. The unit i
 
 **What "one session" means:**
 
-The work is happening **right now**, in this present AI session — typically a focused run on the order of minutes. "Single session" means this immediate run, not some abstract future unit of scheduled work.
+The work is happening **right now**, in this present AI session — one chat, which may run for hours and fan work out to builder subagents. "Single session" means this immediate run, not some abstract future unit of scheduled work.
 
 So the only sizing question worth asking is: *Can I, this AI, complete this whole thing end-to-end in this run without losing coherent context?* The constraint is your ability to hold the full design mentally as you build, test, and verify it — right here, right now.
 
@@ -136,14 +137,14 @@ Human-time framings ("a day's work," "a sprint," "a couple of days") measure som
 
 **How to size honestly:**
 
-Walk through the implementation mentally. Roughly how many files will be created or modified? How many distinct integration points? How many tests? How much investigation may be needed for edge cases discovered mid-implementation? The point is not a precise count — it's a gut check on whether the whole thing fits in one focused, coherent run. Then check that gut read against the **Session Capacity Calibration** section below — it holds the current concrete anchors for what one session reliably carries, and it corrects for the systematic bias toward underestimating.
+Walk through the implementation mentally. How many distinct capabilities does it hold? How many integration points? How many criteria and tests? How much investigation may be needed for edge cases discovered mid-implementation? The point is not a precise count — it's a gut check on whether the whole thing fits in one coherent run. Then check that gut read against the **Session Capacity Calibration** section below — it holds the current concrete anchors for what one session reliably carries, and the bias to correct for: plans have been cut too fine far more often than phases have overrun.
 
 **The decision:**
 
 - **Fits in one session** → you don't need this skill. Hand back to `implement-from-requirements` and build it directly.
 - **Too large** → continue to Step 2.
 
-If you're genuinely unsure, lean toward splitting. The cost of an unnecessary split is small (the user can override). The cost of starting an oversized implementation is real — context fragmentation, half-built features, lost coherence.
+If you're genuinely unsure, keep it whole. Every phase carries a fixed cost (see Session Capacity Calibration), and work that does turn out too large is split mid-implementation in the same chat, keeping what is already built.
 
 ### Step 2: Find Natural Seams
 
@@ -169,17 +170,17 @@ So the test for every candidate seam is the same: **at the end of this phase, ca
 
 **Size every phase, not just the PRD (the per-phase sizing gate):**
 
-Drafting the seams is not the end of Step 2. Before moving on, apply the Step 1 sizing test to **each candidate phase individually**, with the same skepticism you applied to the whole PRD: walk through that phase's implementation mentally — files, integration points, tests, likely mid-implementation investigation (see Session Capacity Calibration below for the current anchors) — and ask whether *it* fits one focused session. Any phase that fails gets cut again using the same seam-finding principles, and the check repeats until **every leaf in the plan passes**.
+Drafting the seams is not the end of Step 2. Before moving on, apply the Step 1 sizing test to **each candidate phase individually**, with the same skepticism you applied to the whole PRD: walk through that phase's implementation mentally — the capabilities it holds, integration points, criteria and tests, likely mid-implementation investigation (see Session Capacity Calibration below for the current anchors) — and ask whether *it* fits one session. Any phase that fails gets cut again at a real seam, and the check repeats until **every phase in the plan passes**. The gate runs in both directions: adjacent phases that together still fit one session, with none of the seams in the calibration's "Cut at real seams" list between them, merge. The seam list earlier in this step says where to cut once cutting is needed; it is not a reason to cut.
 
-**Split lazily, one depth at a time.** The finished plan for a PRD is a flat, execution-ordered list of level-1 phases. A level-1 phase that needs further cutting normally just becomes two level-1 phases — a session-sized, independently verifiable slice is the definition of a phase, so it *is* one. Reach for a second depth at planning time in one situation only: a level-1 phase that is a **natural group of many similar session-sized slices** (one sub-phase per table, one per integration, one per channel) reads better as a parent with lettered children than as fifteen unrelated-looking siblings in the top table. In that case write the parent as a split record and its children as leaves, now. Never plan deeper than the level you can honestly size today: a level-2 phase nobody has reached gets its level-3 children when it is reached and turns out to need them (see "Splitting a Phase Already in the Plan").
+**A fresh plan is flat.** The finished plan for a PRD is a flat, execution-ordered list of phases, `1` to `N`, each one session. A candidate phase that needs further cutting becomes two phases at the same level — a session-sized, independently verifiable slice is the definition of a phase, so it *is* one. Never write a split record at planning time, even when the user named a group of work up front ("Phase 2 is the build") — number the group's phases in sequence and let each one's title say which part of the group it builds. Depth appears only later, when a phase that is already referenced turns out too large (see "Splitting a Phase Already in the Plan"), because lettered children keep every existing id valid.
 
-This gate exists because of a systematic bias: split plans underestimate. Phases get split again at implementation time far more often than they turn out too small — and a split discovered mid-implementation costs a session's worth of context and momentum, while an extra phase decided now costs almost nothing. So when a phase reads as borderline, **split it**.
+Do not split for safety margin. An extra phase is not free — it costs a full session's fixed overhead — while a phase that turns out too large can be re-split in the same chat, keeping the work already built. So when a phase reads as borderline, **keep it whole**.
 
 **Phase count is an output, not a target:**
 
-- A typical PRD splits into **2-4 phases**. A genuinely large PRD can honestly produce **6, 8, or more** — that's the per-phase sizing gate doing its job, not over-slicing.
-- The red flag is not the count; it's **phases thinner than session capacity requires** — slivers that would each finish with most of a session's capacity unused. If every phase is honestly session-sized and there are eight of them, the PRD is simply that big; don't compress real phases to hit an aesthetic count. If many phases are slivers, merge them.
-- A stubbornly enormous count *can* mean the PRD is oversized, but reopening a stakeholder-settled PRD is a rare last resort, not the default. When the level-1 count runs well past the band in `prd-roadmap`'s "PRD Size Calibration", say so in one line of the declaration, with a recommendation to re-cut the PRD into several with `prd-roadmap` — then finish the split anyway. Whether to reopen the PRD is the user's decision, not a reason to stop.
+- A typical PRD splits into **2-4 phases**. A large one can honestly need more, but past about six, look for neighbors that together still fit one session and merge them before declaring.
+- The red flag is **phases thinner than session capacity requires** — slivers that would each finish with most of a session's capacity unused. Merge them. Don't compress honestly session-sized phases to hit an aesthetic count either.
+- A stubbornly enormous count *can* mean the PRD is oversized, but reopening a stakeholder-settled PRD is a rare last resort, not the default. When the phase count runs well past the band in `prd-roadmap`'s "PRD Size Calibration", say so in one line of the declaration, with a recommendation to re-cut the PRD into several with `prd-roadmap` — then finish the split anyway. Whether to reopen the PRD is the user's decision, not a reason to stop.
 
 **When a clean split is hard — do your best before pushing back.** Phasing happens *after* the PRD has usually been hammered out with stakeholders, so reworking it is expensive and frequently off the table. Your job is to **make the split work**, not to bounce it back. If no cut gives every phase standalone end-user value, fall back in this order:
 
@@ -199,7 +200,7 @@ Write the split up in the response **as a decision, then proceed to Step 4 in th
 
 The declaration is a structured write-up the user can check at a glance. For each phase include:
 
-- **Id and title** — `2a`, "Notification event pipeline". Ids per "Phase Identifiers and File Layout."
+- **Id and title** — `1`, "Notification event pipeline". Ids per "Phase Identifiers and File Layout."
 - **Scope** — which acceptance criteria from the PRD (or from the parent phase, when splitting a phase) this phase covers, by label.
 - **Out of scope for this phase** — what's deferred to later phases.
 - **Dependencies** — must any prior phase complete first? Why? (Phase 2 often builds on Phase 1's data model — be explicit so phase ordering is correct.)
@@ -239,11 +240,11 @@ Each phase doc should contain:
 **Leaf template** (copy this skeleton — every section is one or two lines):
 
 ```markdown
-# Phase 2a: [Short title]
+# Phase {id}: [Short title]
 
 **Parent PRD:** [path to {prd-name}-prd.md]
 **Technical design:** [path to technical-design.md] — relevant sections: [heading(s)]
-**Parent phase:** [path to phase-2-{short-name}.md] — omit this line for a level-1 phase
+**Parent phase:** [path to phase-2-{short-name}.md] — omit unless this phase is a child of a split record
 
 ## Summary
 [1-2 sentences on what this phase delivers — plain English, no undefined project shorthand.]
@@ -301,7 +302,7 @@ None — first phase; later phases build on its data model.
 | [2a email channel](./phase-2a-email-channel.md) | Send stored notifications by email, retrying when the provider is down. |
 | [2b in-app channel](./phase-2b-in-app-channel.md) | Show the same notifications inside the app, marked read when opened. |
 
-Split 2026-09-12 at sizing time: each channel is a session on its own. [One line; no narrative.]
+Split 2026-09-12 when its build began: email has to be live and verified before in-app delivery reuses its retry queue. [One line; no narrative.]
 
 ## Acceptance criteria covered
 [The parent's labels, unchanged. Each appears in exactly one child.]
@@ -315,7 +316,7 @@ Split 2026-09-12 at sizing time: each channel is a session on its own. [One line
 
 Add an `Owner` column to the `## Split into` table only when different people run different children. Everything the parent carried beyond these sections — "Carried forward" items, notes, work state — moves to the child that will build it.
 
-**If the split is also recorded in a cross-phase plan table** (`project-plan.md` or any table that lists every phase), keep that table to level-1 phases with a **"What it does"** column of one plain-English sentence each — see "The cross-phase plan table" above. A split parent's row gains a clause naming its children ("split into 2a email, 2b in-app").
+**If the split is also recorded in a cross-phase plan table** (`project-plan.md` or any table that lists every phase), keep that table to top-level ids with a **"What it does"** column of one plain-English sentence each — see "The cross-phase plan table" above. A split parent's row gains a clause naming its children ("split into 2a email, 2b in-app").
 
 **Leave out the fluff.** At creation, a phase doc is a pointer, not a document of record. Do **not** include: restated acceptance-criteria text, copied or paraphrased technical-design content, background or motivation (that's the PRD's job), effort or time estimates, status/owner/date boilerplate, or a narrative defending the split (that was the Step 3 declaration; the split record's one dated line is the whole exception). If a section has nothing phase-specific to say, drop the heading — a row of "N/A" is itself fluff. A typical phase doc **starts at** 10-20 lines; if yours is longer at creation, you're probably duplicating a parent document. Growth *after* creation is different: work routed in from other phases ("Carried forward from Phase N" sections, per the No Loose Ends discipline in `implementation-lifecycle`) is legitimate content, and on a long project it can grow the doc considerably — that's the doc doing its job as the ledger for its phase, not fluff.
 
@@ -323,7 +324,7 @@ Add an `Owner` column to the `## Split into` table only when different people ru
 
 What happens after the documents are written depends on who invoked this skill. In every case, **do not implement inside this skill**, and the documents are committed or pushed only under live user authorization — staged and validated per `pre-commit-validation` here when invoked directly, or at the implement session's wrap-up when they ride its changeset.
 
-**Called from an implement session** (`implement-from-requirements` sized the work at its Phase 2 and delegated here, or the phase being built turned out too large mid-implementation): return to that skill. Outside an authorized `phase-chain`, **it continues in the same chat with the first leaf** — at sizing time, the first child; mid-implementation, the child that holds the work already in progress. The context that session loaded is exactly what the first leaf needs, and the leaf is session-sized by construction, so a fresh chat would only re-read the same documents. The new phase docs ride in that session's changeset. This skill produces no prompt in this case; the implement session's wrap-up produces the next leaf's prompt via `continuation-prompt`.
+**Called from an implement session** (`implement-from-requirements` sized the work at its Phase 2 and delegated here, or the phase being built turned out too large mid-implementation): return to that skill. Outside an authorized `phase-chain`, **it continues in the same chat with the first phase of the new plan** — phase 1 when a whole PRD was split; the first child when a phase was re-split at sizing time; mid-implementation, the child that holds the work already in progress. The context that session loaded is exactly what that phase needs, and the phase is session-sized by construction, so a fresh chat would only re-read the same documents. The new phase docs ride in that session's changeset. This skill produces no prompt in this case; the implement session's wrap-up produces the next phase's prompt via `continuation-prompt`.
 
 **Invoked directly by the user** (`/phase-split` on a PRD, or on a phase the user already knows is too large): this chat's purpose was planning, so stop after the documents are written. Tell the user the phase docs are created; commit/push when covered by live user authorization, otherwise present the message for approval; then provide a copy-paste prompt for the first leaf's chat using `continuation-prompt` (it owns the chat-name line, the lineage block with the PRD and phase by full title, the ordering, and the rule that the prompt points at the phase doc rather than restating it); the prompt is valid once that commit lands. Shape, abbreviated:
 
@@ -350,21 +351,28 @@ What happens after the documents are written depends on who invoked this skill. 
 
 ## Session Capacity Calibration
 
-The sizing test used throughout this skill — *can I hold the full design coherently while I build, test, and verify it in this run* — is deliberately model-relative, so it never needs revision as models improve. This section holds the part that **does** age: the concrete anchors for what "one session" reliably carries with current models. **When models and harnesses improve, this section is the only thing to revise; nothing else in this skill, and nothing in `implement-from-requirements`, states capacity numbers.** Anchors last revised: **August 2026**.
+The sizing test used throughout this skill — *can I hold the full design coherently while I build, test, and verify it in this run* — is deliberately model-relative, so it never needs revision as models improve. This section holds the part that **does** age: the concrete anchors for what "one session" reliably carries with current models. **When models and harnesses improve, this section is the only thing to revise; nothing else in this skill, and nothing in `implement-from-requirements`, states capacity numbers.** Anchors last revised: **October 2026**.
 
 A phase sized for reliable single-session completion looks like:
 
-- **One reviewable PR.** A phase lands as a single coherent, reviewable changeset — this is the unit that survives model upgrades. As a sanity band, that's typically on the order of **10-15 files and several hundred to ~a thousand net lines** including tests. This band is a judgment call informed by benchmark and practitioner data, not a measured limit: a well-spec'd phase in a familiar codebase can run past it with a clear conscience. Treat it as a tripwire, not a cap — if the mental walkthrough shows a *multiple* of it, the phase is really two.
-- **Roughly 3-7 acceptance criteria, every one machine-verifiable** — a test, build, or script the session itself can run. An AC only a human can check is a phase-boundary smell: reliability tracks how much of the work the session can verify as it goes, more than how big the diff is.
-- **Finishes without leaning on context compaction to preserve correctness.** Coherence degrades well before context limits are reached; the whole build-test-verify loop should fit comfortably in one window. Wall-clock time is not the constraint — a phase that waits on long-running jobs or migrations is fine as long as the reasoning around the waiting still fits.
+- **One coherent capability, end to end.** Something a reader can name in one sentence ("send stored notifications by email, retrying when the provider is down"), built through every layer it needs. That is the unit, not a file count: forty files of mechanical change are easier than three files of concurrency, and a count tells you neither.
+- **Every acceptance criterion machine-verifiable in the session** — a test, build, or script the session itself runs. Often 5 to 15 criteria. A criterion only a person can check is a phase-boundary smell: reliability tracks how much of the work the session can verify as it goes, more than how big the diff is.
+- **The session's main context holds the whole design.** It decides, integrates and verifies without leaning on compaction to remember what it decided. Builder subagents — helper agents the session hands discrete pieces of the build to, each with its own context — do not count against it.
+- **Measured anchor (September 2026, Opus 5.5 in Claude Code):** two phases of one production PRD each landed in a single implement chat at about 200 files and 20,000-26,000 added lines, about 60% of it tests, a dozen-plus criteria each. Both went live the same day after the session's own review passes, with a handful of follow-up fixes in the days after. Those chats handed the build to builder subagents working in their own worktrees and integrated the results. That is two observed successes, not a measured limit or a dependable rate, and no phase this size has yet been seen to overrun. A session that builds everything in its one context — the default here, and the only option inside `phase-chain` — carries less and has no measured anchor yet: size it by the capability test alone. A walkthrough well past the measured size, or one that holds a second, unrelated capability, is two phases.
 
-**Size for the dependable case, not the impressive case.** Measurements of frontier coding agents consistently show a several-fold gap between the largest task a model can *sometimes* pull off single-shot and the largest it completes *dependably* — and plan-time sizing naturally anchors on the impressive case. These anchors sit deliberately at the dependable end; a well-spec'd phase in a familiar codebase treats capacity beyond them as upside, not plan. Dependable single-session completion is also what the rest of the methodology assumes: the review and test-hardening passes that follow implementation are there to polish a phase that landed coherently, not to rescue one that overran its session.
+**Size for the dependable case.** A model completes much larger tasks some of the time than it completes reliably. Plan for the reliable case and treat anything beyond it as upside.
+
+**Cut at real seams, not at a size.** The boundaries worth a new session are where the work genuinely changes: a second, unrelated capability; a point where a person must approve a change to shared infrastructure or switch something on in production; a deployable that must be released and verified live before the next one builds on it; a point where what comes next depends on what the first part shows. Reaching a size limit is not a seam.
+
+**Every phase has a fixed cost, so over-splitting is the failure to guard against.** Each phase pays to reload the PRD and design, run the review and test-hardening passes, run the full suite, wait on CI, merge and check it live: several hours per phase in the measured sessions, plus a design spread across more chats and more documents to keep in step. On real plans sized under the earlier, much smaller anchor, the failure was too many phases (one PRD reached 291 phase documents, and another put 25 criteria into 21 phases), not phases that overran. A phase that does turn out too large is split in the same chat by "Splitting a Phase Already in the Plan", keeping the work already built. So when a phase is borderline, keep it whole.
+
+**Human review is a different limit.** Line-by-line human review finds far fewer defects past a few hundred lines per sitting. That limits how a phase's change is presented for review, not how much one session can build: when a team requires a person to read every line, present the phase as several smaller commits rather than cutting it into more sessions.
 
 ---
 
 ## Splitting a Phase Already in the Plan
 
-Sometimes a phase that looked session-sized turns out not to be — `implement-from-requirements` discovers it at sizing time, or mid-implementation when the work keeps growing. The original split was an estimate; revising it is normal, not a failure. This works the same at every depth: a level-1 phase gets lettered children, a level-2 phase gets numbered children, and so on down.
+Sometimes a phase that looked session-sized turns out not to be — `implement-from-requirements` discovers it at sizing time, or mid-implementation when the work keeps growing. The original split was an estimate; revising it is normal, not a failure. This works the same at every depth: a top-level phase gets lettered children, a level-2 phase gets numbered children, and so on down.
 
 The procedure is the same as a fresh split, scoped to what's left:
 
@@ -386,7 +394,7 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 - Size by AI-session capacity, not human calendar time.
 - Use the word "phase," not "story" or "ticket."
 - Find seams where each phase is independently buildable, testable, and shippable.
-- Size **every candidate phase individually** against the Session Capacity Calibration anchors, and keep cutting until each leaf fits a session — a borderline phase gets split. Phase count is an output, not a target.
+- Size **every candidate phase individually** against the Session Capacity Calibration anchors: cut at a real seam until each fits a session, and merge neighbors that together still fit with no real seam between them — a borderline phase stays whole. Phase count is an output, not a target.
 - Map each phase to a defined subset of the PRD's acceptance criteria, referenced by label; when splitting a phase, every label on the parent lands in exactly one child.
 - Number phases in the order they will actually be executed — sequentially, each built and verified before the next starts. Dependencies may only point backward, and the sequence must survive the sequential walkthrough: the natural build order at every step, not just a dependency-valid one.
 - Use positional ids (`2`, `2a`, `2a1`) and the filename `phase-{id}-{short-name}.md`, one file per phase at every depth, all flat in the PRD directory.
@@ -403,7 +411,7 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 - Compress honestly session-sized phases to hit a small phase count, or pad the plan with sliver phases that would leave most of a session unused — the count follows from per-phase sizing, in both directions.
 - Put an owner, a subject code, a track name, or anything but position in a phase id. Owners go in a table column; subjects go in the short-name.
 - Write a phase as a heading inside another phase's document, or write a "plan" document that holds several phases as sections — one phase, one file, always.
-- Plan deeper than you can size today — children are written when their parent is known to be too large, at planning time for a natural group and otherwise when the phase is reached.
+- Write a split record at planning time, or report a plan as phases and sessions separately — a fresh plan is a flat list of phases, each one session; depth appears only when an already-referenced phase is re-split.
 - Create phases to house work discovered mid-implementation — discoveries are dispositioned per `implementation-lifecycle` (most dismissed, some filed), never phased. Phasing delivers existing scope; it is not a place to put new scope.
 - Order or design the split around assumed parallel execution — sequential one-phase-at-a-time is the default; parallelism is an occasional user-chosen exception, not a planning assumption.
 - Split the technical design into per-phase designs — there is one design per PRD, referenced by all phases.

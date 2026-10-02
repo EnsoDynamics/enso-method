@@ -230,7 +230,7 @@ The prompt names `prd-writing-standards`, points at the planned PRD's roadmap en
 
 This section holds the concrete numbers, the only part of this skill that ages. Revise it, and nothing else, when experience shows the band is off. Phase size itself is defined in `phase-split`'s "Session Capacity Calibration"; this band is counted in those phases. Last revised: **September 2026**.
 
-- **A right-sized planned PRD splits into roughly 3 to 10 level-1 phases.** Past about 12, it is two PRDs. Inside a roadmap, an entry that would be only one or two phases usually merges into a neighbor. Outside a roadmap, small PRDs are normal: `phase-split` expects many PRDs to be two to four phases or not split at all. This band is for cutting a big idea, not a minimum for every PRD.
+- **A right-sized planned PRD splits into roughly 3 to 10 phases.** Past about 12, it is two PRDs. Inside a roadmap, an entry that would be only one or two phases usually merges into a neighbor. Outside a roadmap, small PRDs are normal: `phase-split` expects many PRDs to be two to four phases or not split at all. This band is for cutting a big idea, not a minimum for every PRD.
 - **A typical PRD roadmap has 3 to 6 planned PRDs.** A genuinely large idea can produce more. The red flags are PRDs that fail the band, not the count.
 
 ---
