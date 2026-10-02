@@ -142,7 +142,7 @@ This is the critical pre-implementation step. Before writing any code, decide wh
 
 **What "one session" means:**
 
-The work is happening **right now**, in this present AI session — one chat, which may run for hours and fan work out to builder subagents. "Single session" means this immediate run, not some abstract future unit of work being scheduled.
+The work is happening **right now**, in this present AI session — one chat, which may run for hours. "Single session" means this immediate run, not some abstract future unit of work being scheduled.
 
 So the only sizing question worth asking is: *Can I, this AI, complete this whole thing end-to-end in this run without losing coherent context?* The constraint is your ability to hold the full design mentally as you build, test, and verify it — right here, right now.
 

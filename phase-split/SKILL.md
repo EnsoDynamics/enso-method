@@ -110,13 +110,13 @@ Rules the split record enforces:
 
 ### The cross-phase plan table
 
-If the PRD directory has a `project-plan.md` or any table that lists the phases, that table lists the **top-level ids** (`1`, `2`, `3`, …) with a **"What it does"** column of one plain-English sentence each. On a fresh plan those are simply its phases; after a re-split, as in the example below, a row can be a split record, and its own `## Split into` table is the plan for its children. Do not flatten a deep tree into the top-level table; walking parent → child is how the tree is read. A reader who wants "the next runnable leaf" starts at the top table and follows the first unfinished row down.
+If the PRD directory has a `project-plan.md` or any table that lists the phases, that table lists the **top-level ids** (`1`, `2`, `3`, …) with a **"What it does"** column of one plain-English sentence each and a **"Depends on"** column naming the phases each row directly needs ("None" when it needs none), so the whole dependency tree reads in one place. On a fresh plan those are simply its phases; after a re-split, as in the example below, a row can be a split record, and its own `## Split into` table is the plan for its children. Do not flatten a deep tree into the top-level table; walking parent → child is how the tree is read. A reader who wants "the next runnable leaf" starts at the top table and follows the first unfinished row down.
 
 ```markdown
-| Phase | What it does |
-|---|---|
-| [1 event pipeline](./phase-1-event-pipeline.md) | Ingest domain events and store them as notification records — nothing reaches users yet. |
-| [2 delivery channels](./phase-2-delivery-channels.md) | Send stored notifications out — split into 2a email, 2b in-app. |
+| Phase | What it does | Depends on |
+|---|---|---|
+| [1 event pipeline](./phase-1-event-pipeline.md) | Ingest domain events and store them as notification records — nothing reaches users yet. | None |
+| [2 delivery channels](./phase-2-delivery-channels.md) | Send stored notifications out — split into 2a email, 2b in-app. | 1 (the notification records) |
 ```
 
 ---
@@ -129,7 +129,7 @@ Before splitting anything, confirm the work actually needs splitting. The unit i
 
 **What "one session" means:**
 
-The work is happening **right now**, in this present AI session — one chat, which may run for hours and fan work out to builder subagents. "Single session" means this immediate run, not some abstract future unit of scheduled work.
+The work is happening **right now**, in this present AI session — one chat, which may run for hours. "Single session" means this immediate run, not some abstract future unit of scheduled work.
 
 So the only sizing question worth asking is: *Can I, this AI, complete this whole thing end-to-end in this run without losing coherent context?* The constraint is your ability to hold the full design mentally as you build, test, and verify it — right here, right now.
 
@@ -203,7 +203,7 @@ The declaration is a structured write-up the user can check at a glance. For eac
 - **Id and title** — `1`, "Notification event pipeline". Ids per "Phase Identifiers and File Layout."
 - **Scope** — which acceptance criteria from the PRD (or from the parent phase, when splitting a phase) this phase covers, by label.
 - **Out of scope for this phase** — what's deferred to later phases.
-- **Dependencies** — must any prior phase complete first? Why? (Phase 2 often builds on Phase 1's data model — be explicit so phase ordering is correct.)
+- **Dependencies** — the earlier phases this one directly needs, by id, each with what it needs (`1 (the notification records)`), or "None". See "Name every dependency, and only real ones" below.
 - **Brief rationale** — one line on why this cut.
 
 **Number phases in the order they will actually be executed.** The default execution model is strictly sequential: phase 1 is implemented, tested, and verified working before phase 2 begins, and so on, one phase per session, in id order (children in their parent's slot). So the numbering is not merely *a* valid ordering — it is **the** order the work will proceed in, and it must be the order a sensible engineer would naturally proceed in. Run two checks before declaring the split:
@@ -211,7 +211,9 @@ The declaration is a structured write-up the user can check at a glance. For eac
 1. **Dependencies point backward.** A phase may only depend on phases earlier in the sequence — if your draft has "Phases 4 and 7 must complete before Phase 3," the numbering is wrong; renumber so every dependency points backward.
 2. **Sequential walkthrough.** Mentally execute the plan in order. At each phase ask: with only the earlier phases built, does everything this phase needs already exist, and can it be built and verified right now? If at any step the honest answer is "I'd actually do X first," the numbering is wrong — fix the numbers, don't note it as an aside. The sequence must read as the natural way to build the system at every step, not just a dependency-valid sort.
 
-Parallel execution is a rare, user-chosen exception — never a planning input. Independent phases *may* be noted as parallelizable in the declaration (e.g., via worktrees), but never design or order the split around assumed parallelism; someone following the numbers sequentially must always be doing the right thing. When dependencies leave several orderings valid, pick the one that flows most logically — foundation before dependents, core workflow before variations and polish — and among equally logical orders, put the phase that delivers or de-risks the most first.
+**Name every dependency, and only real ones.** A phase depends on an earlier one when it needs something that phase builds (a data model, an interface, a deployed service, live configuration), changes the same code, or can only be verified once that phase is live. List exactly those, by id, with what is needed; write "None" when a phase needs nothing earlier, even late in the plan. Never write "all earlier phases", and never list a phase just because it comes first. The plan still runs in order, one phase at a time; the dependency list is what lets a person, or an agent they ask, see which phases could safely run at the same time. Running any at once is the user's call and never a planning input: never design or order the split around it, and someone following the numbers in order must always be doing the right thing.
+
+When dependencies leave several orderings valid, pick the one that flows most logically — foundation before dependents, core workflow before variations and polish — and among equally logical orders, put the phase that delivers or de-risks the most first.
 
 ### Step 4: Write the Phase Documents
 
@@ -234,7 +236,7 @@ Each phase doc should contain:
 - **Summary** — 1-2 sentences on what this phase delivers, **in plain English**. Write it for a smart reader who wasn't part of the project: no undefined project shorthand, actors and direction named ("the correction package we hand to Vendor X," not "Correction Handoff"), and nothing claimed beyond what the phase's acceptance criteria actually require. This is the same standard as `prd-writing-standards` → "Plain English for Readers Outside the Project"; the Summary is a gloss on the criteria, so check it against them and confirm it neither overclaims nor underclaims.
 - **Acceptance criteria covered** — list which criteria from the parent PRD are in scope, **by label** (e.g., "AC-REV-01, AC-REV-02, AC-GRP-07"). **Don't re-state the full criterion text** — the implementing AI reads the full PRD before building, and duplication invites drift. The implementer's stale-phase-doc check catches drift between these references and the current PRD.
 - **Out of scope for this phase** — what's deferred to later phases.
-- **Phase dependencies** — which phases must come first.
+- **Phase dependencies** — the earlier phases this one directly needs, by id, with what it needs from each, or "None".
 - **Phase-specific implementation notes** — only if there's something unique to this phase that isn't already in the parent technical design.
 
 **Leaf template** (copy this skeleton — every section is one or two lines):
@@ -256,7 +258,7 @@ Each phase doc should contain:
 [What's deferred to later phases.]
 
 ## Phase dependencies
-[Which phases must come first, or "None — first phase."]
+[Each earlier phase this one directly needs, by id, with what it needs from it — or "None."]
 
 ## Phase-specific notes
 [Only if something is unique to this phase and not already in the technical design. Omit this heading entirely if there's nothing to add.]
@@ -297,10 +299,10 @@ None — first phase; later phases build on its data model.
 [Unchanged from before the split.]
 
 ## Split into
-| Phase | What it does |
-|---|---|
-| [2a email channel](./phase-2a-email-channel.md) | Send stored notifications by email, retrying when the provider is down. |
-| [2b in-app channel](./phase-2b-in-app-channel.md) | Show the same notifications inside the app, marked read when opened. |
+| Phase | What it does | Depends on |
+|---|---|---|
+| [2a email channel](./phase-2a-email-channel.md) | Send stored notifications by email, retrying when the provider is down. | None |
+| [2b in-app channel](./phase-2b-in-app-channel.md) | Show the same notifications inside the app, marked read when opened. | 2a (the retry queue) |
 
 Split 2026-09-12 when its build began: email has to be live and verified before in-app delivery reuses its retry queue. [One line; no narrative.]
 
@@ -316,7 +318,7 @@ Split 2026-09-12 when its build began: email has to be live and verified before 
 
 Add an `Owner` column to the `## Split into` table only when different people run different children. Everything the parent carried beyond these sections — "Carried forward" items, notes, work state — moves to the child that will build it.
 
-**If the split is also recorded in a cross-phase plan table** (`project-plan.md` or any table that lists every phase), keep that table to top-level ids with a **"What it does"** column of one plain-English sentence each — see "The cross-phase plan table" above. A split parent's row gains a clause naming its children ("split into 2a email, 2b in-app").
+**If the split is also recorded in a cross-phase plan table** (`project-plan.md` or any table that lists every phase), keep that table to top-level ids with a **"What it does"** column of one plain-English sentence each and a **"Depends on"** column — see "The cross-phase plan table" above. A split parent's row gains a clause naming its children ("split into 2a email, 2b in-app").
 
 **Leave out the fluff.** At creation, a phase doc is a pointer, not a document of record. Do **not** include: restated acceptance-criteria text, copied or paraphrased technical-design content, background or motivation (that's the PRD's job), effort or time estimates, status/owner/date boilerplate, or a narrative defending the split (that was the Step 3 declaration; the split record's one dated line is the whole exception). If a section has nothing phase-specific to say, drop the heading — a row of "N/A" is itself fluff. A typical phase doc **starts at** 10-20 lines; if yours is longer at creation, you're probably duplicating a parent document. Growth *after* creation is different: work routed in from other phases ("Carried forward from Phase N" sections, per the No Loose Ends discipline in `implementation-lifecycle`) is legitimate content, and on a long project it can grow the doc considerably — that's the doc doing its job as the ledger for its phase, not fluff.
 
@@ -357,8 +359,8 @@ A phase sized for reliable single-session completion looks like:
 
 - **One coherent capability, end to end.** Something a reader can name in one sentence ("send stored notifications by email, retrying when the provider is down"), built through every layer it needs. That is the unit, not a file count: forty files of mechanical change are easier than three files of concurrency, and a count tells you neither.
 - **Every acceptance criterion machine-verifiable in the session** — a test, build, or script the session itself runs. Often 5 to 15 criteria. A criterion only a person can check is a phase-boundary smell: reliability tracks how much of the work the session can verify as it goes, more than how big the diff is.
-- **The session's main context holds the whole design.** It decides, integrates and verifies without leaning on compaction to remember what it decided. Builder subagents — helper agents the session hands discrete pieces of the build to, each with its own context — do not count against it.
-- **Measured anchor (September 2026, Opus 5.5 in Claude Code):** two phases of one production PRD each landed in a single implement chat at about 200 files and 20,000-26,000 added lines, about 60% of it tests, a dozen-plus criteria each. Both went live the same day after the session's own review passes, with a handful of follow-up fixes in the days after. Those chats handed the build to builder subagents working in their own worktrees and integrated the results. That is two observed successes, not a measured limit or a dependable rate, and no phase this size has yet been seen to overrun. A session that builds everything in its one context — the default here, and the only option inside `phase-chain` — carries less and has no measured anchor yet: size it by the capability test alone. A walkthrough well past the measured size, or one that holds a second, unrelated capability, is two phases.
+- **The session's main context holds the whole design.** It decides, integrates and verifies without leaning on compaction to remember what it decided.
+- **Measured anchor (September 2026, Opus 5.5 in Claude Code):** two phases of one production PRD each landed in a single implement chat at about 200 files and 20,000-26,000 added lines, about 60% of it tests, a dozen-plus criteria each. Both went live the same day after the session's own review passes, with a handful of follow-up fixes in the days after. Those chats split the build across several helper agents and integrated the results. That is two observed successes, not a measured limit or a dependable rate, and no phase this size has yet been seen to overrun. A session that does all of the building in its one context may carry less and has no measured anchor yet: size it by the capability test alone. A walkthrough well past the measured size, or one that holds a second, unrelated capability, is two phases.
 
 **Size for the dependable case.** A model completes much larger tasks some of the time than it completes reliably. Plan for the reliable case and treat anything beyond it as upside.
 
@@ -397,6 +399,7 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 - Size **every candidate phase individually** against the Session Capacity Calibration anchors: cut at a real seam until each fits a session, and merge neighbors that together still fit with no real seam between them — a borderline phase stays whole. Phase count is an output, not a target.
 - Map each phase to a defined subset of the PRD's acceptance criteria, referenced by label; when splitting a phase, every label on the parent lands in exactly one child.
 - Number phases in the order they will actually be executed — sequentially, each built and verified before the next starts. Dependencies may only point backward, and the sequence must survive the sequential walkthrough: the natural build order at every step, not just a dependency-valid one.
+- Name each phase's direct dependencies by id, with what it needs from each, or "None" — in its phase doc and in any plan table — so the dependency tree is readable at a glance.
 - Use positional ids (`2`, `2a`, `2a1`) and the filename `phase-{id}-{short-name}.md`, one file per phase at every depth, all flat in the PRD directory.
 - Decide the split, declare it in the response, and write the documents in the same turn.
 - When splitting a phase already in the plan, convert its document into a split record and move its carried-forward items and work state into the children that will build them.

@@ -28,14 +28,16 @@ Maintainer notes for `phase-split/SKILL.md` ("Session Capacity Calibration", the
 
 - **Every phase is one session; a fresh plan is flat.** A split parent is a split record, not a phase, and a plan is reported as one count: phase documents with no `## Split into` table. Planning-time depth is gone; depth appears only when an already-referenced phase is re-split, where lettered children keep existing ids valid.
 - **The unit is one coherent capability with every criterion machine-verifiable in the session.**
-- **The reference size is our measured sessions, stated with its limits.** Two successes, not a dependable rate; measured with builder subagents, which the default path and `phase-chain` do not use, so a single-context session is sized by the capability test alone until one is measured.
+- **The reference size is our measured sessions, stated with its limits.** Two successes, not a dependable rate. Those sessions split their build across helper agents, which the methodology does not prescribe; the skill mentions that only in general terms, to qualify the evidence, and a session building in one context is sized by the capability test alone until one is measured.
 - **The bias is inverted, in both directions.** Borderline stays whole, and adjacent phases that together fit one session with no real seam between them merge. Each phase has a fixed cost (reload, review and hardening passes, full suite, CI, merge, live check: hours each), and a phase that overruns is re-split in the same chat without losing work. The observed failure was over-splitting, not overruns, though only under the old small band.
 - **"Size for the dependable case" stays as one line.** The old paragraph argued for the small band; its core point, that models finish larger tasks sometimes than reliably, still holds.
+- **Dependencies are named; parallelism is not planned.** Each phase doc and the plan table name the phases a phase directly needs, with what it needs, or "None". The plan still runs in order; the explicit tree is what lets a person, or an agent they ask, see which phases could run at the same time, and that stays the user's call. A yes/no "parallelizable" mark was rejected: it hides why, and goes stale when a phase changes.
+- **Splitting one phase's build across helper agents is not part of the methodology.** `implement-from-requirements` builds one phase per chat and prescribes nothing about fanning that build out.
 - **Human review is named as a separate limit.** Where a team reads every line, the answer is several smaller commits within a phase, not more sessions. This is the main trade-off of bigger phases, and it stays a team choice.
 
 ## Revisit when
 
 - A phase sized under these anchors overruns its session or lands with defects the session's own review missed. Record the case here.
-- A single-context session (no builder subagents) is measured; give it its own anchor.
+- A session that builds in one context, with no helper agents, is measured; give it its own anchor.
 - METR or Anthropic publish dependable-horizon data for the current model.
 - The phase-count guidance ("typically 2-4; past about six, look for merges") and `prd-roadmap`'s "3 to 10 phases" PRD band were set under the old phase size. With phases several times larger, both may now be too generous; not changed here.
