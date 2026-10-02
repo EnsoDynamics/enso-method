@@ -162,7 +162,7 @@ The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each o
 **Reaches production:** [One or two plain-English sentences: what someone can do or rely on once it ships.]
 **In this PRD:** [Bullets naming full-brief sections by heading, and which parts of each.]
 **Not in this PRD:** [What a neighbor carries, by the neighbor's name.]
-**Depends on:** [Earlier planned PRDs by name, or "Nothing — first."]
+**Depends on:** [Earlier planned PRDs by name, with what each provides, or "None."]
 **Shared contracts it owns:** [Only if any: contracts later PRDs rely on, such as an event schema or device identity. Decided in this PRD's technical design; later PRDs extend them, not redesign them.]
 **Questions it answers:** [The full brief's open questions this PRD must settle, by their stable labels (Step 6), e.g. "Q3–Q9, Q26; first answer to Q1 and Q28".]
 

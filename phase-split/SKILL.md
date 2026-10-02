@@ -99,7 +99,7 @@ Flat in one directory is deliberate: a directory listing groups a parent with it
 
 ### What happens to a phase's document when the phase is split
 
-The parent's file stays, and it becomes a **split record**: its summary, its acceptance-criteria labels, its out-of-scope list, its dependencies, and a `## Split into` table listing the children in execution order with one plain-English sentence each. Everything else the parent doc carried — "Carried forward" items, phase-specific notes, work in progress — is moved into the specific child that will build it, and does not stay on the parent. Its title line says it was split, so anyone who opens it sees at once that it is not the thing to implement.
+The parent's file stays, and it becomes a **split record**: its summary, its acceptance-criteria labels, its out-of-scope list, its dependencies, and a `## Split into` table listing the children in execution order with one plain-English sentence each and what each depends on. Everything else the parent doc carried — "Carried forward" items, phase-specific notes, work in progress — is moved into the specific child that will build it, and does not stay on the parent. Its title line says it was split, so anyone who opens it sees at once that it is not the thing to implement.
 
 Rules the split record enforces:
 
@@ -110,7 +110,7 @@ Rules the split record enforces:
 
 ### The cross-phase plan table
 
-If the PRD directory has a `project-plan.md` or any table that lists the phases, that table lists the **top-level ids** (`1`, `2`, `3`, …) with a **"What it does"** column of one plain-English sentence each and a **"Depends on"** column naming the phases each row directly needs ("None" when it needs none), so the whole dependency tree reads in one place. On a fresh plan those are simply its phases; after a re-split, as in the example below, a row can be a split record, and its own `## Split into` table is the plan for its children. Do not flatten a deep tree into the top-level table; walking parent → child is how the tree is read. A reader who wants "the next runnable leaf" starts at the top table and follows the first unfinished row down.
+If the PRD directory has a `project-plan.md` or any table that lists the phases, that table lists the **top-level ids** (`1`, `2`, `3`, …) with a **"What it does"** column of one plain-English sentence each and a **"Depends on"** column naming the phases each row directly needs, with what it needs from each ("None" when it needs none). A split record's `## Split into` table carries its children's dependencies the same way, so the tree reads from these tables alone. On a fresh plan those are simply its phases; after a re-split, as in the example below, a row can be a split record, and its own `## Split into` table is the plan for its children. Do not flatten a deep tree into the top-level table; walking parent → child is how the tree is read. A reader who wants "the next runnable leaf" starts at the top table and follows the first unfinished row down.
 
 ```markdown
 | Phase | What it does | Depends on |
@@ -282,7 +282,7 @@ AC-EVT-01, AC-EVT-02, AC-EVT-05
 Email and in-app delivery (Phase 2); user notification preferences (Phase 3).
 
 ## Phase dependencies
-None — first phase; later phases build on its data model.
+None.
 ```
 
 (The example omits "Phase-specific notes" because there's nothing phase-specific to add — that's the norm, not an oversight.)
@@ -301,8 +301,8 @@ None — first phase; later phases build on its data model.
 ## Split into
 | Phase | What it does | Depends on |
 |---|---|---|
-| [2a email channel](./phase-2a-email-channel.md) | Send stored notifications by email, retrying when the provider is down. | None |
-| [2b in-app channel](./phase-2b-in-app-channel.md) | Show the same notifications inside the app, marked read when opened. | 2a (the retry queue) |
+| [2a email channel](./phase-2a-email-channel.md) | Send stored notifications by email, retrying when the provider is down. | 1 (the notification records) |
+| [2b in-app channel](./phase-2b-in-app-channel.md) | Show the same notifications inside the app, marked read when opened. | 1 (the notification records); 2a (the retry queue) |
 
 Split 2026-09-12 when its build began: email has to be live and verified before in-app delivery reuses its retry queue. [One line; no narrative.]
 
@@ -359,7 +359,7 @@ A phase sized for reliable single-session completion looks like:
 
 - **One coherent capability, end to end.** Something a reader can name in one sentence ("send stored notifications by email, retrying when the provider is down"), built through every layer it needs. That is the unit, not a file count: forty files of mechanical change are easier than three files of concurrency, and a count tells you neither.
 - **Every acceptance criterion machine-verifiable in the session** — a test, build, or script the session itself runs. Often 5 to 15 criteria. A criterion only a person can check is a phase-boundary smell: reliability tracks how much of the work the session can verify as it goes, more than how big the diff is.
-- **The session's main context holds the whole design.** It decides, integrates and verifies without leaning on compaction to remember what it decided.
+- **The session holds the whole design in its context.** It decides, builds and verifies without leaning on compaction to remember what it decided.
 - **Measured anchor (September 2026, Opus 5.5 in Claude Code):** two phases of one production PRD each landed in a single implement chat at about 200 files and 20,000-26,000 added lines, about 60% of it tests, a dozen-plus criteria each. Both went live the same day after the session's own review passes, with a handful of follow-up fixes in the days after. Those chats split the build across several helper agents and integrated the results. That is two observed successes, not a measured limit or a dependable rate, and no phase this size has yet been seen to overrun. A session that does all of the building in its one context may carry less and has no measured anchor yet: size it by the capability test alone. A walkthrough well past the measured size, or one that holds a second, unrelated capability, is two phases.
 
 **Size for the dependable case.** A model completes much larger tasks some of the time than it completes reliably. Plan for the reliable case and treat anything beyond it as upside.
@@ -381,6 +381,7 @@ The procedure is the same as a fresh split, scoped to what's left:
 - **Scope = the phase's remaining work only.** Anything already implemented and verified stays done — don't re-plan it. If implementation is partially complete, the first child picks up exactly where the work stopped, and its doc says so. "Remaining work" means the work the phase was already scoped to carry — a split never converts mid-implementation discoveries into new phases. Discoveries go through the Materiality Gate and disposition rule (`implementation-lifecycle`); most are dismissed or filed, not phased.
 - **The children take the next depth down; every other id in the plan stays put.** Phase `2` becomes a split record and its work lands in `2a`, `2b`, …, executed in letter order in the slot where `2` sat. Phase `2a` splits into `2a1`, `2a2`, …. Plan tables, other phase docs' dependency lines, and references already made in commits, chat names, and people's heads all stay valid, because no existing id changes. The one exception: a split whose ids nothing references yet — typically the plan you wrote earlier in this same session — is simply corrected in place, as flat siblings at the same depth. Never append the remainder as new trailing siblings and never renumber a referenced plan.
 - **Convert the parent's document into a split record** per "Phase Identifiers and File Layout," moving its carried-forward items and work state into the specific children that will build them.
+- **Give every child its direct dependencies** per Step 3, including phases outside the parent, in its doc and in the `## Split into` table. A later phase that depended on the parent keeps `2` unless it needs only one child; then narrow it to that child (`2a (the retry queue)`).
 - **Update every surface that lists the phases** — the other phase docs' dependency lines and any cross-phase plan table — so the split stays coherent.
 - **Same decide-and-declare rule as Step 3.** State the cut, write the docs, continue. Do not stop to ask.
 
@@ -399,7 +400,7 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 - Size **every candidate phase individually** against the Session Capacity Calibration anchors: cut at a real seam until each fits a session, and merge neighbors that together still fit with no real seam between them — a borderline phase stays whole. Phase count is an output, not a target.
 - Map each phase to a defined subset of the PRD's acceptance criteria, referenced by label; when splitting a phase, every label on the parent lands in exactly one child.
 - Number phases in the order they will actually be executed — sequentially, each built and verified before the next starts. Dependencies may only point backward, and the sequence must survive the sequential walkthrough: the natural build order at every step, not just a dependency-valid one.
-- Name each phase's direct dependencies by id, with what it needs from each, or "None" — in its phase doc and in any plan table — so the dependency tree is readable at a glance.
+- Name each phase's direct dependencies by id, with what it needs from each, or "None" — in its phase doc, its split record's `## Split into` table, and any plan table — so the dependency tree is readable at a glance.
 - Use positional ids (`2`, `2a`, `2a1`) and the filename `phase-{id}-{short-name}.md`, one file per phase at every depth, all flat in the PRD directory.
 - Decide the split, declare it in the response, and write the documents in the same turn.
 - When splitting a phase already in the plan, convert its document into a split record and move its carried-forward items and work state into the children that will build them.
