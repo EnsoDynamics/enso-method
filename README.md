@@ -153,6 +153,7 @@ top-level directory with a `SKILL.md` is one skill, in the open
 
 **Quality and principles**
 - `deliverable-review`, `test-hardening`, `refactor-pass` — the post-build quality chain
+- `test-audit` — once a phase or PRD is finished: grade every acceptance criterion's test evidence, then fill the gaps, missing first
 - `pre-commit-validation` — commit-boundary checks for a checkout several sessions share
 - `engineering-principles` — the principles the method depends on: no silent fallbacks, the testing evidence standard, production data, judgment calls
 - `wall-clock-awareness` — cut waiting time in tests, builds and CI

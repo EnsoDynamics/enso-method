@@ -23,6 +23,7 @@ This is an action skill, not an audit. It does not produce a coverage report or 
 **Do NOT use this skill for:**
 
 - A whole-repo test audit divorced from a specific piece of implemented work — this skill anchors on the requirements of the work just done, not on generic coverage metrics
+- An independent audit of a finished phase's or PRD's test evidence, with a written grade for every criterion — that is `test-audit`
 - A substitute for running tests during implementation — the implement skills own that; this is a second, deliberate pass after review
 
 ---
@@ -150,14 +151,14 @@ This is what the sub-agent follows. **Re-read the requirements, the changed code
 
 ### 1. Acceptance-Criterion-to-Evidence Map
 
-For each in-scope acceptance criterion (or the stated intent, for discovery work), identify which test(s) prove it and grade the evidence:
+For each in-scope acceptance criterion (or the stated intent, for discovery work), identify which test(s) prove it and grade the evidence. The grades answer one question, *if this criterion's behavior broke, would the suite notice?*, and are the same four `test-audit` uses:
 
-- **missing** — no test provides evidence for this criterion
-- **weak** — a test exists but would still pass if the behavior were wrong (not-null/didn't-crash assertions, happy path only, mocks the boundary the criterion is about, expectations copy-pasted from the implementation rather than derived from the requirement)
-- **adequate** — credible evidence, with named gaps
-- **strong** — the test would fail if the criterion stopped holding
+- **missing** — nothing exercises this criterion
+- **weak** — tests exist, but some required part could break without any test failing: not-null, didn't-crash or count-only assertions; expectations copied from the implementation rather than derived from the requirement; a mock standing in for the boundary the criterion is about; or a part the criterion states, including an error case it names, with no test
+- **adequate** — every required part would fail a test if it broke on its main path, tested at the boundary it is about; named gaps remain (edge or error cases the criterion implies, or the evidence was never seen to fail)
+- **strong** — adequate, with those edge and error cases covered, and a test seen to fail with each required part deliberately broken
 
-One test may serve several criteria; a criterion may need several tests. Grade the evidence, not the count.
+Grade a criterion by its least-proven required part; it is missing only when nothing exercises any part. This pass runs no red checks, so its grades stop at adequate unless this session saw a test fail with the behavior broken. One test may serve several criteria; a criterion may need several tests. Grade the evidence, not the count.
 
 ### 2. Mock Inventory
 
@@ -193,7 +194,7 @@ Return a structured list of findings, ordered: missing evidence first, then unju
 - Prefer real resources in sandbox/dev over mocks; treat unjustified mocks as the highest-value conversions
 - Name the failure each added test would catch — and the criterion it traces to — before adding it
 - Root-cause every failure the hardened suite surfaces — fix the code or fix the test, whichever is genuinely wrong
-- Stop when the improvement is meaningful; say so in one line if the suite is already strong
+- Stop when the improvement is meaningful; say so in one line if the evidence is already credible
 
 ### DO NOT
 
@@ -215,6 +216,7 @@ This skill is self-contained — the testing philosophy and scope boundary above
 |-------|-------------|
 | `implement-from-requirements` | Auto-runs this skill after deliverable review completes — the third step of its chain. Its test phase builds the initial portfolio; this skill hardens it with fresh eyes. |
 | `implement-from-discovery` | Same chain, discovery-triggered work — auto-runs this skill after its deliverable review; the baseline is the stated intent of the fix rather than PRD acceptance criteria. |
+| `test-audit` | The independent check once a phase or PRD is finished: it grades every criterion's evidence on the same four grades, across all the sessions that built it, and fills the gaps. This skill hardens one session's work; that one audits the finished whole. |
 | `deliverable-review` | The preceding step. It verifies the deliverable matches intent; this skill verifies the tests prove the requirements. Run it first — its fixes change code that tests must cover. |
 | `engineering-principles` | The testing evidence standard this skill enforces. This skill's rules are a self-contained restatement, deliberately aligned; test tooling and framework conventions come from the house engineering standards the project names, if any. |
 | `implementation-lifecycle` | The umbrella methodology — its Materiality Gate and No Loose Ends discipline are the general form of the scope boundary and wrap-up rules stated natively here. |

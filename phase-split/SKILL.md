@@ -103,7 +103,7 @@ The parent's file stays, and it becomes a **split record**: its summary, its acc
 
 Rules the split record enforces:
 
-- **Every acceptance-criteria label on the parent appears in exactly one child.** A criterion that would only become verifiable once two children exist means the cut is wrong or the criterion is too coarse; re-cut.
+- **Every acceptance-criteria label on the parent appears in exactly one child**, by the same rule and with the same two exceptions as a fresh plan (Step 3, "Every criterion lands in exactly one phase").
 - **The children partition the parent's scope and add none.** Discoveries never become children (see the Materiality Gate in `implementation-lifecycle`).
 - **Only leaves are implemented.** `implement-from-requirements` is always pointed at a phase that has no `## Split into` table. Pointed at a split parent, it takes the first child not yet closed and says so.
 - **Closure is one line on the leaf.** When a leaf lands, the implement session's wrap-up writes `**Closed:** YYYY-MM-DD` under the leaf's title (plus the commit hash when that session is the one committing). A leaf is closed only when its acceptance criteria are verified and no human action recorded in its phase doc is still outstanding; a leaf waiting only on such an action is "Awaiting a Human Action" (`implementation-lifecycle`), not closed. The line is the one completion marker a phase doc carries, and it is never written at creation; other work state (blocked work, owed items, pending human actions) goes in sections, per `implementation-lifecycle`. A split record's `## Split into` table may gain a `Status` column after creation for the same purpose. "First child not yet closed" means the first child without that line; when every child carries it the parent is complete — say so, and `continuation-prompt`'s end-of-track rule decides whether a prompt follows.
@@ -206,6 +206,11 @@ The declaration is a structured write-up the user can check at a glance. For eac
 - **Dependencies** — the earlier phases this one directly needs, by id, each with what it needs (`1 (the notification records)`), or "None". See "Name every dependency, and only real ones" below.
 - **Brief rationale** — one line on why this cut.
 
+**Every criterion lands in exactly one phase.** Before declaring, check that the phases' lists together hold every criterion in the PRD exactly once, retired labels excepted (when splitting a phase: every label on the parent). A criterion no phase lists is scope the plan has silently dropped, and one listed twice has no phase that must prove it. A criterion that could only be verified once two phases exist means the cut is wrong; re-cut. Two kinds of criterion legitimately cross a seam:
+
+- **A compound criterion** — two outcomes that could each be verified alone, joined in one sentence ("by email and in-app") — when the right cut separates them. Split it in the PRD into two criteria that together say exactly what it said: retire its label, leaving it in the PRD as `AC-X-03 — retired, split into AC-X-09 and AC-X-10`; give the two the next free numbers (`prd-writing-standards`, "Stable Acceptance-Criterion Labels"); and update anything that cites the old label. That changes the wording, not the intent, and the PRD edit rides in the phase documents' commit.
+- **A cross-cutting criterion** — a constraint on everything the PRD builds rather than one capability ("every page requires sign-in"). The first phase that can verify it owns it; each later phase whose work it constrains also lists it as `AC-SEC-01 (also applies to this phase's work)` and proves it for what that phase adds.
+
 **Number phases in the order they will actually be executed.** The default execution model is strictly sequential: phase 1 is implemented, tested, and verified working before phase 2 begins, and so on, one phase per session, in id order (children in their parent's slot). So the numbering is not merely *a* valid ordering — it is **the** order the work will proceed in, and it must be the order a sensible engineer would naturally proceed in. Run two checks before declaring the split:
 
 1. **Dependencies point backward.** A phase may only depend on phases earlier in the sequence — if your draft has "Phases 4 and 7 must complete before Phase 3," the numbering is wrong; renumber so every dependency points backward.
@@ -252,7 +257,7 @@ Each phase doc should contain:
 [1-2 sentences on what this phase delivers — plain English, no undefined project shorthand.]
 
 ## Acceptance criteria covered
-[Parent-PRD AC labels only — e.g. AC-XXX-01, AC-XXX-02. Do not restate the text.]
+[Parent-PRD AC labels only — e.g. AC-XXX-01, AC-XXX-02, plus `AC-XXX-05 (also applies to this phase's work)` for a cross-cutting criterion an earlier phase owns (Step 3). Do not restate the text.]
 
 ## Out of scope for this phase
 [What's deferred to later phases.]
@@ -307,7 +312,7 @@ None.
 Split 2026-09-12 when its build began: email has to be live and verified before in-app delivery reuses its retry queue. [One line; no narrative.]
 
 ## Acceptance criteria covered
-[The parent's labels, unchanged. Each appears in exactly one child.]
+[The parent's labels, unchanged. Each appears in exactly one child, with Step 3's two exceptions.]
 
 ## Out of scope for this phase
 [Unchanged.]
@@ -398,7 +403,7 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 - Use the word "phase," not "story" or "ticket."
 - Find seams where each phase is independently buildable, testable, and shippable.
 - Size **every candidate phase individually** against the Session Capacity Calibration anchors: cut at a real seam until each fits a session, and merge neighbors that together still fit with no real seam between them — a borderline phase stays whole. Phase count is an output, not a target.
-- Map each phase to a defined subset of the PRD's acceptance criteria, referenced by label; when splitting a phase, every label on the parent lands in exactly one child.
+- Map each phase to a defined subset of the PRD's acceptance criteria, referenced by label, so that every criterion (when splitting a phase, every label on the parent) lands in exactly one phase; Step 3 has the two exceptions.
 - Number phases in the order they will actually be executed — sequentially, each built and verified before the next starts. Dependencies may only point backward, and the sequence must survive the sequential walkthrough: the natural build order at every step, not just a dependency-valid one.
 - Name each phase's direct dependencies by id, with what it needs from each, or "None" — in its phase doc, its split record's `## Split into` table, and any plan table — so the dependency tree is readable at a glance.
 - Use positional ids (`2`, `2a`, `2a1`) and the filename `phase-{id}-{short-name}.md`, one file per phase at every depth, all flat in the PRD directory.
@@ -435,4 +440,5 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 | `technical-design-writing-standards` | Defines the single technical design per PRD that phase docs point into by section heading — the design is never split or duplicated per phase. |
 | `prd-roadmap` | The same job one level up: it cuts an idea too big for one PRD into right-sized planned PRDs, reusing this skill's seam principles at PRD scale. Each planned PRD, once written, comes here to be split into phases. |
 | `autonomous-requirements-refinement` / `implementation-readiness-check` | Should already have run against the PRD and technical design before this skill is invoked — this skill assumes the requirements are implementation-ready, it just decides whether they're too large for one session. |
+| `test-audit` | Audits a finished phase or PRD criterion by criterion: a phase document's "Acceptance criteria covered" list is the scope of a phase audit, and the one-phase-per-criterion rule is what makes a PRD audit add up. |
 | `continuation-prompt` | Produces the first leaf's copy-paste prompt when this skill was invoked directly: a chat-name line first (`ph2a1 …`), then the lineage block (PRD and phase by full title), pointers into the phase doc, valid once the phase-docs commit lands. |

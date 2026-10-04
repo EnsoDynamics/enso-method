@@ -19,7 +19,7 @@ Three problems it exists to fix:
 ## When to Use
 
 - The user asks for a prompt to paste into a **new** chat, in any wording that means starting a fresh session.
-- A skill hands work to a fresh chat: `phase-split` after writing phase docs when the user invoked it directly (called from an implement session it produces no prompt — that session builds the first leaf, and its wrap-up produces the next one), `implement-from-requirements` at wrap-up when a next phase exists.
+- A skill hands work to a fresh chat: `phase-split` after writing phase docs when the user invoked it directly (called from an implement session it produces no prompt — that session builds the first leaf, and its wrap-up produces the next one), `implement-from-requirements` at wrap-up when a next phase exists, `test-audit` when its remediation outlasts the chat.
 - A prompt already given was wrong (bad name, too long, stale) and the user wants it regenerated. Re-run the whole skill; if only the name was wrong, only the name changes.
 - A skill or the user invokes it at the **end of a track** — the unit just finished has no successor in its own chain. That is a legitimate invocation, and its correct output is a statement that the track is complete and **no prompt**. See the gate below.
 
@@ -33,7 +33,7 @@ A **context package** is a message from this chat to another chat that is *alrea
 
 ## Before Step 1: Confirm a Next Unit Exists in This Track, and Name What It Serves
 
-This skill continues a track. It does not choose one. Before drafting anything, answer one question from the governing document: **is there a next unit of work in the chain the finished unit belongs to?** The chain is the one that document defines — the next phase or sub-phase of the same PRD, change, or phase plan that is not yet closed, in the order the document states.
+This skill continues a track. It does not choose one. Before drafting anything, answer one question from the governing document: **is there a next unit of work in the chain the finished unit belongs to?** The chain is the one that document defines — the next phase or sub-phase of the same PRD, change, or phase plan that is not yet closed, in the order the document states. A test audit's governing document is its `test-audit.md` and its chain is that file's To fix list (`test-audit`): a next unit exists while its Status line still lists criteria to fix.
 
 - **If there is, continue.** That unit is the prompt's subject and every step below applies to it.
 - **If there is not — the unit just finished was the last in its track — produce no prompt.** Say the track is complete, name what closed it (date and commit hashes), and stop. That is this skill's correct output at the end of a track, not a failure to run it.
@@ -51,7 +51,7 @@ The calling skills already agree: `implement-from-requirements` invokes this ski
 The second question, asked of the unit the prompt is for: **what does it serve, and can I say so without inventing anything?** Fill the lineage block from Step 3 now, from the documents, before drafting anything else. The block has three lines and every line is checkable:
 
 1. The PRD, by the full title in its H1 (`Order Notifications`), never the directory slug or the chat-name abbreviation.
-2. The phase, by its id **and** the full title from the phase doc's H1 (`Phase 2a1 — Delivery receipts from the SMS provider`). For a leaf below a split parent, the leaf's own title; a positional id already carries the ancestry. An unsplit PRD has no phase: line 2 reads `whole PRD, not split`.
+2. The phase, by its id **and** the full title from the phase doc's H1 (`Phase 2a1 — Delivery receipts from the SMS provider`). For a leaf below a split parent, the leaf's own title; a positional id already carries the ancestry. An unsplit PRD has no phase: line 2 reads `whole PRD, not split`. A test audit of a whole split PRD reads `whole PRD, all phases`.
 3. What this chat does for them, in one line: `implements it`, or `fixes <the thing> that blocks AC-DLV-04 of it`. A fix names the acceptance criterion it unblocks — the label, from the phase doc's "Acceptance criteria covered" — not a symptom. Chats that do not build use their activity's verb: `refines its requirements`, `splits it into phases`, `drafts its technical design`, `investigates <x> for it`, `reviews it`.
 
 The shapes that legitimately have no PRD phase are listed in `implementation-lifecycle` ("Every Session Names What It Serves"): ticket-tracked work, a declared ops thread with a session file, a component defect reported from outside, requirements work on the PRD itself, methodology work. Each puts its own lineage on line 1 in place of the PRD, and `no phase — <shape>` on line 2; Step 3 item 2 shows the rendered block. One variant: writing a planned PRD from a PRD roadmap, where the PRD does not exist yet, puts the roadmap's full title on line 1 and the planned PRD on line 2 — `In service of: Acme Cloud PRD Roadmap` / `Cloud Ingestion — planned PRD, first in the roadmap` / `This chat: writes its PRD.`
@@ -76,7 +76,7 @@ Draft the prompt in your head, then sort every sentence into one of three bins. 
 
 | Bin | What belongs here | Where it goes |
 |-----|-------------------|---------------|
-| **Repo truth** | State of the work: what is closed and when, what is owed, measured facts and their dates, decisions and why, hazards the next implementer inherits, what not to re-derive, a predecessor's findings | The governing document, per `implementation-lifecycle`: the phase doc carries work state (a landed leaf gets its `**Closed:** YYYY-MM-DD` line under the title, per `phase-split`), the Technical Design carries durable design facts, the assumptions doc carries business-logic calls. Write it there now. |
+| **Repo truth** | State of the work: what is closed and when, what is owed, measured facts and their dates, decisions and why, hazards the next implementer inherits, what not to re-derive, a predecessor's findings | The governing document, per `implementation-lifecycle`: the phase doc carries work state (a landed leaf gets its `**Closed:** YYYY-MM-DD` line under the title, per `phase-split`), the Technical Design carries durable design facts, the assumptions doc carries business-logic calls, and a test audit's state lives in its `test-audit.md`. Write it there now. |
 | **Machine and session truth** | Which checkout or worktree to use and which to avoid, the branch to stay on, a local venv or interpreter quirk, a checkout that carries someone else's untracked files | The prompt. This is true of one machine on one day and does not belong in a repo document. |
 | **Pointers** | Paths and section headings for everything in the first bin | The prompt. |
 
@@ -119,6 +119,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
    | `prd-roadmap` | `rdmap` |
    | `investigate-question`, an issue or ad-hoc investigation | `invest` |
    | `deliverable-review`, a design, code or PR review | `review` |
+   | `test-audit` | `audit` |
    | `refactor-pass` | `refac` |
    | an ad-hoc operational thread (a stakeholder volley, an incident) | `ops` |
    | anything else | the skill's own verb stem, cut to six characters |

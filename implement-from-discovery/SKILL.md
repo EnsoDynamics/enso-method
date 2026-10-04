@@ -150,7 +150,7 @@ Apply any fixes the review surfaces. Re-run tests after fixes. Announce when com
 
 ### Phase 7: Test Hardening
 
-After deliverable review completes — including any fixes it produced — **automatically run the `test-hardening` skill**, with the same announce-before-and-after pattern. It verifies the tests actually prove the stated intent of this fix (fresh-eyes assessment, then strengthening: missing evidence → mock-to-real conversions → weak assertions), bounded strictly by that intent — it never grows tests for behavior outside it. A suite that's already strong gets a one-line confirmation, not manufactured work.
+After deliverable review completes — including any fixes it produced — **automatically run the `test-hardening` skill**, with the same announce-before-and-after pattern. It verifies the tests actually prove the stated intent of this fix (fresh-eyes assessment, then strengthening: missing evidence → mock-to-real conversions → weak assertions), bounded strictly by that intent — it never grows tests for behavior outside it. A suite whose evidence is already credible gets a one-line confirmation, not manufactured work.
 
 ### Phase 8: Wrap-Up
 
