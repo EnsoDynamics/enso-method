@@ -123,8 +123,10 @@ npx skills add EnsoDynamics/enso-method -g
 ```
 
 In Claude Code and Codex the skills install as a plugin, which names each one
-`enso-method:<skill>` so none can clash with a same-named skill from somewhere else. To update
-later, see the [setup guide](docs/enso-method-setup-guide.md#install-and-update). Then, in your
+`enso-method:<skill>` so none can clash with a same-named skill from somewhere else. New to
+plugins? See how they work in [Claude Code](https://code.claude.com/docs/en/plugins/install)
+and [Codex](https://learn.chatgpt.com/docs/plugins). To update, or to work from a clone of the
+repo, see the [setup guide](docs/enso-method-setup-guide.md#install-and-update). Then, in your
 agent (in Codex, pick skills from the `$` menu or type the full name, such as
 `$enso-method:prd-writing-standards`):
 

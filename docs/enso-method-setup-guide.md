@@ -7,7 +7,10 @@ recommended global instructions, the optional hooks, and forking. Start with the
 ## Install and update
 
 In Claude Code and Codex, install the skills as a plugin. A plugin names each skill
-`enso-method:<skill>`, so none can clash with a same-named skill from another source.
+`enso-method:<skill>`, so none can clash with a same-named skill from another source. New to
+plugins? [Claude Code's guide](https://code.claude.com/docs/en/plugins/install) and
+[OpenAI's guide for Codex](https://learn.chatgpt.com/docs/plugins) explain marketplaces,
+installing and updating.
 
 ```bash
 claude plugin marketplace add EnsoDynamics/enso-method        # Claude Code
@@ -37,6 +40,28 @@ npx skills update -g                           # later, to update
 
 `-g` installs for your user rather than for one project. In a tool that has the plugin, use
 the plugin rather than the skills CLI, or every skill loads twice.
+
+### Work from a clone
+
+If you'd rather keep the skills in a clone of the repository, so `git pull` updates them and
+you can read or change them in place, point each tool at the clone. The skills keep their
+`enso-method:` prefix.
+
+```bash
+git clone https://github.com/EnsoDynamics/enso-method.git ~/enso-method
+
+# Claude Code: add the clone as a marketplace; the plugin loads from the clone itself
+claude plugin marketplace add ~/enso-method
+claude plugin install enso-method@enso-method
+
+# Codex: link each skill into your skills folder
+mkdir -p ~/.agents/skills
+for d in ~/enso-method/skills/*/; do ln -s "${d%/}" ~/.agents/skills/; done
+```
+
+Claude Code picks up changes in the clone at the next session or `/reload-plugins`. Don't also
+link the skills into `~/.claude/skills`: Claude Code would load the linked copies under their
+plain names and hide the plugin's.
 
 ## Plugging in your house engineering standards
 
