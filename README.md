@@ -119,7 +119,7 @@ codex plugin marketplace add EnsoDynamics/enso-method
 codex plugin add enso-method@enso-method
 
 # Other agents (Cursor, GitHub Copilot, Gemini CLI and more), with the skills CLI
-DO_NOT_TRACK=1 npx skills add EnsoDynamics/enso-method -g
+npx skills add EnsoDynamics/enso-method -g
 ```
 
 In Claude Code and Codex the skills install as a plugin, which names each one
