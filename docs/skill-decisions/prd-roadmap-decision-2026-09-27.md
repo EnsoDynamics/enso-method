@@ -1,6 +1,6 @@
 # PRD roadmap: cutting an idea too big for one PRD (decision record, 2026-09-27)
 
-Maintainer notes for `prd-roadmap/SKILL.md` and its touch points in `prd-writing-standards`, `phase-split`, `continuation-prompt`, `implementation-lifecycle`, and `technical-design-writing-standards`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the skill's rules or names.
+Maintainer notes for `skills/prd-roadmap/SKILL.md` and its touch points in `prd-writing-standards`, `phase-split`, `continuation-prompt`, `implementation-lifecycle`, and `technical-design-writing-standards`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the skill's rules or names.
 
 ## The problem
 

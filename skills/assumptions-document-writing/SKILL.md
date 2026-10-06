@@ -1003,7 +1003,9 @@ cannot stop work.
 
 Merge this into `~/.claude/settings.json`, keeping any hooks already there (if a
 `PreToolUse` list exists, add the group to it). Adjust the path if this skill is not linked
-under `~/.claude/skills`. One registration serves every repository:
+under `~/.claude/skills`; if you installed the Enso Method as a plugin, point it at a clone of
+the repository (`<clone>/skills/assumptions-document-writing/hooks/…`), because the plugin's
+own copy moves with every update. One registration serves every repository:
 
 ```json
 {

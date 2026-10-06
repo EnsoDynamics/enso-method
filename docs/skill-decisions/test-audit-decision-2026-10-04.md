@@ -1,6 +1,6 @@
 # Test audit: grading and repairing a finished PRD's test evidence (decision record, 2026-10-04)
 
-Maintainer notes for `test-audit/SKILL.md` and its touch points in `test-hardening`, `phase-split`, `implement-from-requirements`, `implement-from-discovery`, `implementation-lifecycle`, `continuation-prompt`, the README and `docs/how-the-enso-method-works.md`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the grades, the red-check rules or the remediation rules.
+Maintainer notes for `skills/test-audit/SKILL.md` and its touch points in `test-hardening`, `phase-split`, `implement-from-requirements`, `implement-from-discovery`, `implementation-lifecycle`, `continuation-prompt`, the README and `docs/how-the-enso-method-works.md`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the grades, the red-check rules or the remediation rules.
 
 ## The problem
 

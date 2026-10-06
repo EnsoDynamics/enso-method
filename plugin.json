@@ -1,0 +1,13 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "enso-method",
+  "description": "Tell AI what you want, not what to do: skills that turn a plain-language request into a PRD, a technical design and a phased plan, then build, review and test it.",
+  "author": {
+    "name": "Doug Kerwin",
+    "url": "https://ensodynamics.com"
+  },
+  "homepage": "https://ensomethod.org",
+  "repository": "https://github.com/EnsoDynamics/enso-method",
+  "license": "MIT",
+  "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"]
+}

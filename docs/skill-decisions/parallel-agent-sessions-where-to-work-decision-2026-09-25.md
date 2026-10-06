@@ -1,6 +1,6 @@
 # Parallel agent sessions: where each chat works (decision record, 2026-09-25)
 
-Maintainer notes for the rule in `implementation-lifecycle/SKILL.md` ("Parallel Sessions: Where to Work") and its prompt-side counterpart in `continuation-prompt/SKILL.md` (Step 3, "Where to work"). **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing either rule.
+Maintainer notes for the rule in `skills/implementation-lifecycle/SKILL.md` ("Parallel Sessions: Where to Work") and its prompt-side counterpart in `skills/continuation-prompt/SKILL.md` (Step 3, "Where to work"). **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing either rule.
 
 ## The problem
 

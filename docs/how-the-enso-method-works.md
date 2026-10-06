@@ -1,6 +1,6 @@
 # How the Enso Method Works
 
-*A human-readable overview of the method. The skills themselves are the full definition; `implementation-lifecycle/SKILL.md` is the umbrella.*
+*A human-readable overview of the method. The skills themselves are the full definition; `skills/implementation-lifecycle/SKILL.md` is the umbrella.*
 
 ---
 

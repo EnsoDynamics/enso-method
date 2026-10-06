@@ -17,6 +17,26 @@ npx skills update -g                                                 # later, to
 
 `-g` installs for your user rather than for one project.
 
+Or install the same skills as a plugin. A plugin names each skill `enso-method:<skill>`, so it
+cannot collide with a same-named skill from another source:
+
+```bash
+claude plugin marketplace add EnsoDynamics/enso-method        # Claude Code
+claude plugin install enso-method@enso-method
+claude plugin marketplace update enso-method                  # later, to update
+claude plugin update enso-method@enso-method
+
+codex plugin marketplace add EnsoDynamics/enso-method         # Codex
+codex plugin add enso-method@enso-method
+codex plugin marketplace upgrade enso-method                  # later, to update
+```
+
+Claude Code still accepts the bare `/prd-writing-standards` unless another skill uses that
+name. Codex matches plugin skills only by their full name: pick them from the `$` menu or type
+`$enso-method:prd-writing-standards`. Claude Code doesn't update plugins from other
+marketplaces on its own; to have it do so, turn on auto-update for `enso-method` under
+`/plugin` → Marketplaces. Use one install method, not both, or every skill loads twice.
+
 ## Plugging in your house engineering standards
 
 The method carries principles, not stack opinions. Your team's own standards (language,
@@ -97,9 +117,11 @@ already there:
 
 ## Forking and adding a skill
 
-1. Create a directory with a plain, descriptive name (lowercase, hyphens).
+1. Create a directory under `skills/` with a plain, descriptive name (lowercase, hyphens).
 2. Add a `SKILL.md` with YAML frontmatter (`name`, `description`) and the instructions.
-3. Install your fork the same way: `npx skills add <your-org>/<your-fork> -g`.
+3. Install your fork the same way: `npx skills add <your-org>/<your-fork> -g`. To install it as
+   a plugin, first change `name` in `plugin.json`, `.claude-plugin/plugin.json` and
+   `.claude-plugin/marketplace.json` to your fork's own name, which becomes its skill prefix.
 
 Decision records for skill rules live in [`skill-decisions/`](skill-decisions/), outside
 every skill directory so they never load into a running session. Read the relevant one

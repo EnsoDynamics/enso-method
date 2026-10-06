@@ -1,0 +1,16 @@
+{
+  "name": "enso-method",
+  "owner": {
+    "name": "EnsoDynamics",
+    "url": "https://ensodynamics.com"
+  },
+  "description": "The Enso Method: open-source skills for building production software with AI coding agents.",
+  "plugins": [
+    {
+      "name": "enso-method",
+      "source": ".",
+      "description": "Tell AI what you want, not what to do: skills that turn a plain-language request into a PRD, a technical design and a phased plan, then build, review and test it.",
+      "category": "development"
+    }
+  ]
+}

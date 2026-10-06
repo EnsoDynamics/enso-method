@@ -21,7 +21,7 @@ jobs:
           python3 - <<'EOF'
           import pathlib, sys, yaml
           bad = []
-          skills = sorted(pathlib.Path('.').glob('*/SKILL.md'))
+          skills = sorted(pathlib.Path('skills').glob('*/SKILL.md'))
           for path in skills:
               text = path.read_text()
               if not text.startswith('---\n'):
@@ -41,5 +41,30 @@ jobs:
               elif len(str(meta['description'])) > 1024:
                   bad.append(f'{path}: description over 1024 characters')
           print('\n'.join(bad) or f'{len(skills)} skills OK')
+          sys.exit(1 if bad else 0)
+          EOF
+      - name: Check the plugin manifests agree
+        # plugin.json (the vendor-neutral Agent Plugins format, read by Codex and
+        # others) and .claude-plugin/ (Claude Code's format, also read by Codex)
+        # describe the same plugin, so a drifted name would ship two prefixes.
+        run: |
+          python3 - <<'EOF'
+          import json, pathlib, sys
+          root = json.loads(pathlib.Path('plugin.json').read_text())
+          claude = json.loads(pathlib.Path('.claude-plugin/plugin.json').read_text())
+          market = json.loads(pathlib.Path('.claude-plugin/marketplace.json').read_text())
+          bad = []
+          allowed = {'$schema', 'name', 'version', 'description', 'author', 'homepage',
+                     'repository', 'license', 'keywords', 'extensions'}
+          if root.get('$schema') != 'https://agent-plugins.org/schemas/1.0.0/plugin.schema.json':
+              bad.append('plugin.json: $schema is not Agent Plugins 1.0.0')
+          if set(root) - allowed:
+              bad.append(f'plugin.json: fields outside the Agent Plugins schema: {sorted(set(root) - allowed)}')
+          names = {root.get('name'), claude.get('name')} | {p.get('name') for p in market.get('plugins', [])}
+          if len(names) != 1:
+              bad.append(f'plugin names disagree: {sorted(map(str, names))}')
+          if 'version' in root or 'version' in claude:
+              bad.append('a manifest pins version; installs then stop following new commits')
+          print('\n'.join(bad) or f'manifests OK: {names.pop()}')
           sys.exit(1 if bad else 0)
           EOF

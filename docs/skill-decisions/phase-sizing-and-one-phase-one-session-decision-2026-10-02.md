@@ -1,6 +1,6 @@
 # Phase sizing, and one phase per session (decision record, 2026-10-02)
 
-Maintainer notes for `phase-split/SKILL.md` ("Session Capacity Calibration", the per-phase sizing gate, "A fresh plan is flat") and the sizing gate in `implement-from-requirements`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the capacity anchors.
+Maintainer notes for `skills/phase-split/SKILL.md` ("Session Capacity Calibration", the per-phase sizing gate, "A fresh plan is flat") and the sizing gate in `implement-from-requirements`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the capacity anchors.
 
 ## The problem
 
