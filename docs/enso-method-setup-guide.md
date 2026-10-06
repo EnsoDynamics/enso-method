@@ -6,19 +6,8 @@ recommended global instructions, the optional hooks, and forking. Start with the
 
 ## Install and update
 
-Install with the [skills CLI](https://skills.sh), which supports Claude Code, Codex and most
-other coding agents:
-
-```bash
-npx skills add EnsoDynamics/enso-method -g                           # every agent it finds on this machine
-npx skills add EnsoDynamics/enso-method -g -a claude-code -a codex   # only these two
-npx skills update -g                                                 # later, to update
-```
-
-`-g` installs for your user rather than for one project.
-
-Or install the same skills as a plugin. A plugin names each skill `enso-method:<skill>`, so it
-cannot collide with a same-named skill from another source:
+In Claude Code and Codex, install the skills as a plugin. A plugin names each skill
+`enso-method:<skill>`, so none can clash with a same-named skill from another source.
 
 ```bash
 claude plugin marketplace add EnsoDynamics/enso-method        # Claude Code
@@ -35,7 +24,21 @@ Claude Code still accepts the bare `/prd-writing-standards` unless another skill
 name. Codex matches plugin skills only by their full name: pick them from the `$` menu or type
 `$enso-method:prd-writing-standards`. Claude Code doesn't update plugins from other
 marketplaces on its own; to have it do so, turn on auto-update for `enso-method` under
-`/plugin` → Marketplaces. Use one install method, not both, or every skill loads twice.
+`/plugin` → Marketplaces.
+
+For any other agent, install plain copies with the
+[skills CLI](https://github.com/vercel-labs/skills), which supports Cursor, GitHub Copilot,
+Gemini CLI and most other coding agents:
+
+```bash
+DO_NOT_TRACK=1 npx skills add EnsoDynamics/enso-method -g     # every agent it finds on this machine
+DO_NOT_TRACK=1 npx skills update -g                           # later, to update
+```
+
+`-g` installs for your user rather than for one project. `DO_NOT_TRACK=1` turns off the
+CLI's anonymous install count; on Windows, set the variable first in your shell instead of in
+front of the command. In a tool that has the plugin, use the plugin rather than the skills
+CLI, or every skill loads twice.
 
 ## Plugging in your house engineering standards
 
@@ -119,9 +122,10 @@ already there:
 
 1. Create a directory under `skills/` with a plain, descriptive name (lowercase, hyphens).
 2. Add a `SKILL.md` with YAML frontmatter (`name`, `description`) and the instructions.
-3. Install your fork the same way: `npx skills add <your-org>/<your-fork> -g`. To install it as
-   a plugin, first change `name` in `plugin.json`, `.claude-plugin/plugin.json` and
+3. Change `name` in `plugin.json`, `.claude-plugin/plugin.json` and
    `.claude-plugin/marketplace.json` to your fork's own name, which becomes its skill prefix.
+   Then install it the same way, with `<your-org>/<your-fork>` in place of
+   `EnsoDynamics/enso-method`.
 
 Decision records for skill rules live in [`skill-decisions/`](skill-decisions/), outside
 every skill directory so they never load into a running session. Read the relevant one

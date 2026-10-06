@@ -107,24 +107,26 @@ has the full walkthrough and an example assumption.
 
 ## Get started
 
-```bash
-npx skills add EnsoDynamics/enso-method -g
-```
-
-That installs every skill for Claude Code, Codex and the other agents the
-[skills CLI](https://skills.sh) supports; run `npx skills update -g` for the latest.
-
-Or install it as a plugin, which keeps every skill under an `enso-method:` prefix so none can
-collide with a same-named skill from somewhere else:
+Install the skills in your agent:
 
 ```bash
-claude plugin marketplace add EnsoDynamics/enso-method && claude plugin install enso-method@enso-method   # Claude Code
-codex plugin marketplace add EnsoDynamics/enso-method && codex plugin add enso-method@enso-method         # Codex
+# Claude Code
+claude plugin marketplace add EnsoDynamics/enso-method
+claude plugin install enso-method@enso-method
+
+# Codex
+codex plugin marketplace add EnsoDynamics/enso-method
+codex plugin add enso-method@enso-method
+
+# Other agents (Cursor, GitHub Copilot, Gemini CLI and more), with the skills CLI
+DO_NOT_TRACK=1 npx skills add EnsoDynamics/enso-method -g
 ```
 
-Choose one install method, not both, or every skill loads twice. Then, in your agent (in
-Codex, start skills with `$` instead of `/`; with the plugin, pick them from the `$` menu or
-type the full name, such as `$enso-method:prd-writing-standards`):
+In Claude Code and Codex the skills install as a plugin, which names each one
+`enso-method:<skill>` so none can clash with a same-named skill from somewhere else. To update
+later, see the [setup guide](docs/enso-method-setup-guide.md#install-and-update). Then, in your
+agent (in Codex, pick skills from the `$` menu or type the full name, such as
+`$enso-method:prd-writing-standards`):
 
 1. **Write the PRD.** Run `/prd-writing-standards` and describe what you want in your own
    words. Talk it through; the messy version is better than a tidy instruction.
