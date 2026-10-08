@@ -22,7 +22,7 @@ A PRD should be understandable by product managers, stakeholders, and anyone who
 
 A PRD in `docs/prds/` is a medium body of work that ends with something finished that can be promoted to production. It is not the whole application; a bounded change in `docs/changes/` uses the same document set and can be as small as one fix (see "Document Storage Convention"). Before drafting, check the source material against the PRD-sized test in `prd-roadmap` (Step 2). The usual sign it fails: the work would take many phases before anything finished reaches production, or it bundles several outcomes that could each ship on their own. When it fails, run `prd-roadmap` first. It cuts the idea into planned PRDs, and this skill then writes them one at a time. The same holds when a draft outgrows the test partway through writing: stop, and hand the draft to `prd-roadmap` as its input.
 
-**Writing a planned PRD from a PRD roadmap.** When the PRD is an entry in a PRD roadmap (`docs/roadmaps/{name}/{name}-prd-roadmap.md`), its scope comes from that entry, and its decisions come from the full brief beside it. Use the directory name the entry gives. Put a `**Roadmap:**` line under the H1 linking the entry, and set the entry's Status to `PRD written` with a link to the PRD file, in the same change.
+**Writing a planned PRD from a PRD roadmap.** When the PRD is an entry in a PRD roadmap (`docs/roadmaps/{name}/{name}-prd-roadmap.md`), its scope comes from that entry (and its rows in the coverage matrix beside it, when the roadmap has one), and its decisions come from the full brief beside it. Use the directory name the entry gives. Put a `**Roadmap:**` line under the H1 linking the entry, and set the entry's Status to `PRD written` with a link to the PRD file, in the same change.
 
 ---
 
@@ -266,7 +266,7 @@ Requirements live under `docs/` in one of two roots, each holding one directory 
 
 Above both sits a third root for ideas too big for one PRD:
 
-- `docs/roadmaps/` — one directory per idea that was cut into several PRDs, holding its full brief and its PRD roadmap (`docs/roadmaps/{name}/{name}-full-brief.md` and `{name}-prd-roadmap.md`). `prd-roadmap` owns this layout. The PRDs it plans still live in `docs/prds/`, one directory each, named `{name}-{short-name}`.
+- `docs/roadmaps/` — one directory per idea that was cut into several PRDs, holding its full brief and its PRD roadmap (`docs/roadmaps/{name}/{name}-full-brief.md` and `{name}-prd-roadmap.md`), plus an optional `{name}-coverage-matrix.md`. `prd-roadmap` owns this layout. The PRDs it plans still live in `docs/prds/`, one directory each, named `{name}-{short-name}`.
 
 When unsure, use `docs/changes/`; if it grows into a program, move the directory. **Only the user creates a change directory**, when deciding to work on something — a session never creates one to park work it noticed (see `implementation-lifecycle`, the disposition rule).
 

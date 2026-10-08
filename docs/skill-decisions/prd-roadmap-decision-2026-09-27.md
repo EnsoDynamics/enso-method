@@ -25,3 +25,14 @@ Maintainer notes for `skills/prd-roadmap/SKILL.md` and its touch points in `prd-
 - **Document names answer the question a reader would ask.** The user first asked, on seeing the plan, whether the brief is deleted or split after the cut. `{name}-full-brief.md` says it is the whole thing; `{name}-prd-roadmap.md` says the roadmap's entries are PRDs, not a dated feature roadmap. Both live in `docs/roadmaps/{name}/`, a third documentation root above `docs/prds/` and `docs/changes/`.
 - **Inputs arrive under any name and get renamed.** The skill consolidates every input (main document plus supplements) into one full brief, named for the thing being built rather than the document type, using `git mv` for tracked files and the trash for untracked extras.
 - **The next planned PRD is the user's decision.** A roadmap is not a track in `continuation-prompt`'s sense: after a PRD ships, the user decides whether the next planned PRD still stands, and the roadmap may be reordered by then.
+
+## Amendments (2026-10-08)
+
+From using the skill on a large rebuild of a live system, where the first cut had to be redone twice. Each rechecking pass found the same kinds of miss.
+
+- **Read the live system (Step 1).** The spec described the target, not production. Other scheduled jobs and services wrote the same records, and production screens ran workflows the spec never drew. Two of those findings changed the cut. The skill now reads what production does and every other writer of the records, and records each in the full brief.
+- **Coverage matrix (optional).** Asserting that every in-scope item lands in one PRD was not enough: a line-by-line map of the owner's asks found an ask with no PRD. The matrix proves coverage only. It is not a sizing input: item counts per PRD say nothing about size.
+- **Seams table built bottom-up.** The table derived from the cut missed shared foundations and many producer-to-consumer handoffs. Each now goes to the first PRD that uses it, and a consumer that ships first carries an interim rule in its Depends on line, so dependencies still point backward.
+- **Near-term entries are sized now.** A priority entry had been left as "plausibly two PRDs". It is now sized and written as one or two, and a borderline entry stays one, because `prd-writing-standards`' size check sends an outgrown draft back here. An earlier draft of this rule said "if it might be two, cut it now"; that was rejected as the same over-splitting bias `phase-split` had to remove.
+- **Rejected: sizing from counts of screens, endpoints or tests.** It reads as a threshold and repeats the failure of the old phase file-count band (see `phase-sizing-and-one-phase-one-session-decision-2026-10-02.md`). Size stays measured in phases, estimated by walking the work.
+
