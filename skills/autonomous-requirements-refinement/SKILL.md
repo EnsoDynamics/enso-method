@@ -163,6 +163,11 @@ Proposed answer: … Evidence: … Checked: …
 | Script | Question | Finding |
 |---|---|---|
 
+## Conflict check
+Pass 1: {date} · {n} earlier criteria changed · {r} Replaces lines written · {q} raised as questions ({Q ids})
+Changed after pass 1: {labels of criteria added or changed since the pass-1 check}
+Completion: {date} · {criteria re-checked} · {result}
+
 ## Noticed, out of scope
 - {one line each — things investigation tripped over that fail the scope gate}
 
@@ -204,6 +209,7 @@ If a subagent fails, retry once. If it fails again:
 - **Investigator:** mark the question Blocked with the error and continue with the next question.
 - **Writer:** the answer is already known — never discard it. Record it verbatim under **Question notes**, mark the question Answered, not folded, and retry the fold before launching the next investigation.
 - **Discovery:** the pass cannot proceed. Set Status to `Paused: discovery failed` with the error and report to the user.
+- **Conflict check:** record `not run` and the error under **Conflict check**, and say so in the completion report. The completion commit then carries no `Conflict check:` line, so the build runs its own full check.
 - **Conformance:** skip it for this pass, note the skip in the state file, and run it at the next checkpoint.
 - **Final verification:** report the documents as not verified; do not mark them ready.
 
@@ -235,6 +241,8 @@ The subagent must:
 - Return at most **2× the per-pass cap** candidates, ranked by impact and uncertainty (HIGH impact and low confidence first)
 
 The orchestrator takes the top **Questions per pass** into this pass, marks the rest Deferred in the state file, and records the pass's Surfaced (new) and Taken counts.
+
+**In pass 1 only, run the conflict check** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements") in a second subagent alongside discovery, against the whole PRD. Tell every readiness-check subagent this skill launches, each pass's discovery and the final verification, to skip its own. The check finds the criteria in the repo's other PRDs and change directories that this PRD changes. An intended change is folded in as a `Replaces:` line on the new criterion (`prd-writing-standards`) by a writer subagent, serialized with the other folds, with no question. An unintended one, where this PRD would break behavior someone asked for, enters the Questions table as a Business question and competes for a slot on impact like any other. Record the result under **Conflict check** in the state file. From then on, the orchestrator adds under **Changed after pass 1** the label of every criterion a writer or conformance subagent reports adding or changing.
 
 **Questions carried from a prior pass** (Deferred, or Blocked with the blocker cleared) come first in the ranking. Draining the backlog beats surfacing new questions.
 
@@ -268,7 +276,7 @@ After the pass's questions are landed, launch one subagent to read all requireme
 | Business rules stated as technical specs in the Technical Design | PRD (if policy) or Assumptions (if uncertain) |
 | Code-level decisions in the PRD | Technical Design |
 | Open questions stated as facts | Assumptions |
-| Decision history (who ruled what, when; superseded versions; dated correction notes), or descriptions of how existing code works, in the Technical Design | Removed; git keeps the history. Keep the decision as it stands now |
+| Decision history (who ruled what, when; superseded versions; dated correction notes), or descriptions of how existing code works, in the Technical Design | Removed; git keeps the history. Keep the decision as it stands now. `Replaces:` and `Superseded by:` lines are pointers between documents, not history, and stay |
 | Design built around code the posture says to salvage and switch off | One line in the Existing Code section saying it is switched off |
 
 **Relocate, never delete.** The exceptions are the decision history and descriptions of existing code in the row above, which git already keeps, and superseded entry text and edit narratives in the assumptions document, which version control likewise keeps (`assumptions-document-writing`). Every other detail is preserved — copied to the right document, integrated (not appended), then removed from the wrong one. Apply each document's writing standard. Verify cross-document links and assumption-ID references resolve.
@@ -312,11 +320,12 @@ The ordinary count of business assumptions awaiting validation is never a reason
 ### Phase 7: Completion
 
 1. **Final conformance pass** (as Phase 4).
-2. **Final verification** — one more `implementation-readiness-check` subagent, scope-gated, against the finished documents. If it surfaces new questions below the threshold and passes remain, treat them as a new pass and go to Phase 3. If the maximum is reached with questions still below threshold, report `Maximum passes reached` and mark the documents not ready. Never label that result `Converged`.
-3. **Write the completion report** (below) from the state file, while it still exists.
-4. **Delete the state file.** The questions that mattered are in the documents; the rest is in the report.
-5. **Final staging** — stage the requirements documents and the state-file deletion, and propose `docs({feature}): requirements refinement complete — {passes} passes, {questions} questions` for the user to review and commit. Put the **Noticed, out of scope** lines in the message body — once the state file is gone, the commit is their only durable home.
-6. **Output the completion report:**
+2. **Re-run the conflict check for the criteria listed under Changed after pass 1.** An empty list counts as a check that ran. Fold or raise its findings as in pass 1; a raised question goes to Phase 3 like the final verification's. Record the result under **Conflict check**.
+3. **Final verification** — one more `implementation-readiness-check` subagent, scope-gated, against the finished documents. If it surfaces new questions below the threshold and passes remain, treat them as a new pass and go to Phase 3. If the maximum is reached with questions still below threshold, report `Maximum passes reached` and mark the documents not ready. Never label that result `Converged`.
+4. **Write the completion report** (below) from the state file, while it still exists.
+5. **Delete the state file.** The questions that mattered are in the documents; the rest is in the report.
+6. **Final staging** — stage the requirements documents and the state-file deletion, and propose `docs({feature}): requirements refinement complete — {passes} passes, {questions} questions` for the user to review and commit. Put the **Noticed, out of scope** lines in the message body — once the state file is gone, the commit is their only durable home. Put the conflict check's result in the body too, as one line starting `Conflict check:` (`Conflict check: 3 earlier criteria replaced, 1 raised as a question`, or `Conflict check: no earlier criteria changed`): `implement-from-requirements` reads that line to narrow its own check. Write the line only when both checks ran.
+7. **Output the completion report:**
 
 ```
 === Autonomous Requirements Refinement Complete ===
@@ -333,6 +342,7 @@ Document updates:
 Exploration scripts: {list, or none}
 Out of scope, noticed and not acted on: {list from the state file}
 
+Conflict check: {n earlier criteria replaced, q raised as questions | no earlier criteria changed | not run: reason}
 Final verification: {clean | N questions, listed below}
 
 Items below threshold (if any): {question — confidence — why}

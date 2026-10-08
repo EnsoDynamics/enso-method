@@ -31,7 +31,7 @@ Paths above show `docs/prds/`; a `docs/changes/` directory is identical.
 
 **Beside them, once a test audit has run:** `test-audit.md` in the PRD's directory, the map of each criterion's test evidence. `test-audit` owns it, and only a `test-audit` session writes it; it is never a destination for discovered work.
 
-**PRD and Technical Design are the source of truth.** Code implements what they say. If code and docs disagree, figure out which is right — fix the wrong one. Never implement something different from what the docs say without updating the docs first — and that includes ad hoc fixes to work delivered long ago: amending the PRD is always allowed and is the cheapest thing a session can do. A change directory (`prd-writing-standards`, storage convention) is for work the user chooses to write up on its own, never a substitute for amending.
+**PRD and Technical Design are the source of truth.** Code implements what they say. If code and docs disagree, figure out which is right — fix the wrong one. Never implement something different from what the docs say without updating the docs first — and that includes ad hoc fixes to work delivered long ago: amending the PRD that owns the behavior is always allowed and is the cheapest thing a session can do. A change directory (`prd-writing-standards`, storage convention) is for work the user chooses to write up on its own, never a way around an amendment. When a later PRD or change directory changes behavior an earlier one defined, the later one owns it and the earlier one is not rewritten (see "When Later Work Changes Earlier Requirements" below).
 
 **Assumptions Document is a green light.** A declared assumption means "we're going with this unless stakeholders tell us otherwise." It does NOT mean "we're waiting for confirmation." The whole point is to keep moving. That is not a rule with exceptions — it is what an assumption *is* — and it holds for an entry that reopens a ruling a stakeholder already gave (Gate 3 in `assumptions-document-writing`): the build proceeds on the better-evidenced answer; what a reopened entry owes is louder disclosure, not a hold. **When adding assumptions, always use the `assumptions-document-writing` skill** — assumptions have a specific format (proposed answer, rationale, confidence, impact, confirm-or-correct checkboxes) and they consistently get written incorrectly without referencing that skill.
 
@@ -67,7 +67,7 @@ Stakeholders validate assumptions asynchronously. We correct course if they say 
 
 Before changing code, align the documents:
 
-- **Docs right, code wrong** → fix the code
+- **Docs right, code wrong** → fix the code; when the code consistently does something else instead, first apply "When Later Work Changes Earlier Requirements" below: shipped behavior someone could have chosen is not reverted to match a document without a decision
 - **Code right, docs wrong** → fix the docs first, then code is already correct
 - **Neither clearly right** → resolve through investigation or assumption, update docs, then implement
 
@@ -145,6 +145,42 @@ Question arises
 
 ---
 
+## When Later Work Changes Earlier Requirements
+
+A system accumulates PRDs, and a later one often changes what an earlier one said. Rewriting every earlier PRD to describe the system as it is now is neither affordable nor honest, because each was true when it was built. So:
+
+- **The latest-built document that defines a behavior owns it.** The earlier criterion gets a `Superseded by:` line pointing to the criterion that changed it, and the later criterion carries `Replaces:` (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion", owns the format and the partial forms). Follow `Superseded by:` lines to the end of the chain before treating any criterion as current.
+- **An ad hoc change amends the owner,** the criterion at the end of the chain, never a fully superseded one. A partly superseded criterion still owns the part in force.
+- **`Replaces:` is written with the PRD; `Superseded by:` is written when the replacing criterion is built,** in the same commit as its code. The replacing criterion requires that edit to the earlier PRD, so it is in scope.
+- **A fully superseded criterion is no longer owed.** A build skips it, or builds only the part in force, and phase plans, test hardening, test audits and wrap-ups leave it out as they do retired labels, listing it as superseded.
+- **Existing code that differs from a criterion is an observation unless this session's work needs that code changed.** Only then does this rule decide which side is right. Not every change goes through this method: a teammate may have changed behavior on purpose with no requirements written at all, and the code may be right.
+  - **A plain bug** is a malfunction nobody would choose: a crash, an error, corrupted or inconsistent output. Fix it; nothing below applies.
+  - **A consistent contradiction** is a coherent alternative a person could have chosen: a different value, threshold, status or step, or a behavior that is gone. First, the conflict check: if a later-built criterion changed this one, that one owns the behavior; add the missing pointer pair.
+  - **Otherwise, shipped behavior stands until a decision says otherwise.** Reverting it to match a document is a business question whose proposed answer is to keep it, decided by the usual thresholds: at 95% or more, amend the owning criterion to match ("code right, docs wrong"), or below that, an assumption entry proposing to keep it, and proceed. If that criterion records a stakeholder's ruling, it is a reopening at any confidence (Gate 3 in `assumptions-document-writing`). Evidence moves the confidence, never the default: `git log -S'<value>'` or `git log -L` on the code (look past commits that only reformat or move lines), a test, comment or config entry asserting the current behavior, a commit that set it after the criterion was written. Squashed, vague or missing history (imported code) lowers confidence; it never makes reverting the default.
+  - **A later decision wins:** the user's direct request, or the ticket or report this session serves naming that behavior. Then revert, and name the reverted commit, when there is one, in the commit message.
+  - **Building a criterion that would change existing behavior,** rather than add it, follows the same rule when the code's history shows that behavior was changed after the criterion was written: it is a conflict-check finding, intended or a business question.
+  - Without pointers, tell which criterion was built later from `**Closed:**` lines, the git history of the code that implements each criterion, and what the code does now.
+
+**The conflict check.** Nobody remembers every earlier PRD, so finding the criteria that new work changes is a step, not the author's memory. One subagent reads the criteria being checked and every other criterion in the repo's PRD roots (`docs/prds/`, `docs/changes/`, or the repo's established equivalent), built or not. When the roots hold no other PRD or change directory, there is nothing to check. It skips retired labels and fully superseded criteria, which keeps the read small as the system grows; where there are many directories, it shortlists them by title and summary first, then reads the shortlisted criteria in full. It reports each criterion that the ones being checked change, narrow, contradict or remove, quoting both. A check for a criterion being amended also asks the reverse, whether a later-built criterion already changed it; a check before changing code to match a criterion asks only that. Each finding that decides what the session does is resolved one of two ways; any other finding is an observation for the Materiality Gate, not pointer work:
+
+- **The change is intended** (the new PRD says so, or plainly means it): a `Replaces:` or `Replaces in part:` line on the new criterion.
+- **It is not:** the new work would break behavior someone asked for. That is a business question, decided by the usual thresholds, never a silent pick: at 95% or more, either change the new criterion to keep the earlier behavior or accept the change with a `Replaces:` line; below 95%, an assumption. Overturning a criterion a stakeholder personally ruled on is a reopening at any confidence (Gate 3 in `assumptions-document-writing`).
+
+**If the check's subagent fails,** retry once, then run the check in the main chat. If that fails too, proceed: the risk is no worse than before the check existed, and the tripwire below still stands. Record `Conflict check skipped: <reason>` in the wrap-up and the commit body, never a `Conflict check:` line, so the next build runs its own.
+
+It runs at these points, and each skill carries its own step:
+
+| Where | What it checks |
+|---|---|
+| `autonomous-requirements-refinement`, pass 1 | The whole PRD, with findings resolved as questions in the run; at completion, again for criteria the run added or changed after pass 1 |
+| `implementation-readiness-check`, when run on its own | The whole PRD |
+| `implement-from-requirements`, after sizing and before building | The criteria this session builds, narrowed by the last recorded check; with none, the whole PRD, recorded for later phases |
+| `implement-from-discovery`, `test-audit`, and anywhere else code is about to change to match a criterion | Amending: the criterion, both ways. Matching code to a criterion it consistently contradicts: only whether a later-built criterion changed it; the shipped-behavior rule covers the rest. Skipped when a check in this session already covered it |
+
+**The test tripwire catches what the check missed.** Before changing the expected result of an existing test the session did not write, or deleting one, check that something accounts for the change: a criterion or Technical Design decision the session builds, amends or enforces requires the new expectation, or, where no criterion speaks to the behavior, the defect the fix serves (its ticket, incident or report) does. A test that a criterion's own change forces to change is accounted for. If nothing accounts for it, the session is changing behavior nobody declared: resolve it by the Doc Divergence rule (`implement-from-requirements`), which ends either in a criterion that accounts for it (an amendment, or a `Replaces:` line and its back-pointer) or in putting the behavior back. Renaming or restructuring a test without changing what it expects does not trip it.
+
+---
+
 ## Session Discipline: No Loose Ends
 
 The framework above governs *what to decide*; this section governs *how the session behaves* around those decisions.
@@ -156,7 +192,7 @@ The user is often running several chats at once. Every FYI, caveat, "worth notin
 Implementation surfaces discoveries constantly — anomalies, inconsistencies, possible cleanups, theoretical defects, tangential improvements. In a brownfield system the supply is infinite. **Noticing something does not create work.** Before an item enters the disposition buckets below, judge it against what this session is converging on. A discovery is **material** only if it:
 
 - prevents a stated acceptance criterion from being satisfied,
-- contradicts an explicit requirement,
+- contradicts an explicit requirement (in the work being produced; existing code that differs from a requirement is an observation unless this session's work needs that code changed, and only then does "When Later Work Changes Earlier Requirements" decide which side is right),
 - makes the implementation being produced materially incorrect, or
 - creates real data-integrity, security, or operational risk in what's being shipped.
 
@@ -412,7 +448,7 @@ The typical sequence for implementing a feature or closing a gap:
 
 3. **Establish readiness — but note this is a state, not a step that always runs.** "Implementation-ready" means the gaps have been thought through and remaining business uncertainty is captured as assumptions. Two skills can establish it, and **both are explicit user choices, not automatic**: `implementation-readiness-check` is the human checkpoint, surfacing everything below 95% for you to confirm or redirect (deliberately user-invoke-only); `autonomous-requirements-refinement` is the heavier multi-pass version that drives docs to ready state on its own.
 
-   **The implement skills do NOT re-run a readiness check.** If you're going straight from a refined PRD to building, you don't need one: the same investigate → declare-an-assumption → proceed logic runs continuously inside the implement skill's own uncertainty handling, so no separate automated gate is needed. Reach for a readiness check when you specifically want the gap analysis front-loaded as its own step — before deciding whether to phase-split, before handing requirements to someone else, or when you want a checkpoint before any code is written. And if an implement session finds the docs clearly under-baked, it stops and recommends `autonomous-requirements-refinement` (or a readiness check, for a human checkpoint) rather than pressing on.
+   **The implement skills do NOT re-run a readiness check.** If you're going straight from a refined PRD to building, you don't need one: the same investigate → declare-an-assumption → proceed logic runs continuously inside the implement skill's own uncertainty handling, so no separate automated gate is needed (the build's narrow conflict check, `implement-from-requirements` Phase 4, is not a readiness check). Reach for a readiness check when you specifically want the gap analysis front-loaded as its own step — before deciding whether to phase-split, before handing requirements to someone else, or when you want a checkpoint before any code is written. And if an implement session finds the docs clearly under-baked, it stops and recommends `autonomous-requirements-refinement` (or a readiness check, for a human checkpoint) rather than pressing on.
 
 4. **Size for a single AI session** — if the work is too large for one focused session, `phase-split` cuts it into phases (`implement-from-requirements` runs this sizing gate automatically, and neither skill stops to ask whether to split — the cut is declared and the session carries on with the first leaf). Sizing isn't one-and-done: mid-implementation you may discover that even a single phase is bigger than the split assumed. When that happens, re-invoke `phase-split` to cut the remaining work into child phases (`2a` under `2`, `2a1` under `2a`, one file each) rather than grinding on past coherent context. Re-cutting covers only the work the phase was already scoped to carry — it is never a vehicle for turning mid-implementation discoveries into new phases; those go through the Materiality Gate and disposition rule, and most are dismissed.
 

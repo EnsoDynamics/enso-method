@@ -240,9 +240,12 @@ the ones it leans on:
   assigns it to another. Cross-check the decisions against the interfaces,
   integration points and repos touched.
 - **Sibling documents.** Grep `docs/prds/` and `docs/changes/` for older PRDs or
-  designs covering the same feature. A stale predecessor that contradicts the
-  current design must be updated or explicitly superseded — two documents both
-  claiming to be current is a defect.
+  designs covering the same feature. A predecessor the current design changes is
+  not rewritten: the new design's decision and the PRD's criteria carry
+  `Replaces:` lines naming what they change (`prd-writing-standards`, "When Later Work
+  Changes an Earlier Criterion"; `technical-design-writing-standards`, "Changes to
+  an Earlier Design"). A contradiction without a `Replaces:` line is a defect —
+  two documents both claiming to be current.
 - **Links and references.** Every referenced artifact must resolve as a
   repo-relative path. Paths pasted from someone's local notes are broken links for
   everyone else.

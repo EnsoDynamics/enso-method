@@ -43,7 +43,7 @@ The user points at a document, and that document fixes the criteria. Never infer
 | A split record | Its labels: the union of its children's |
 | A PRD, or a change directory | Every criterion in the PRD, retired labels excepted |
 
-If what the user said fits more than one document, ask in one line. An unlabeled PRD (small ones may be) is cited by each criterion's bold title.
+If what the user said fits more than one document, ask in one line. An unlabeled PRD (small ones may be) is cited by each criterion's bold title. **In every scope, a criterion with a `Superseded by:` line is left out,** listed as superseded with its pointer, never graded: its behavior was replaced on purpose, and grading it would ask for the old behavior back. One with `Superseded in part by:` is graded on the part still in force (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion").
 
 **Only built criteria are graded.** Pointing at a phase or an unsplit PRD says it is built. When the scope is a PRD or a split record whose phases are not all closed, criteria owned by a phase with no `**Closed:**` line are listed as Not built yet and left out.
 
@@ -70,9 +70,11 @@ A criterion takes the grade of its least-proven required part, with one exceptio
 
 **Statuses, for rows that get no grade:**
 
-- **Not implemented:** no code does what the criterion says. That is a delivery gap, not a test gap. Surface it in the wrap-up as an action item, recommending `implement-from-discovery` with the criterion as its lineage, and leave it out of remediation.
+- **Not implemented:** no code does what the criterion says. First check whether the behavior was changed on purpose later, by a later-built criterion or a commit in the code's history (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one conflict check covers every such row in the audit). If a later PRD changed it, add the missing pointer pair and list the row as superseded. If the code does something else a person could have chosen, it is shipped behavior and stands (the lifecycle's shipped-behavior rule): list the row as changed outside the requirements and name it in the wrap-up for the user to record, whatever the history shows. Otherwise it is a delivery gap, not a test gap. Surface it in the wrap-up as an action item, recommending `implement-from-discovery` with the criterion as its lineage, and leave it out of remediation.
 - **Person-checked:** only a person could check it, such as a stakeholder approving wording. Use it only when no test or script could check the criterion; "hard to automate" is not the bar.
 - **Not built yet:** see Scope.
+- **Superseded:** a later PRD replaced the criterion; the row shows its pointer.
+- **Changed outside the requirements:** the code deliberately does something else and no document records it; named in the wrap-up for the user to record.
 
 **Blocked.** When the boundary a criterion is about has no non-production counterpart (no vendor sandbox, no dev environment), the best possible evidence is a narrow mock plus read-only checks (`engineering-principles`, "The Evidence Standard"). Grade it honestly, usually Weak, and add `blocked: <what is missing>`. It is outside the remediation target, and the user gets the action: stand up the environment.
 
@@ -141,7 +143,7 @@ High-risk criteria go first within a tier, and a tier is finished before the nex
 - Is seen red before it counts, by Step 3's procedure against the behavior it proves, or is recorded `red check not possible: <why>`.
 - Follows the evidence standard and environment rules (`engineering-principles`; `test-hardening`, "Environment Rules for Real-Resource Tests"): real resources at the boundary, writes only to non-production systems, test data tagged, fixtures checked in.
 
-**When a new test finds the criterion broken,** the test is right and the code is wrong; never weaken the test. The work may already be in production, so if the break costs money, data or production correctness now, stop: "Critical finding, stopping to surface." Otherwise fix the code when the fix is small and plainly within the criterion. When it is bigger than the test work left, the row goes under Waiting and the fix goes to the user as an action item, recommending `implement-from-discovery`.
+**When a new test finds the criterion broken,** and the code consistently does something else instead, first check whether the behavior was changed on purpose later, by a later-built criterion or a commit in the code's history (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one conflict check covers every such row in the run). If a later PRD changed it, add the missing pointer pair and list the row as superseded; otherwise the shipped behavior stands, and the row is listed as changed outside the requirements and named in the wrap-up. Either way the new test is dropped; an audit never reverts shipped behavior on its own. Otherwise the test is right and the code is wrong; never weaken the test. The work may already be in production, so if the break costs money, data or production correctness now, stop: "Critical finding, stopping to surface." Otherwise fix the code when the fix is small and plainly within the criterion. When it is bigger than the test work left, the row goes under Waiting and the fix goes to the user as an action item, recommending `implement-from-discovery`.
 
 **A question only a stakeholder can answer** (what the required value is, when the requirements don't say) goes to the assumptions document through `assumptions-document-writing`, never into `test-audit.md` (`implementation-lifecycle`, "A Decision Needs an Assumption Entry, Always").
 
@@ -240,7 +242,7 @@ For each criterion:
 1. **Required parts, from the requirements alone.** Read the criterion in the PRD, the assumption entries and technical-design sections it depends on, and in a phase audit the phase document. Before opening a test, write down what would have to be observed for it to hold: each required part as something a test could check, including any error or boundary case the criterion states. Derive them from the requirements, never from the code; expectations read off the implementation bless whatever it does.
 2. **Find the evidence and the code.** Search the tests by label, by the names the criterion uses, and by the code the technical design names for it. Map each test to the parts it exercises, and note the files that implement the criterion.
 3. **Check each mapped test.** Did it pass in the baseline, and does the project's normal test run collect it? Does it reach the boundary its part is about, or mock it? Do its assertions pin the required outcome with values taken from the requirements? Would it fail if that part broke?
-4. **Grade** by "The Grades", or give a status (Not implemented, Person-checked). Add `blocked: <what is missing>` when the criterion's boundary has no non-production counterpart.
+4. **Grade** by "The Grades", or give a status (Not implemented, Person-checked, Superseded, Changed outside the requirements). Add `blocked: <what is missing>` when the criterion's boundary has no non-production counterpart.
 5. **Risk.** High if a silent break would cost money, corrupt or lose data, expose private data or access, or do something irreversible outside the system.
 6. **Gap and fix.** For anything below Strong: what is missing, and the smallest fix that would raise the grade, at the level and against the resource it needs.
 7. **Red-check target.** For anything graded Adequate or better: the file and function a red check should break for the criterion's riskiest part, and how.
@@ -267,7 +269,7 @@ Report one record per criterion with these fields. Observations outside the crit
 - Grade Strong without red checks on every required part
 - Red-check a test that reaches production, or break a guard on whether, where or how much the code writes or sends
 - Overwrite a file someone else edited during a red check, or leave a check unrestored
-- Plan remediation in phase documents, a PRD amendment or a change directory
+- Plan remediation in phase documents, a PRD amendment or a change directory (a missing `Superseded by:` pointer pair the conflict check finds is not remediation)
 - Write a test that traces to no criterion in scope, or fix pre-existing failures unrelated to the criteria
 - Weaken a test to make it pass against code that breaks the criterion
 - Work the Strong tier unasked

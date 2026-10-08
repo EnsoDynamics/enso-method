@@ -72,6 +72,33 @@ Other documents then cite `AC-RETURNS-02`, not "the second bullet in the returns
 
 (The short bold phrase after each label—"Eligible items are clear"—is the criterion's plain-language title. See "Plain English for Readers Outside the Project" below for what makes a good one.)
 
+### When Later Work Changes an Earlier Criterion
+A later PRD or change directory often changes behavior an earlier one defined: a longer return window, a status that now means something else, a step that no longer happens. The earlier PRD is not rewritten to match. It was true when it was built, and the later document now owns that behavior: **the latest-built document that defines a behavior is its source of truth** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"). Two lines connect them:
+
+- **On the new criterion, written with the PRD:** a `Replaces:` line naming each earlier criterion it changes. It is part of the new PRD's content and changes freely while the PRD is drafted and refined. While writing, add one only where you already know the earlier criterion; don't search the repo for them, because the conflict check does that during refinement or at build.
+- **On the earlier criterion, written when the new one is built:** a `Superseded by:` line naming the new criterion, in the same commit as the code that makes it true. Not before: a PRD that is never built, or waits months, must not mark behavior superseded while the code still does it.
+
+```markdown
+- [ ] **AC-WINDOW-01 — Returns accepted for 60 days.** Customers can start a return up to 60 days after delivery.
+  - Replaces: AC-RETURNS-03 in `docs/prds/customer-returns/customer-returns-prd.md`
+
+- [ ] **AC-RETURNS-03 — Returns accepted for 30 days.** Customers can start a return up to 30 days after delivery.
+  - Superseded by: AC-WINDOW-01 in `docs/changes/longer-return-window/longer-return-window-prd.md`
+```
+
+The rules that keep the lines trustworthy:
+
+- **Name the path with the label.** A label is unique only inside its own PRD. An unlabeled criterion is named by its bold title.
+- **Say when only part changed,** on both lines: `Replaces in part: … (the return window only)` on the new criterion, `Superseded in part by: … (the return window only)` on the earlier one. The rest of the earlier criterion stays in force, and that criterion still owns it: an amendment to that part edits it in place.
+- **"Later" means built later.** If a criterion is superseded before it is built (a later PRD shipped first), the build of its own PRD skips it, or builds only the part still in force.
+- **Point to the next document, never the latest.** When a third PRD changes the behavior again, it replaces the second PRD's criterion, and only that criterion gets a new `Superseded by:` line. Earlier pointers are never rewritten: a reader follows the chain to its end, and the chain is the history. One criterion replaced by two, or one new criterion replacing parts of two, is a line naming both.
+- **Removing a behavior is a criterion too.** "Customers no longer receive the weekly digest" replaces the criterion that added it.
+- **Never edit a fully superseded criterion's text.** An amendment goes to the end of the chain, the criterion that owns the behavior now.
+- **These lines are not decision history.** Conformance and cleanup passes keep them.
+- **Moving a directory** (a change that grew into a program) updates every path in these lines that points into it.
+
+Nobody is expected to remember every earlier PRD. The conflict check (`implementation-lifecycle`) finds the earlier criteria a new PRD changes, and turns each into a `Replaces:` line or a question.
+
 ### Out of Scope and Other Optional Sections
 State what is explicitly excluded when doing so prevents genuine boundary confusion. Other sections—such as future considerations, dependencies, or readiness—are optional and should appear only when they help readers understand or decide the product requirements.
 
@@ -243,7 +270,7 @@ Above both sits a third root for ideas too big for one PRD:
 
 When unsure, use `docs/changes/`; if it grows into a program, move the directory. **Only the user creates a change directory**, when deciding to work on something — a session never creates one to park work it noticed (see `implementation-lifecycle`, the disposition rule).
 
-Both roots hold **living documents** for the work they describe. Any change to intended behavior — including an ad hoc fix — amends the PRD and technical design first, then the code (`implementation-lifecycle`, Docs Before Code). Amending is always allowed and is the cheapest thing a session can do, so it is the default. A change directory is for work you choose to write up on its own: too big for an amendment, spanning several PRDs, or a component with no PRD to amend. The convention will never be applied perfectly; its job is that the next session starts from the documents, not from the code. Where the work is scheduled, prioritized, or assigned is outside this methodology; an optional `**Source:**` line at the top of the PRD may name where the requirement came from (a ticket key, an email, a meeting) as a pointer, and no skill reads that system.
+Both roots hold **living documents** for the work they describe. Any change to intended behavior — including an ad hoc fix — amends the PRD and technical design that own that behavior first, then the code (`implementation-lifecycle`, Docs Before Code). Amending is always allowed and is the cheapest thing a session can do, so it is the default. A change directory is for work you choose to write up on its own: too big for an amendment, spanning several PRDs, or a component with no PRD to amend. When that work changes behavior an earlier PRD defined, the earlier PRD is not rewritten: the new criterion names what it replaces ("When Later Work Changes an Earlier Criterion" above). The convention will never be applied perfectly; its job is that the next session starts from the documents, not from the code. Where the work is scheduled, prioritized, or assigned is outside this methodology; an optional `**Source:**` line at the top of the PRD may name where the requirement came from (a ticket key, an email, a meeting) as a pointer, and no skill reads that system.
 
 Related technical designs, assumptions, mockups, mappings, samples, and phase documents colocate inside the directory so readers can find the complete context in one place. Follow an established repository convention when one already exists instead of moving documents for consistency alone.
 

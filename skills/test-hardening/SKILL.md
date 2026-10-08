@@ -83,7 +83,7 @@ Hardening raises the *quality of evidence*, never the test count for its own sak
 
 Anchor the pass on what the session was supposed to deliver:
 
-1. Identify the governing requirements — the phase doc's acceptance criteria, the PRD's acceptance criteria, or (for discovery-driven work) the stated intent of the fix. This list is the scope boundary for everything that follows.
+1. Identify the governing requirements — the phase doc's acceptance criteria, the PRD's acceptance criteria, or (for discovery-driven work) the stated intent of the fix. This list is the scope boundary for everything that follows. Leave out any criterion with a `Superseded by:` line; one with `Superseded in part by:` is in scope for the part still in force (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements").
 2. Run `git diff --stat` / `git status` to see what code changed this session.
 3. Identify the test suite, how it runs, and which tests relate to the changed code.
 

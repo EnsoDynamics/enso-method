@@ -57,9 +57,11 @@ Identify what you're changing. For each affected component, find:
 - **Technical Design** — `technical-design.md` in that same directory
 - **Assumptions** — `assumptions.md` in that same directory, if one exists
 
+A criterion in those docs may carry a `Superseded by:` line pointing into a later PRD or change directory. Follow the chain to its end: the criterion there owns the behavior now, and it is what the fix is checked against and what an amendment edits (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"). A superseded criterion records what was built then, not what the system should do now.
+
 If no PRD/TD exists for the component, that's significant — the component may be older code that predates the PRD framework. Surface this to the user. Don't fabricate docs you don't have, but acknowledge the alignment-check is degraded and proceed with whatever architectural intent you can glean from the code itself, README, or comments.
 
-You also need the **bigger picture** of the service you're touching, not just the one component's docs — a discovery is a delta against the whole system, so you need to know what else your change could affect. If the service has a **service/product overview or a substantive README**, read it; that's often a better single source of overall context than any one PRD. If the service has accumulated **several PRDs and no overview**, don't read them all — read the founding/earliest (it usually frames the service's purpose and architecture, where later ones are narrow increments) and skim the rest's titles, unless a later PRD is clearly the current source of truth. If there's no orienting context at all, flag it to the user — and treat it as a sign the service should grow a short overview (a methodology gap), not a reason to silently press on.
+You also need the **bigger picture** of the service you're touching, not just the one component's docs — a discovery is a delta against the whole system, so you need to know what else your change could affect. If the service has a **service/product overview or a substantive README**, read it; that's often a better single source of overall context than any one PRD. If the service has accumulated **several PRDs and no overview**, don't read them all — read the founding/earliest (it usually frames the service's purpose and architecture, where later ones are narrow increments) and skim the rest's titles, unless a later PRD is clearly the current source of truth, and follow any `Superseded by:` lines you meet. If there's no orienting context at all, flag it to the user — and treat it as a sign the service should grow a short overview (a methodology gap), not a reason to silently press on.
 
 Read these docs before implementing. Skim is not enough. The whole point of this phase is loading the design intent into your head so you can compare it to the proposed change.
 
@@ -86,11 +88,13 @@ Three cases:
 
 | Case | Meaning | Action |
 |------|---------|--------|
-| **Docs right, code wrong** | The PRD/TD describes the intended behavior; the code doesn't do it; the discovery is a gap-closing fix | Implement the fix. This is the most common case. |
+| **Docs right, code wrong** | The PRD/TD describes the intended behavior; the code doesn't do it; the discovery is a gap-closing fix | Implement the fix. This is the most common case. When the code does something else instead, rather than failing, apply the check below first. |
 | **Code right, docs wrong** | The code is correct but the PRD/TD has drifted out of date | Update the docs first, then the code is already correct. |
 | **Docs silent, new behavior** | The PRD/TD doesn't address this case at all; the discovery is proposing new behavior | Apply the technical-vs-business gate (Phase 3). New behavior often needs an assumption. |
 
 If the change *contradicts* the PRD/TD's stated intent (not just fills a gap), resolve it as a Doc Divergence (the rule is in `implement-from-requirements`; the philosophy in `implementation-lifecycle`) — a decide-and-proceed, not a session stop: below 95% business confidence, an assumption entry and the build continues on it (it stops only when no answer can be put forward); where a stakeholder had personally ruled, it is a reopening at any confidence. Don't silently implement something the docs explicitly say shouldn't happen.
+
+**Before amending a criterion, run the conflict check for it, both ways; before changing code to match a criterion the code consistently contradicts ("docs right, code wrong" where the code does something else instead), apply the shipped-behavior rule** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"): a later PRD may own the behavior, and shipped behavior someone could have chosen is kept, even with no requirements behind it, unless the user or the ticket this fix serves asks to change it. A plain bug, a malfunction nobody would choose, needs no check. Other PRDs or change directories may define the same behavior, and a repo whose PRDs predate `Superseded by:` lines has no pointers to follow. If a later-built document already defines the behavior, it is the owner: check the fix against it, amend it rather than the earlier one, and add the missing pointer pair (the lifecycle section says how to tell which was built later). When the amendment intentionally changes another document's criterion, it gets a `Replaces:` line and that criterion a `Superseded by:` line (or the partial forms), with the matching lines on any design section it changes, all in this fix's commit (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion"). An unintended conflict is resolved as a contradiction, as above.
 
 ### Phase 3: Apply the Technical-vs-Business Gate
 
@@ -125,6 +129,8 @@ Apply the judgment principles in `engineering-principles` when ambiguity arises 
 
 Match existing code style. Don't refactor surrounding code unless the change requires it.
 
+**Mind the test tripwire.** Before changing the expected result of an existing test this session did not write, or deleting one, check that something accounts for the change: the criterion this fix amends or enforces requires the new expectation, or, where no criterion speaks to the behavior, the defect this fix serves does. If nothing does, the fix is changing behavior nobody declared: stop and resolve it as a contradiction (Phase 2) before going on (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements").
+
 **Before every edit outside the files the identified fix itself touches, name what part of the fix requires it.** Not "consistency," not "while I'm here," not "the sibling has the same bug," not "this comment is stale now." If nothing in the one identified change requires the edit, it is not made. That never excuses your own breakage: what the fix itself *made* wrong is owed before done — causation, not location. Scope leaks sideways through neighbours, not through tangents, and each neighbour looks like correctness. If a non-required edit starts forcing follow-ups — a regenerated artifact, a re-pinned test, a drift gate going red — that cascade is the tell: **revert the root edit rather than fix its fourth consequence.** A neighbour that would take longer than the fix itself is out by that fact alone. (`implementation-lifecycle`, "Adjacency is how scope actually leaks".)
 
 ### Phase 5: Test
@@ -133,7 +139,7 @@ This phase runs the suite several times. If one run takes more than about two mi
 `wall-clock-awareness` before the second run — the cheap fixes are an afternoon and every
 later session inherits them.
 
-1. **Run existing tests.** If your change is in covered territory, existing tests verify it. Fix any failures caused by your change.
+1. **Run existing tests.** If your change is in covered territory, existing tests verify it. Fix any failures caused by your change; changing what an existing test expects goes through the test tripwire (Phase 4).
 2. **Add tests for new behavior** where the existing suite doesn't cover what you built. Match the codebase's existing test patterns.
 3. **Use real resources for integration behavior.** Integration tests should hit real databases, APIs, and services in sandbox/dev environments, per the evidence standard in `engineering-principles`; mocks only for isolated logic or the narrow cases it allows.
 4. **For UI/frontend changes**, exercise the change in a browser before reporting done. Type-checking and unit tests don't verify UX.
@@ -179,6 +185,8 @@ At this or any other terminal state, append the session marker's DONE line (`imp
 
 - Locate and read the affected component's PRD/TD/Assumptions before implementing
 - Verify the change aligns with the docs' intent before changing code
+- Follow `Superseded by:` lines to the criterion that owns the behavior now, and amend only that one
+- Run the conflict check before amending a criterion, and apply the shipped-behavior rule before matching code to a criterion it consistently contradicts
 - Open Phase 2 with the lineage line — the component's PRD by full title and the acceptance criterion, ticket id, incident, or report this fix serves — and stop if nothing named fills it and the user did not ask for the fix themselves
 - Preflight every external credential and connection the fix and its tests need before implementing, so an expiry surfaces while the user is still present
 - Apply the technical-vs-business gate honestly — the threshold matters and is the load-bearing decision

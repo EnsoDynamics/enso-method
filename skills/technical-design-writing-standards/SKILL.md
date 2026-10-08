@@ -125,6 +125,10 @@ Don't name specific classes or describe internal structure—that's implementati
 
 Document any decisions that still need to be made or areas of uncertainty.
 
+### Changes to an Earlier Design
+
+When this design changes a decision or interface an earlier PRD's design made, the decision carries a `Replaces:` line naming the earlier design and section: `Replaces: docs/prds/customer-returns/technical-design.md, §Status Mapping` (or `Replaces in part: … (what changed)`). When the change is built, the earlier section gets one line under its heading, `Superseded by: <path>, §<heading>`, or `Superseded in part by: … (what changed)`, in the same commit as the code. The rules are the PRD's (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion"): the earlier text is never rewritten, each pointer goes to the next document, and the line is a pointer between documents, not decision history.
+
 ---
 
 ## What Does NOT Belong in a Technical Design Document
@@ -142,7 +146,7 @@ This is a design document, not an implementation document. There should be no re
 "Modify `SchemaService.cs` to add method `GetRawDataTableName()`" - this level of detail doesn't belong here. The developer will figure out where code goes.
 
 ### Decision History
-State each decision and its rationale as it stands now. Who ruled on it and when, superseded versions, and dated correction notes belong in git history and the assumptions document, not the design.
+State each decision and its rationale as it stands now. Who ruled on it and when, superseded versions, and dated correction notes belong in git history and the assumptions document, not the design. `Replaces:` and `Superseded by:` lines are pointers between documents, not history, and stay.
 
 ### Unnecessary Detail
 A technical design document doesn't need to document every detail. Focus on:

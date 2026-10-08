@@ -35,7 +35,7 @@ corrections, and a month later nobody can say what the code was supposed to do.
 The fix isn't a better prompt. It's doing the thinking before the build:
 
 - **Requirements lead the build.** Work starts from a PRD and a technical design, and a
-  meaningful change amends them before it is built.
+  meaningful change amends them, or names what it replaces, before it is built.
 - **Assumptions are green lights.** A business question is researched, answered with a
   proposal and a confidence level, and the build continues. Stakeholders confirm or correct
   it later.

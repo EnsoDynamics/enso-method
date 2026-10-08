@@ -91,8 +91,9 @@ This is what the sub-agent follows.
 
 **Critical instruction: Re-read every changed file from disk before evaluating.** Do not review from conversation memory. The whole point is fresh eyes on the actual output.
 
-**Spec documents are the source of truth.** When the review is checking implementation against a technical design document, PRD, or other spec, the default assumption is that the spec is correct and the implementation should match it. If the implementation diverges from the spec:
+**Spec documents are the source of truth.** When the review is checking implementation against a technical design document, PRD, or other spec, the default assumption is that the spec is correct and the implementation should match it. The spec is the criterion that owns the behavior now: follow any `Superseded by:` line to the later criterion before judging code against an earlier one (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"). If the implementation diverges from the spec:
 - The default finding should be **"implementation doesn't match spec"** — flag it as an implementation gap to fix.
+- A divergence in code this session did not write is not an implementation gap: report it as an observation. It may be a deliberate change made outside the method. If the session's work depends on it, the main agent applies `implementation-lifecycle`, "When Later Work Changes Earlier Requirements".
 - Only recommend a spec update when the divergence was a **deliberate, justified decision** made during implementation (e.g., a third-party API limitation that prevents the spec'd approach, or source data structured differently than the spec described). In that case, clearly label the finding as "spec update needed (justified divergence)" and explain why.
 - Never silently update spec documents to match the implementation — that inverts the review's purpose. If a spec update is warranted, resolve it by the calling workflow's Doc Divergence rule (`implement-from-requirements`) — never silently, never over a stakeholder's ruling; run standalone, present the proposed change to the user for approval first.
 

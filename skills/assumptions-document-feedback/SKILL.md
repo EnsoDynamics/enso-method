@@ -208,7 +208,7 @@ For each **validated** or **corrected** item:
    - Field Mapping docs: If the correction changes data sources or logic
 
 2. **Update the PRD**:
-   - Fold the decision into the requirement it settles (an acceptance criterion, Summary or Business Context), stated as the requirement itself
+   - Fold the decision into the requirement it settles (an acceptance criterion, Summary or Business Context), stated as the requirement itself. If that criterion carries a `Superseded by:` line covering what the ruling settles, a later-built PRD changed that behavior on purpose: do not fold, and name the conflict between the ruling and the later PRD in the report, for the user to settle with the stakeholder. If it is only partly superseded and the ruling concerns the part still in force, fold into it as usual (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion")
    - Update acceptance criteria if the correction changes what "done" looks like
    - Note the source/date of validation for traceability
 

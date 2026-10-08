@@ -68,6 +68,8 @@ Surface those questions, propose how you'd answer them, and give the human a cha
 
 Confirm you've reviewed the PRD, technical design, the phase document when the work is split, and relevant existing code.
 
+**Then run the conflict check** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements") against the whole PRD, unless the caller says it runs its own (`autonomous-requirements-refinement` does). It finds criteria in the repo's other PRDs and change directories that this PRD changes. An unintended conflict, where this PRD would break behavior someone asked for, is a Business question like any other, with your proposed answer. Intended ones are listed in the output as the `Replaces:` lines to add (`prd-writing-standards`), and added when the user asks you to update the documents.
+
 **If foundational documents (PRD, technical design) cannot be located**, include a prominent warning at the top of the output stating which documents were unavailable. Without these documents, all confidence assessments are suspect. Still complete the check—don't refuse to produce output.
 
 **2. Surface questions**
@@ -142,6 +144,8 @@ The final output should be a concise list of **questions requiring confirmation*
 - The impact if wrong
 
 If foundational documents were missing, include a prominent warning at the top before the questions.
+
+After the questions, when this check ran its own conflict check, list every finding not already asked above under **Earlier criteria this PRD replaces**, whatever its confidence: one line each, the new criterion and the `Replaces:` line it gets, or for an unintended conflict you are sure of, the fix to the new criterion you propose. Write "Conflict check: no earlier criteria changed" when it found none.
 
 Example (documents found):
 
@@ -262,7 +266,7 @@ Steps:
 1. For each confirmed answer, identify which documents it affects (PRD, technical design, assumptions, phase documents, or any other context documents that were part of the review).
 2. Update all affected documents, using the appropriate writing standards skills (`prd-writing-standards`, `technical-design-writing-standards`, etc.).
 3. If an assumptions document exists and any of the readiness check items overlap with existing assumptions, update the assumptions document too (mark assumptions as confirmed, update proposed answers if they changed).
-4. Show what you changed so the human can verify.
+4. Show what you changed so the human can verify. When this check ran its own conflict check, include a `Conflict check:` line with its result in the proposed commit message, so the build narrows from it.
 
 ---
 
