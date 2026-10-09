@@ -23,7 +23,10 @@ which is what `/rename` would have set. Two rules, checked in order:
 
 Both rules look inside a leading `<pasted_content id="...">` tag: the VS Code
 extension wraps pasted text in one, so a pasted prompt's name line is the line
-after the tag, not the tag itself.
+after the tag, not the tag itself. Both rules also skip whole context blocks the
+client puts ahead of the user's text, such as the `<browser_instruction>` block the
+VS Code extension prepends to a session's first message when Claude in Chrome is
+enabled (Claude Code 2.1.287 and later).
 
 Why not always require the `Chat:` prefix: the VS Code extension seeds a new
 tab's label from the raw first prompt and does not pick up a hook-set title
@@ -60,6 +63,10 @@ import sys
 MAX_LEN = 60          # hard cap on the title we return
 BARE_NAME_MAX = 40    # a bare first line longer than this is a sentence, not a name
 PASTE_OPEN = re.compile(r'<pasted_content\b[^>\n]*>[ \t]*\n')
+# A whole context block a client prepends to the user's text, e.g.
+# <browser_instruction>...</browser_instruction>; never the paste wrapper.
+INJECTED_BLOCK = re.compile(
+    r'<(?!pasted_content\b)([A-Za-z_][\w-]*)\b[^>\n]*>.*?</\1\s*>\s*', re.DOTALL)
 
 
 def is_first_prompt(event: dict) -> bool:
@@ -94,6 +101,10 @@ def main() -> int:
         return 0
 
     text = prompt.lstrip()
+    # The VS Code extension (2.1.287 and later) prepends a
+    # <browser_instruction> block to the first message; skip any such blocks.
+    while (block := INJECTED_BLOCK.match(text)):
+        text = text[block.end():]
     # The VS Code extension (2.1.280 and later) wraps a pasted prompt in
     # <pasted_content id="..."> ... </pasted_content id="...">; the name line
     # is the first line inside it.
