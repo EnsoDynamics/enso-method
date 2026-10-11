@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://ensomethod.org"><img src="docs/assets/enso-method-banner.jpg" alt="The Enso Method: tell AI what you want, not what to do. Open source skills for Claude Code and Codex." width="720"></a>
+  <a href="https://ensomethod.org"><img src="docs/assets/enso-method-banner.jpg" alt="The Enso Method: clear requirements in. Tested software out. Open source skills for Claude Code and Codex." width="720"></a>
 </p>
 
 <p align="center">
@@ -11,20 +11,25 @@
 
 # The Enso Method
 
-**Tell AI what you want, not what to do.**
+**Clear requirements in. Tested software out.**
 
-The Enso Method is a way of building production software with AI coding agents, and the
-open source agent skills for Claude Code and Codex that carry it out. You describe what you
-want in plain language. The method turns it into a PRD (product requirements document) and a
-technical design, which you review. It researches the open questions and answers them or
-writes them down as assumptions, and then the agents build it, phase after phase,
-while your attention goes elsewhere. The requirements documents, not a chat history, drive
-the build.
+The Enso Method is a way of building production software with AI coding agents, delivered
+as free, open source agent skills for Claude Code and Codex. You describe the outcome you
+want in plain language. The method turns it into a PRD (product requirements document) and
+a technical design, which you review before the build. Then the agents build it in phases
+while your attention goes elsewhere, checking every acceptance criterion with a test that
+would fail if the behavior were wrong.
 
-It is built for the case most AI methods skip: **the person who decides isn't the one at the
-keyboard.** A client, a business owner, a department head. The build keeps moving on
-proposals they confirm or correct on their own schedule, and they are left with documents
-they can actually read.
+Technical questions are researched against the real code, data and APIs. Open business
+decisions are written down as assumptions, with a proposed answer, evidence and a confidence
+level. Stakeholders confirm or correct them on their own schedule while the build continues.
+Their answers go back into the requirements, which stay the source of truth for future
+changes.
+
+It is built for when **the person who decides isn't the one at the keyboard**: a client,
+a business owner, a product owner. They get proposals and requirements they can actually
+read. Solo developers benefit too: the decisions stay written down for the next change
+and the next agent session.
 
 ## Why
 
