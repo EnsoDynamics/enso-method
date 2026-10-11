@@ -9,7 +9,7 @@
     {
       "name": "enso-method",
       "source": ".",
-      "description": "Tell AI what you want, not what to do: skills that turn a plain-language request into a PRD, a technical design and a phased plan, then build, review and test it.",
+      "description": "Agent skills for Claude Code and Codex that record business assumptions with evidence and confidence, and preserve requirements as the source of truth.",
       "category": "development"
     }
   ]

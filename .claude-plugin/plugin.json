@@ -1,7 +1,7 @@
 {
   "name": "enso-method",
   "displayName": "The Enso Method",
-  "description": "Tell AI what you want, not what to do: skills that turn a plain-language request into a PRD, a technical design and a phased plan, then build, review and test it.",
+  "description": "Agent skills for Claude Code and Codex that record business assumptions with evidence and confidence, and preserve requirements as the source of truth.",
   "author": {
     "name": "Doug Kerwin",
     "url": "https://ensodynamics.com"
@@ -9,5 +9,9 @@
   "homepage": "https://ensomethod.org",
   "repository": "https://github.com/EnsoDynamics/enso-method",
   "license": "MIT",
-  "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"]
+  "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"],
+  "version": "0.1.0",
+  "icon": ".claude-plugin/icon.png",
+  "privacyPolicyUrl": "https://github.com/EnsoDynamics/enso-method/blob/main/docs/enso-method-plugin-privacy-policy.md",
+  "supportUrl": "https://github.com/EnsoDynamics/enso-method/issues"
 }

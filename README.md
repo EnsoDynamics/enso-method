@@ -191,6 +191,30 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `engineering-principles` — the principles the method depends on: no silent fallbacks, the testing evidence standard, production data, judgment calls
 - `wall-clock-awareness` — cut waiting time in tests, builds and CI
 
+## Data handling
+
+See the [plugin privacy policy](docs/enso-method-plugin-privacy-policy.md) for
+project data, external providers, retention and support contacts.
+
+The plugin contains instructions, documentation and two optional Python hooks.
+It has no MCP servers or automatically enabled hooks, and includes no telemetry.
+The optional hooks work locally: one reads prompt and transcript information to
+set a session title, and the other reads tool-event metadata and writes a
+temporary marker to avoid repeating an assumptions-document reminder. Neither
+makes network calls. EnsoDynamics runs no service that receives project data
+from the plugin.
+
+Following the skills can involve reading project files, querying databases and
+APIs, and writing requirements, assumptions and code in your workspace. Depending
+on your project, those records may contain personal data. The skills can also
+direct your coding agent to use external services for research, testing and
+delivery, including GitHub when pushing work. Those operations use
+your agent's tools, permissions and configured services. Their data handling and
+retention depend on the agent and services you use.
+
+Report sensitive security concerns through the
+[security reporting channel](SECURITY.md).
+
 ## Who's behind it
 
 The Enso Method is created and maintained by Doug Kerwin, author of *The Enterprise Vibe
