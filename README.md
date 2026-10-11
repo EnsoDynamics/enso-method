@@ -15,10 +15,11 @@
 
 The Enso Method is a way of building production software with AI coding agents, and the
 open source agent skills for Claude Code and Codex that carry it out. You describe what you
-want in plain language. The method turns it into a PRD, a technical design and a plan,
-researches every open question and answers it or writes it down as an assumption, and then
-the agents build it, phase after phase, while your attention goes elsewhere. The
-requirements documents, not a chat history, drive the build.
+want in plain language. The method turns it into a PRD (product requirements document) and a
+technical design, which you review. It researches the open questions and answers them or
+writes them down as assumptions, and then the agents build it, phase after phase,
+while your attention goes elsewhere. The requirements documents, not a chat history, drive
+the build.
 
 It is built for the case most AI methods skip: **the person who decides isn't the one at the
 keyboard.** A client, a business owner, a department head. The build keeps moving on
@@ -36,6 +37,8 @@ The fix isn't a better prompt. It's doing the thinking before the build:
 
 - **Requirements lead the build.** Work starts from a PRD and a technical design, and a
   meaningful change amends them, or names what it replaces, before it is built.
+- **Review before the build.** You review the PRD and the technical design before anything
+  is built. That is where your judgment goes in; after that, the build runs without you.
 - **Assumptions are green lights.** A business question is researched, answered with a
   proposal and a confidence level, and the build continues. Stakeholders confirm or correct
   it later.
@@ -51,7 +54,7 @@ Each step is a skill your agent runs, and each hands the next a document it can 
 Refinement is a loop: it finds the gaps, researches each question against the real code and
 data, and writes the answers back into the PRD and design, recording business decisions as
 assumptions for stakeholders to confirm, until nothing is left to guess. Stages 2 and 3 run
-once per phase: a phase is built, reviewed, hardened and committed, then `continuation-prompt`
+once per phase: a phase is built, reviewed, its tests hardened, and committed, then `continuation-prompt`
 hands the next one to a fresh session. An idea too big for one PRD first goes through
 `prd-roadmap`.
 
@@ -146,9 +149,9 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
 `$enso-method:prd-writing-standards`):
 
 1. **Write the PRD.** Run `/prd-writing-standards` and describe what you want in your own
-   words. Talk it through; the messy version is better than a tidy instruction.
-2. **Design and refine.** Run `/technical-design-writing-standards`, then
-   `/autonomous-requirements-refinement` to close the gaps.
+   words. Talk it through; the messy version is better than a tidy instruction. Then review it.
+2. **Design and refine.** Run `/technical-design-writing-standards` and review the design,
+   then `/autonomous-requirements-refinement` to close the gaps.
 3. **Build.** Run `/implement-from-requirements`. It sizes the work, splits it if it must,
    and builds, reviews and tests the first phase in the same session.
 

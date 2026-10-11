@@ -512,6 +512,8 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Why we can't assume**: [Brief explanation of why the evidence favors none of the options, and what would let us decide]
 
+**Confidence**: X% (under ~20%) | **Blocks**: [the work that can't proceed until this is answered]
+
 ---
 
 ## Data Assumptions
@@ -800,6 +802,7 @@ Don't fake confidence. Be honest about what you know vs. what you're guessing.
 - **50-70%**: Reasonable assumption based on partial evidence
 - **30-50%**: Educated guess that needs validation
 - **<30%**: Low confidence, likely wrong
+- **Under ~20%, with no option favored**: still written into this document, with its honest confidence (5%, 10%), but as a Blocking Open Question at the top: the work it governs can't proceed until it is answered (see "Blocking Open Questions" above)
 
 ❌ **Don't**: Set high confidence just because it "seems logical"
 
