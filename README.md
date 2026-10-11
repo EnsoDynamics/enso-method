@@ -1,5 +1,5 @@
 <p align="center">
-  <a href="https://ensomethod.org"><img src="docs/assets/enso-method-banner.jpg" alt="The Enso Method: tell AI what you want, not what to do. Open-source skills for Claude Code and Codex." width="720"></a>
+  <a href="https://ensomethod.org"><img src="docs/assets/enso-method-banner.jpg" alt="The Enso Method: tell AI what you want, not what to do. Open source skills for Claude Code and Codex." width="720"></a>
 </p>
 
 <p align="center">
@@ -14,7 +14,7 @@
 **Tell AI what you want, not what to do.**
 
 The Enso Method is a way of building production software with AI coding agents, and the
-open-source agent skills for Claude Code and Codex that carry it out. You describe what you
+open source agent skills for Claude Code and Codex that carry it out. You describe what you
 want in plain language. The method turns it into a PRD, a technical design and a plan,
 researches every open question and answers it or writes it down as an assumption, and then
 the agents build it, phase after phase, while your attention goes elsewhere. The

@@ -47,7 +47,7 @@ These documents colocate inside `docs/prds/{prd-name}/` (a program) or `docs/cha
 
 | Confidence | Action |
 |-----------|--------|
-| **95%+** | Just do it, whatever the impact — no need to document or ask |
+| **95%+** | Decide and proceed, whatever the impact. Nobody is asked and nothing is declared: listing every near-certain call would bury the few that need a person |
 | **Below 95%** | Proceed on the best answer, and document it as an assumption for stakeholder review, at its honest confidence |
 | **No answer to put forward** | Stop and ask — only when the evidence favors none of the options (in practice, a best answer under roughly 20%) |
 

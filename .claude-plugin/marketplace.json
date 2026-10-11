@@ -4,7 +4,7 @@
     "name": "EnsoDynamics",
     "url": "https://ensodynamics.com"
   },
-  "description": "The Enso Method: open-source skills for building production software with AI coding agents.",
+  "description": "The Enso Method: open source skills for building production software with AI coding agents.",
   "plugins": [
     {
       "name": "enso-method",
