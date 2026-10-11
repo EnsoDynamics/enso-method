@@ -18,6 +18,11 @@ EnsoDynamics service or send project data to an EnsoDynamics endpoint.
 The setup guide describes two scripts you can choose to configure in Claude
 Code. Installing the plugin does not enable them automatically.
 
+The documented configuration puts the hooks in your global Claude Code settings.
+Once enabled there, they can process matching events in any Claude Code session,
+including other projects and sessions where you have not invoked an Enso Method
+skill. Remove their entries from those settings to disable them.
+
 - The session-title hook reads the current prompt supplied by Claude Code and,
   when needed, the local session transcript to check whether a user message
   already exists. It returns a session title to Claude Code.
@@ -38,6 +43,15 @@ in your environment. Depending on the task you request, this can involve reading
 project files, requirements and business records; querying databases and APIs;
 and writing requirements, assumptions, code and other project documents. Those
 inputs and outputs may contain personal or confidential information.
+
+The implementation skills also direct the agent to create and read local
+`.agent-sessions/` logs to coordinate work. These can include session identifiers,
+chat titles, project and task names, status events, timestamps and worktree paths.
+The instructions require excluding this folder from Git. When creating another
+log, the agent is instructed to remove completed logs older than seven days and
+logs untouched for fourteen days. This cleanup depends on the agent following
+those instructions; it is not automatic expiry. Copies you retain, backups and
+data processed by your AI provider follow their own retention settings.
 
 The agent may use your configured credentials to access systems needed for your
 task. The plugin provides no credential collection form or credential storage
