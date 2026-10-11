@@ -9,6 +9,5 @@
   "homepage": "https://ensomethod.org",
   "repository": "https://github.com/EnsoDynamics/enso-method",
   "license": "MIT",
-  "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"],
-  "version": "0.1.0"
+  "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"]
 }

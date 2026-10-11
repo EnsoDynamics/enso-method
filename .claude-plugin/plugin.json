@@ -10,7 +10,6 @@
   "repository": "https://github.com/EnsoDynamics/enso-method",
   "license": "MIT",
   "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"],
-  "version": "0.1.0",
   "icon": ".claude-plugin/icon.png",
   "privacyPolicyUrl": "https://github.com/EnsoDynamics/enso-method/blob/main/docs/enso-method-plugin-privacy-policy.md",
   "supportUrl": "https://github.com/EnsoDynamics/enso-method/issues"

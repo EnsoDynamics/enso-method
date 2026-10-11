@@ -153,8 +153,3 @@ already there:
 Decision records for skill rules live in [`skill-decisions/`](skill-decisions/), outside
 every skill directory so they never load into a running session. Read the relevant one
 before changing a rule.
-
-When publishing a plugin update, raise `version` in both `plugin.json` and
-`.claude-plugin/plugin.json`. Claude Code keeps a marketplace-installed plugin
-on its current version until that value changes. Validate both the plugin and
-marketplace manifests before publishing.
