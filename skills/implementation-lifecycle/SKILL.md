@@ -501,7 +501,7 @@ Sometimes the correct decision is not to handle a case in code — a platform co
 
 ## Relationship to Other Skills
 
-This skill provides the **framework context**. Other skills provide the **procedures**.
+This skill provides the **framework context**. Other skills provide the **procedures**. For which skill runs at each stage, and in what order, see `using-the-enso-method`.
 
 | Skill | When to Use |
 |-------|-------------|

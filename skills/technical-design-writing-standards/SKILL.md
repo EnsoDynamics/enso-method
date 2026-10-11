@@ -1,6 +1,6 @@
 ---
 name: technical-design-writing-standards
-description: Standards and process for writing technical design documents — architecture decisions, interfaces, data models, and integration points, including designs for changes to an existing system. Use to write a design from a PRD, or to check one. Not implementation instructions.
+description: Standards and process for writing technical design documents — architecture decisions, interfaces, data models, and integration points, including designs for changes to an existing system. Use to write a design from a PRD the user has reviewed, or to check one; autonomous-requirements-refinement follows the user's review of the design. Not implementation instructions.
 user-invocable: true
 ---
 
@@ -47,6 +47,7 @@ A system can be mixed; say which parts are which. `autonomous-requirements-refin
 4. **Keep to the PRD.** The design never adds a requirement, and behavior the PRD doesn't ask for is out of scope. Technical choices you can make, make, and record why. A gap in the PRD goes in Open Questions; a business uncertainty also goes in the assumptions document per `assumptions-document-writing`.
 5. **Check before handing it over.** Every acceptance criterion is covered by something in the design, nothing is designed that no criterion asks for, and it can be read in one sitting.
 6. **For a design with hard-to-reverse decisions** — a new service, a schema or data model, a public interface — run `review-technical-design` next, before `autonomous-requirements-refinement`. It is optional; a design that follows an established pattern can skip it.
+7. **Once the user has reviewed the design** (with `review-technical-design`'s triage, when it ran), `autonomous-requirements-refinement` refines the PRD and design together to implementation-ready.
 
 ---
 

@@ -1,6 +1,6 @@
 ---
 name: autonomous-requirements-refinement
-description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
+description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state, run once the user has reviewed the PRD and design, before implement-from-requirements — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
 user-invocable: true
 ---
 

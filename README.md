@@ -169,6 +169,9 @@ Skills load on demand by name and description, so you rarely invoke one directly
 directory under `skills/` with a `SKILL.md` is one skill, in the open
 [Agent Skills](https://agentskills.io) format.
 
+**Start here**
+- `using-the-enso-method` — the map: which skill runs at each stage, in what order, and where you review. Ask your agent to "use the Enso Method" and it loads this
+
 **Requirements and design**
 - `prd-roadmap` — cut an idea too big for one PRD into an ordered roadmap of planned PRDs
 - `prd-writing-standards` — write a PRD, and where the documents live

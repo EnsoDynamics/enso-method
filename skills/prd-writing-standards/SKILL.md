@@ -1,6 +1,6 @@
 ---
 name: prd-writing-standards
-description: Standards for writing skimmable PRDs (Product Requirements Documents) — clear business context and testable outcomes without implementation details, invented responsibilities, or step-by-step instructions.
+description: Write or check a PRD (Product Requirements Document), the requirements a technical design is then built from. Skimmable — clear business context and testable outcomes without implementation details, invented responsibilities, or step-by-step instructions. Use when the user describes something to build and no PRD exists yet, or to bring an existing PRD up to this standard.
 user-invocable: true
 ---
 
@@ -313,3 +313,9 @@ Documents a repo already holds stay where they are and are read as they are — 
 ### Cross-Repo Initiatives
 
 If a PRD spans multiple repositories, store it in whichever repo is the primary home for the initiative, or in a dedicated product/project-level repo if one exists.
+
+---
+
+## Next: The Technical Design
+
+Once the PRD is complete and the user has reviewed it, write its technical design with `technical-design-writing-standards`, as `technical-design.md` in the same directory.
