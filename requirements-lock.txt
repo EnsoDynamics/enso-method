@@ -1,0 +1,2 @@
+# The YAML parser used by the Skill Frontmatter workflow, not a plugin runtime dependency.
+PyYAML==6.0.3

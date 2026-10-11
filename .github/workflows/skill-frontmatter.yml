@@ -11,13 +11,13 @@ jobs:
   skill-frontmatter:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
       - name: Parse every SKILL.md frontmatter strictly
         # Strict YAML parsers (the skills CLI, Codex) silently skip a skill whose
         # frontmatter fails to parse, or whose description is over 1024 characters
         # (Codex rejects it), so a bad description must fail the build.
         run: |
-          pip install --quiet pyyaml
+          pip install --quiet -r requirements-lock.txt
           python3 - <<'EOF'
           import pathlib, sys, yaml
           bad = []
@@ -44,9 +44,11 @@ jobs:
           sys.exit(1 if bad else 0)
           EOF
       - name: Check the plugin manifests agree
-        # plugin.json (the vendor-neutral Agent Plugins format, read by Codex and
-        # others) and .claude-plugin/ (Claude Code's format, also read by Codex)
-        # describe the same plugin, so a drifted name would ship two prefixes.
+        # plugin.json (the portable Agent Plugins format, canonical for Codex,
+        # which reads its OpenAI settings from extensions.com.openai) and
+        # .claude-plugin/ (Claude Code's format) describe the same plugin, so a
+        # drifted name would ship two prefixes. Both stay unversioned so
+        # installs follow new commits.
         run: |
           python3 - <<'EOF'
           import json, pathlib, sys
@@ -65,6 +67,11 @@ jobs:
               bad.append(f'plugin names disagree: {sorted(map(str, names))}')
           if 'version' in root or 'version' in claude:
               bad.append('a manifest pins version; installs then stop following new commits')
+          if pathlib.Path('.codex-plugin/plugin.json').exists():
+              bad.append('.codex-plugin/plugin.json would be ignored; OpenAI settings live in plugin.json extensions.com.openai')
+          icon = root.get('extensions', {}).get('com.openai', {}).get('interface', {}).get('composerIcon', '')
+          if not icon or not pathlib.Path(icon).is_file():
+              bad.append('plugin.json extensions.com.openai.interface.composerIcon is missing')
           print('\n'.join(bad) or f'manifests OK: {names.pop()}')
           sys.exit(1 if bad else 0)
           EOF

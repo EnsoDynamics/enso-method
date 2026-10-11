@@ -9,5 +9,17 @@
   "homepage": "https://ensomethod.org",
   "repository": "https://github.com/EnsoDynamics/enso-method",
   "license": "MIT",
-  "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"]
+  "keywords": ["prd", "technical-design", "requirements", "planning", "implementation", "testing", "methodology"],
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "The Enso Method",
+        "shortDescription": "Record business assumptions and preserve software requirements",
+        "developerName": "Enso Dynamics",
+        "websiteURL": "https://ensomethod.org",
+        "privacyPolicyURL": "https://github.com/EnsoDynamics/enso-method/blob/main/docs/enso-method-plugin-privacy-policy.md",
+        "composerIcon": "./assets/icon.png"
+      }
+    }
+  }
 }
