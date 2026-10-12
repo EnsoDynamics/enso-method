@@ -14,7 +14,7 @@ A review-and-fix loop for a drafted PRD and everything that travels with it: its
 
 A PRD written from source material (a brief, a roadmap entry, a stakeholder's handoff, interviews) is rarely right on the first draft. Some cases go unstated, two passages disagree, a fix in one place leaves a stale copy in another, and a mockup shows something the criteria no longer say. One review round finds some of this; the fixes then create a few new problems of their own. This skill runs the rounds until they stop finding anything that matters, without the user.
 
-**The goal:** when the run ends, no Medium or High problem a reviewer found in the PRD, its assumptions or its mockups is left unfixed, apart from any rejected with a stated reason or handed off whole to another session, so the user's review is spent on the product decisions, not on defects.
+**The goal:** when the run ends, no Medium or High problem a reviewer found in the PRD, its assumptions or its mockups is left unfixed, apart from any rejected with a stated reason or handed off whole to another session, so the user's review is spent on the product decisions, not on defects. And the PRD is still one a person can read and sign off: a run that covers every case but leaves the criteria unreadable has not reached its goal ("Keep It Readable").
 
 **The shape of the work.** A long review loop gets expensive in three places, and the skill is built around each:
 
@@ -102,6 +102,20 @@ A fix may make the PRD say precisely what its source material and stated intent 
 
 A finding that needs a business decision the sources do not settle becomes an assumption at the best-supported answer, following `assumptions-document-writing` (its gates first: the answer is often already written down). Use a Blocking Open Question only for the rare case that skill defines; it pauses the run.
 
+**Say what settles each fix.** For every Medium or High it fixes, the writer names what settles the fix: the source material (cited), a rule the PRD already states, or a new decision. A new business decision the sources do not settle becomes an assumption, as above, so the person signing off sees it as something to confirm rather than a rule to skim past. A consequence of a rule the PRD already states is not a new decision and gets no assumption of its own: too many entries get approved unread (`assumptions-document-writing`).
+
+---
+
+## Keep It Readable
+
+Review rounds find cases, and every case found invites one more clause. Left alone, the criteria the rounds set out to sharpen become a document nobody can sign off with understanding, and an agent builds from it no better. Every fix follows `prd-writing-standards`, "Keep Criteria Readable as Cases Are Added":
+
+- **A case a stated rule settles needs no clause of its own.** The fix sharpens that rule's wording rather than adding one. Reviewers rate such a case Low at most (`deliverable-review`, "Calibrating the edges"); the writer still fixes a finding at the rating it was given.
+- **A criterion a fix would grow is restated, split, or given a table of its cases,** never extended clause by clause.
+- **Each rule is stated once,** and every other place names it by label.
+- **Mockup notes stay short.** A note says what its state shows and which criteria it covers. Links between states are neither reviewed nor explained.
+- **Growth is tracked.** The Rounds table records the words in the acceptance criteria after each fix step, and every full round's reviewer gets those figures with the readability question (Phase 2). Criteria that grew with no new requirement behind them are where to look first.
+
 ---
 
 ## Facts
@@ -173,9 +187,9 @@ Last updated: {date time}
 {The 1–2 sentence intent every round reviews against, and the decisions the source material settles, as deliverable-review's Steps 1–2 need them. Written once; amended only when the user rules.}
 
 ## Rounds
-| Round | Kind | High fixed | Medium fixed | Low fixed | Rejected (severity) | Handed off whole | Areas with a fixed Medium or High |
-|---|---|---|---|---|---|---|---|
-| 1 | Full | 2 | 6 | 10 | 1 (Low) | 0 | refunds, bundled items |
+| Round | Kind | High fixed | Medium fixed | Low fixed | Rejected (severity) | Handed off whole | Areas with a fixed Medium or High | Criteria words |
+|---|---|---|---|---|---|---|---|---|
+| 1 | Full | 2 | 6 | 10 | 1 (Low) | 0 | refunds, bundled items | 3,900 → 4,050 |
 
 ## Findings
 Open, rejected and handed-off findings, and the last round's fixed findings with what changed for each. Those are what the next delta round checks; they are replaced when the next round's fixes are recorded, so both the next reviewer and the next writer see them. Rejected and handed-off findings stay for the whole run.
@@ -261,13 +275,14 @@ The orchestrator plays `deliverable-review`'s main agent for its Steps 1–3: th
    - for a delta round: the previous round's findings and what was changed for each or, for a rejected one, the reason, from the Findings table, and the diff from step 2
    - that mockups are design references, how they render and the main users' width, and, for a delta round, which screens' content changed
    - for a full round, `deliverable-review` Step 6's question: does the deliverable, as it stands, accomplish the intent? A gap is a finding, rated like any other
+   - for a full round, two more questions, with the criteria-word figures from the Rounds table: can the person who signs the PRD off read each criterion once and say what it checks ("Keep It Readable")? And does any assumption's chosen answer now look wrong, given what the run has learned? Either is a finding, rated like any other
 4. **Record the findings** in the state file: a Rounds row with the round and its kind, each new finding in the Findings table as Open, the facts the reviewer verified added to Facts, and the snapshot from step 1 as the **Delta base**.
 
 ### Phase 3: Fix
 
-1. **Launch one writer** with the open findings, the documents, the Facts table, the Scope Gate, the settled questions, the agreed and pending seam wording from Hand-offs, the rules in "Working Beside Other Sessions", the previous round's fixes (so it can see a passage flipping back), and the instruction to fix by `deliverable-review` Step 5: each visual fixed in its own medium, a propagation sweep for every term, figure, name or rule a fix changed, and a check of each sentence a fix adds against its neighbours. Fixes follow `prd-writing-standards` and, for assumptions, `assumptions-document-writing`.
+1. **Launch one writer** with the open findings, the documents, the Facts table, the Scope Gate, the settled questions, the agreed and pending seam wording from Hand-offs, the rules in "Working Beside Other Sessions", the previous round's fixes (so it can see a passage flipping back), and the instruction to fix by `deliverable-review` Step 5: each visual fixed in its own medium, a propagation sweep for every term, figure, name or rule a fix changed, and a check of each sentence a fix adds against its neighbours. Fixes follow `prd-writing-standards` and, for assumptions, `assumptions-document-writing`, and keep the PRD readable ("Keep It Readable"). The writer returns, beyond its fixes, what settles each Medium or High it fixed ("The Scope Gate") and the words in the acceptance criteria after its fixes.
 2. **The writer fixes every finding, Lows included, rejects it with a reason, or hands it off when only another session can fix it.** A finding is rejected only when the governing text, a fact, a stakeholder's ruling or the scope gate shows it is wrong, and the reason names which.
-3. **Record the result:** the Rounds row is completed (fixed counts, rejected, handed off whole, areas with a fixed Medium or High); the previous round's Fixed rows are removed, and this round's fixed findings are marked Fixed with what changed; rejected and handed-off ones keep their reason or Hand-offs row; screens redrawn, assumptions changed and rejected Mediums and Highs go in Run totals; new facts go in Facts; files the writer created or edited that are not yet listed go in Documents; passages it settled after flipping go in Settled questions; out-of-scope lines and hand-offs in their sections. Set **Next round** from The Loop (and **Delta rounds run** once one has), and **Next action**.
+3. **Record the result:** the Rounds row is completed (fixed counts, rejected, handed off whole, areas with a fixed Medium or High, criteria words before and after); the previous round's Fixed rows are removed, and this round's fixed findings are marked Fixed with what changed; rejected and handed-off ones keep their reason or Hand-offs row; screens redrawn, assumptions changed and rejected Mediums and Highs go in Run totals; new facts go in Facts; files the writer created or edited that are not yet listed go in Documents; passages it settled after flipping go in Settled questions; out-of-scope lines and hand-offs in their sections. Set **Next round** from The Loop (and **Delta rounds run** once one has), and **Next action**.
 4. **Report the round in one line:** `Round {N} ({kind}): fixed High {h} · Medium {m} · Low {l}; rejected {r} ({severities}); handed off whole {k}. Next: {kind}`.
 
 ### Phase 4: Continue or Stop
@@ -294,6 +309,7 @@ Using the state file only:
 Rounds: {N} ({f} full, {d} delta)   Final round: full, no Medium or High left to fix
 Findings fixed across all rounds: High {h} · Medium {m} · Low {l}   Rejected: {r}, Mediums and Highs listed with their reasons   Handed off: {list, or none}
 Mockups: {s} screens, {k} redrawn during the run
+Acceptance criteria: {c} criteria, {w0} → {w1} words
 Assumptions added or amended: {IDs, or none}
 Facts verified: {n}
 
@@ -315,12 +331,14 @@ Next: the user reviews the PRD, ideally with whoever owns the business decisions
 - Render mockups at their main users' width: every screen in a full round, only the screens the fixes affected in a delta round
 - Record each verified fact with the exact record and query, and reuse it
 - Keep the state file current after every step; resume from it, never restart
+- Keep the PRD readable for the person who signs it off: sharpen a rule, split it or give its cases a table, rather than add a clause
 - Stop at the round cap and say what is still open
 
 ### DO NOT
 
 - End the run on a delta round, or on a full round that had a Medium or High to fix, even once it is fixed, unless the user says to stop
 - Re-rate a finding to end the loop sooner; fix it at the reviewer's rating, and reject only a finding that is wrong
+- Grow a criterion one clause per case, or spell out a case a rule the PRD already states settles
 - Add a capability neither the source material nor the stated intent asks for
 - Review mockups at every screen size the PRD names; those sizes are requirements on the product
 - Run two writers at once, or edit another session's lines in a shared document

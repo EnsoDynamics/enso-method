@@ -54,6 +54,26 @@ Bad acceptance criteria:
 
 Precise is not the same as readable. See "Plain English for Readers Outside the Project" below for how the criteria and the sections around them get written so someone who wasn't part of the project can follow them.
 
+### Keep Criteria Readable as Cases Are Added
+A person signs a PRD off by reading it, and an agent builds from it. Write it as detailed as the build needs and no more, and keep it that way as review rounds add cases. A criterion that grows a clause for every case a reviewer raises ends up checked by nobody and misread by everyone, agents included.
+
+- **First ask whether a stated rule already settles the case.** If applying a rule the PRD already states answers it, the case needs no words of its own; at most, sharpen the rule's wording so the answer is plain. The technical design applies the rule to each place it touches.
+- **Restate; don't append.** When a criterion must change to cover a case, rewrite it as one statement of the rule. A criterion that has grown "unless", "except when" and "including those" one round at a time is due a rewrite.
+- **A rule with many cases gets a table.** When a behavior genuinely differs by case, keep the criterion to the rule in a sentence and put the cases in a short table beneath it, one row per case. A reviewer checks a row at a glance, and a test covers one row at a time.
+- **State each rule once.** Other criteria, notes and mockups name it by label rather than restate it. A restated rule drifts, and every copy is one more thing a fix has to find.
+- **Keep context out of the criterion.** A criterion says what must be true. When it deliberately changes how things work today, one short closing sentence may say so, so a builder does not keep the old behavior; evidence and history go in the Business Context or in the assumption that records the decision.
+- **Tripwire, not a limit:** a criterion that no longer reads as one short paragraph, or that a reader has to read twice to find what is being checked, is due a split or a table.
+
+```markdown
+- [ ] **AC-REFUND-04 — Each returned item is refunded by its condition.** When a return arrives, each item is refunded as the table says, and the customer sees which row applied.
+
+  | Condition on arrival | Refund |
+  |---|---|
+  | Unopened | Full price, to the original payment method |
+  | Opened, undamaged | Full price, as store credit |
+  | Damaged by the customer | None; the item is sent back at no charge |
+```
+
 ### Stable Acceptance-Criterion Labels
 When other documents (plans, technical designs, phase docs, status updates) will point back into a PRD, references must survive the PRD being edited and reordered. Section numbers and paragraph positions shift when content moves, so they are poor references.
 
@@ -122,6 +142,7 @@ Good: "The system can access a contact list containing each person's name, compa
 When a PRD has mockups, each state shows what its criteria require, so a reader never has to reconcile the drawing with the text.
 
 - **Correct the drawing; never annotate it.** When a criterion changes, or the work establishes a fact a mockup contradicts, redraw every affected state in the same change. A note saying what a mockup gets wrong leaves two specifications, and a builder may follow the wrong one. The one exception is material from a handoff package. Nothing in a handoff is edited: the whole package stays as received, in its own location named for where it came from and when (such as `source-material/{source}-handoff-{date}/`), never inside the PRD's directory, so nobody mistakes it for the PRD's requirements. The PRD's own mockups and text say where they depart from it.
+- **Keep each state's note short.** A note says what the state shows and which criteria it covers. It does not restate rules, which live in the criteria, or explain how the states link to each other: links between states are a convenience for stepping through, not part of what is specified.
 - **Draw from the facts.** Sample data comes from real records where the project allows reading them. A state that shows something other than what the first release is expected to do, such as an optional integration already in place, says which scenario it draws.
 - **Regenerate a mockup in its own medium.**
   - *Code, the usual case for screens* (HTML, SVG, a page generated from data): edit the source or its generator and render it again. Any agent can, and code keeps exact text such as record numbers identical across states, diffs cleanly, and can be measured by script (`deliverable-review`, "Look at Visual Deliverables").

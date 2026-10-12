@@ -130,8 +130,8 @@ Give every finding a severity, by what happens if the deliverable is used as it 
 | Severity | The test | Typical findings |
 |---|---|---|
 | **High** | Following the deliverable as written gives a wrong result that is costly or hard to undo | a wrong behavior, money, data, safety or legal outcome; two passages that disagree where building either one would be costly to undo; a missing requirement the stated intent needs; a broken build or failing tests; a security hole |
-| **Medium** | A competent builder, maintainer or reader following it literally would build or decide something other than what was intended, or would have to stop and ask | an ambiguity with two plausible readings; an unstated case on a path users reach in normal operation; two passages that disagree with no way to tell which governs; a stale passage in governing text that contradicts current behavior |
-| **Low** | A reader would still get it right | wording; formatting; bookkeeping; redundancy. Layout polish of a design reference is not reported at all ("Look at Visual Deliverables") |
+| **Medium** | A competent builder, maintainer or reader following it literally would build or decide something other than what was intended, or would have to stop and ask | an ambiguity with two plausible readings; an unstated case on a path users reach in normal operation, that no stated rule settles; two passages that disagree with no way to tell which governs; a stale passage in governing text that contradicts current behavior |
+| **Low** | A reader would still get it right | wording; formatting; bookkeeping; redundancy. Layout polish of a design reference, and how its states link to each other, are not reported at all ("Look at Visual Deliverables") |
 
 **Governing text** is what a builder or reader acts on for a behavior: a requirement, a rule, a contract, the code that runs. **Bookkeeping** is text that records or points at governing text rather than stating it: indexes, lists of what a section covers, trace tables, cross-reference lists, counts, change notes, dates and status lines. A pointer a reader follows to find the governing text, such as a line naming the requirement that replaced this one, is not bookkeeping: rate it by where it sends the reader. When bookkeeping disagrees with governing text that is itself correct, a reader who follows the governing text still gets it right.
 
@@ -140,6 +140,8 @@ Calibrating the edges:
 - **An edge case** reachable only through an unlikely combination of events, with a contained outcome (an error the user sees and retries, a question someone asks), is Low, unless it touches money, safety, data loss or legal exposure; then rate that outcome.
 - **A fix that missed a copy** takes the severity of where the stale copy sits: in governing text, Medium or higher; in an index, a note, or a summary that only points at governing text, Low. A summary that restates a rule is stating it.
 - **Sample data** in a mockup or example that contradicts established facts is Low, unless a reader would build, configure or confirm the wrong thing from it; then Medium.
+- **A case a stated rule already settles** is Low at most, even on a normal path: when applying a rule the deliverable states gives the answer, its not being spelled out for that case leaves a reader nothing to stop and ask. It is Medium only when no stated rule applies, or two stated rules give different answers. Asking for every consequence of a rule to be written out grows a document clause by clause without making it more correct.
+- **Readability of a document a person signs off** (a PRD, its assumptions, a design a stakeholder approves): a requirement buried under clauses, so that a reader can no longer say what is being checked, is Medium, because the sign-off it exists for will approve what nobody could read. Length alone is Low. The fix is a rewrite, a split or a table (`prd-writing-standards`, "Keep Criteria Readable as Cases Are Added"), never another clause.
 
 ### 1. Trace Decisions to Output
 
@@ -174,7 +176,7 @@ Look for internal inconsistencies — statements that conflict, examples that do
 
 ### 5. Check Clarity
 
-Read the output as if you weren't part of the conversation. Is anything assuming context that isn't captured?
+Read the output as if you weren't part of the conversation. Is anything assuming context that isn't captured? For a document a person signs off, can that person read each requirement once and say what it checks?
 
 ### 6. Look at Visual Deliverables
 
@@ -183,7 +185,7 @@ A mockup, prototype, diagram, rendered page or generated image is reviewed by lo
 **First decide what the visual is for;** that sets how much looking it needs.
 
 - **The product itself:** a built page or app screen, a published site, a report or image that ships. Its layout is part of what is delivered, so render every screen or state at each screen size its spec names, or at least the smallest and the largest it must support.
-- **A design reference:** a mockup or prototype in a requirements document, a diagram in a design. It shows what is to be built, and the built product gets a review of its own. Render each screen or state once, at the width its main users work at, and review what it says against the criteria. Report its layout only where that makes content unreadable or misleading: a value cut off, one element hiding another, something the criteria require missing from the screen. Alignment, spacing and how it reflows at other sizes are left to the built product's review. The screen sizes a requirements document names are requirements on the product, not on its mockups.
+- **A design reference:** a mockup or prototype in a requirements document, a diagram in a design. It shows what is to be built, and the built product gets a review of its own. Render each screen or state once, at the width its main users work at, and review what it says against the criteria. Report its layout only where that makes content unreadable or misleading: a value cut off, one element hiding another, something the criteria require missing from the screen. Alignment, spacing and how it reflows at other sizes are left to the built product's review, and so are the links between its states: they are a convenience for stepping through, not part of what is specified. The screen sizes a requirements document names are requirements on the product, not on its mockups.
 
 Then, for either kind:
 
