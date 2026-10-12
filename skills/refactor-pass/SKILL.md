@@ -1,18 +1,18 @@
 ---
 name: refactor-pass
-description: "Post-commit follow-on to the implementation chain — judge whether the work just implemented warrants refactoring and, when it does, perform the refactoring in the same invocation: structure-only changes, tests stay green, presented as its own refactor(scope) commit proposal (the skill never commits; the user does). Strongly decline-biased; the most common outcome is a one-paragraph \"no refactor warranted\" with zero artifacts. Runs only on a committed feature baseline — recommended at implement-chain wrap-up for after the user commits, or standalone against a named commit and its requirements. An action skill — when refactoring is warranted it does the refactoring, not a report about it."
+description: "Post-commit step of the implementation chain — judge whether the work just implemented warrants refactoring and, when it does, perform the refactoring in the same invocation: structure-only changes, tests stay green, committed as its own refactor(scope) commit unless the user's instructions say not to. Strongly decline-biased; the most common outcome is a one-line \"no refactor warranted\" with zero artifacts. Runs only on a committed feature baseline — run by the implement chain after the feature commit and before any push, or standalone against a named commit and its requirements. An action skill — when refactoring is warranted it does the refactoring, not a report about it."
 user-invocable: true
 ---
 
 # Refactor Pass
 
-The optional follow-on to the standard implementation chain: implement (`implement-from-requirements` or `implement-from-discovery`) → `deliverable-review` → `test-hardening` → *user commits the feature work* → **`refactor-pass`**.
+The last judgment step of the standard implementation chain: implement (`implement-from-requirements` or `implement-from-discovery`) → `deliverable-review` → `test-hardening` → *feature commit* → **`refactor-pass`** → *push, when the default covers it*.
 
 The chain steps ask "does the work do what was asked, and do the tests prove it?" This pass asks a different question: **now that it works, is proven, and is safely committed, did building it leave the code structurally worse — and is fixing that worth doing right now?** Then, if the answer is yes, it does the fixing. One invocation covers both the judgment and the work: there is no separate "assessment" deliverable to carry into another session.
 
-Two commit rules frame everything here. **The pass runs only on a committed feature baseline** — the implement skills recommend it at wrap-up but never run it themselves, because refactoring can make a mess, and a committed baseline makes any mess trivially revertible without touching the feature diff. And **the pass does not commit on its own** — like every other skill in the chain, it stages its changes and presents a `refactor(scope): ...` commit message; the user reviews the diff and commits by their own judgment.
+Two commit rules frame everything here. **The pass runs only on a committed feature baseline** — the implement skills run it right after the feature commit and never before, because refactoring can make a mess, and a committed baseline makes any mess trivially revertible without touching the feature diff. And **the pass commits its own work separately** — when it changes anything, it makes its own `refactor(scope): ...` commit, never folded into the feature commit, so the two diffs are read apart. It commits by the implement chain's default and gives way to the user's instructions the same way (`pre-commit-validation`, "Who Commits"): a user who said not to commit gets the staged change and its message instead.
 
-**The default answer is no.** This is not hedging — it is the expert position the skill is built on. Refactoring is justified economically (Fowler): by making real, observed friction go away in code that will be worked on again — never by aesthetics, and never by imagined future needs ("speculative generality" is itself a code smell in Fowler's catalog). Most implementation sessions end with code that is good enough, and for those the entire output of this pass is one short paragraph. Do not manufacture a refactor to justify the invocation.
+**The default answer is no.** This is not hedging — it is the expert position the skill is built on. Refactoring is justified economically (Fowler): by making real, observed friction go away in code that will be worked on again — never by aesthetics, and never by imagined future needs ("speculative generality" is itself a code smell in Fowler's catalog). Most implementation sessions end with code that is good enough, and for those the entire output of this pass is one line. Do not manufacture a refactor to justify the invocation.
 
 Why this moment: "right after the feature, with green hardened tests" is the *refactor* step of red-green-refactor writ large — Kent Beck calls it *tidying after*. The tests `test-hardening` just certified are the safety net that makes structure-only change safe.
 
@@ -20,7 +20,7 @@ Why this moment: "right after the feature, with green hardened tests" is the *re
 
 ## When to Use
 
-- As the recommended next step after an implement chain wraps up and the user has committed the feature work — ideally in the same chat, which still holds the strongest evidence
+- As the step an implement chain runs after its feature commit and before any push, in the same chat, which still holds the strongest evidence
 - Manually, in the same chat, when the user says "should we refactor this?", "clean this up", or "run the refactor pass"
 - **Standalone in a fresh chat**, pointed at completed work — a teammate's finished feature, a phase implemented in a chat that's now closed. This mode needs concrete anchors (below), not a vague description.
 
@@ -42,7 +42,7 @@ The implementing session holds evidence no fresh chat can reconstruct: whether t
 
 Fully supported, with eyes open about what changes: the experiential signals are gone, so the assessment runs on **structural evidence readable from the diff** — duplication, scatter, dead scaffolding, stale names. That evidence is real and sufficient; the bar for acting on it does not move. What the mode strictly requires is anchors, asked for if missing rather than inferred:
 
-1. **The changeset** — the commit SHA or range that shipped the work (`git show <sha> --stat`, `git diff <base>..<head>`). It must be *committed*: if the work is still sitting uncommitted in the tree, stop and have the user commit it first — the pass never refactors on top of an uncommitted feature.
+1. **The changeset** — the commit SHA or range that shipped the work (`git show <sha> --stat`, `git diff <base>..<head>`). It must be *committed*: if the work is still sitting uncommitted in the tree, stop and say so — the session that built it, or the user, commits it first; the pass never refactors on top of an uncommitted feature.
 2. **The requirements** — the phase doc or PRD the work implemented, or for discovery-driven work a one-line statement of what it was meant to do. This bounds what "the work touched" means and guards against behavior change: the refactored code must still do exactly what these requirements say.
 
 A workable fresh-chat invocation: *"Run refactor-pass on commit `<sha>` — it implemented `<path to phase doc or PRD>`."*
@@ -77,7 +77,7 @@ These come from the same sources as the signals and are absolute:
 2. **Two hats, never both** (Kent Beck's metaphor, via Fowler). Refactoring changes structure, never behavior. No bug fixes, no edge-case handling, no "while I'm in here" improvements to what the code *does*. Observable behavior — API responses, data written, log content consumers rely on — is identical before and after (incidental identifier text in logs and tracebacks may change as a mechanical consequence of a rename). And **renames stop at any externally consumed name**: public package APIs, serialized or persisted field names, string-referenced symbols (`getattr`, config-driven imports, queue/task names), CLI flags, config keys, metric names a dashboard reads. Grep for string occurrences of a name before renaming it; if the name crosses such a boundary, it is not a tidy — leave it.
 3. **Tests are the safety net, so the safety net is frozen.** `test-hardening` just certified these tests; they are the proof that behavior didn't change. No assertion changes, no test deletions, no new tests. The only permitted test edits are mechanical consequences of the refactor itself — updated imports, renamed symbols, moved paths.
 4. **Only code this work touched**, plus the minimal surrounding unit a tidy genuinely requires (extracting a shared helper may touch its second call site). Pre-existing mess in files this work never touched is out of scope — not mentioned, not fixed (Fowler: code that isn't changing doesn't earn refactoring).
-5. **Its own commit, on a committed baseline, committed by the user.** Refactoring starts only after the feature commit has landed and is never folded into it — a reviewer must be able to read the feature diff and the refactor diff separately. The pass stages and proposes a `refactor(scope): ...` message; it runs `git commit` itself only when the user explicitly says to.
+5. **Its own commit, on a committed baseline.** Refactoring starts only after the feature commit has landed and is never folded into it — a reviewer must be able to read the feature diff and the refactor diff separately. The pass commits its tidies as `refactor(scope): ...`; when the user's instructions say not to commit, it stages them and presents the message instead.
 6. **Small steps, tests between.** Execute one tidy at a time and run the relevant tests after each, so a red suite points at the last small step, not at an hour of entangled edits.
 
 ---
@@ -87,7 +87,7 @@ These come from the same sources as the signals and are absolute:
 ### Step 1: Establish the Anchor and the Baseline
 
 1. Identify the mode. Same chat: the work just implemented is the anchor and the session's own experience is admissible evidence. Fresh chat: obtain the changeset and requirements anchors, asking for whichever is missing.
-2. **Confirm the feature work is committed.** If it is still uncommitted or only staged, stop — remind the user to commit it (their call, their judgment) and pick the pass up afterward. Refactoring only ever happens on top of a committed baseline, so a refactor that goes wrong is trivially revertible and never entangles the feature diff.
+2. **Confirm the feature work is committed.** If it is still uncommitted or only staged, stop and say the pass runs once that commit lands. Refactoring only ever happens on top of a committed baseline, so a refactor that goes wrong is trivially revertible and never entangles the feature diff.
 3. **Confirm the checkout actually contains the work, and note what else is in flight.** Verify the anchor commit is reachable from HEAD (`git merge-base --is-ancestor <sha> HEAD`) — if it isn't (wrong branch, unfetched work), stop and say so rather than refactoring code that doesn't contain the feature. Then check `git status` for other sessions' uncommitted or staged files on this shared checkout: proceed only if the refactor's scope doesn't touch them, and never sweep them into staging.
 4. Confirm the safety net: the full relevant suite is green. In the same-chat case this was just established by `test-hardening`. Standalone, run it before touching anything. **If the suite is red, diagnose before routing**: an environmental failure (missing credentials, wrong profile or interpreter) gets fixed as environment setup; genuinely weak or failing tests mean stop and recommend `test-hardening` first. Refactoring without a trustworthy net is the classic anti-pattern this ordering exists to prevent.
 5. Establish the code in scope: the files this work touched (`git show <sha> --stat` / `git diff <base>..<head>` of the shipped changeset).
@@ -98,9 +98,9 @@ Walk the signal list against the in-scope code. This is a main-agent judgment, n
 
 ### Step 3: Verdict
 
-State the verdict in a few sentences, citing specific signals with specific evidence — or their absence.
+State the verdict citing specific signals with specific evidence — or their absence.
 
-- **No refactor warranted** (the common case): one short paragraph — which signals were checked, why nothing met the bar — and done. **No report file, no findings list, no "however you might consider…" trailer.** A clean pass that ends in one paragraph is the skill succeeding, not the skill finding nothing to do.
+- **No refactor warranted** (the common case): a one-line verdict — which signals were checked, why nothing met the bar — and done. **No report file, no findings list, no "however you might consider…" trailer.** A clean pass that ends in one line is the skill succeeding, not the skill finding nothing to do.
 - **Refactor warranted and within the small-tidy gate**: name the tidies (typically one to three), then proceed to Step 4 without pausing for permission — performing the refactor is what this skill is for.
 - **Refactor warranted but over the gate**: proceed to Step 5 (brief and stop).
 
@@ -109,15 +109,15 @@ State the verdict in a few sentences, citing specific signals with specific evid
 1. Perform the tidies one at a time, smallest first, running the relevant tests after each.
 2. Run the **full suite** at the end — the same command `test-hardening` ran, named in the wrap-up.
 3. Any failure is triaged honestly: the refactor broke it → fix the refactor (or revert that tidy); never adjust a test to absorb a behavior change, because a behavior change means the two-hats rule was violated.
-4. Stage the refactored files (only them, never `git add .`), validate per `pre-commit-validation`, and present a `refactor(scope): ...` commit message labeled with the repo name. **Do not commit** unless the user explicitly says to — the user reviews the diff and commits by their own judgment, exactly as with the feature commit.
+4. Stage the refactored files (only them, never `git add .`) and validate per `pre-commit-validation`. Inside an implement chain, skip its Step 1 pull: the branch was brought current for the feature commit, and a remote that moved since shows up as a rejected push (in the shared checkout, reported with both commits left local). Announce the `refactor(scope): ...` message with the repo name, and commit. Inside an implement chain, the chain pushes next; run standalone, push yourself when `pre-commit-validation`'s default push or the user's authorization covers it ("Who Commits") — a feature branch by default, never forced; without authorization, a push that would land on an integration branch is held for the user's word. Its own-commits check stops the push when the anchor commit is someone else's unpushed work; say so and leave the refactor commit local. When the user's instructions say not to commit or not to push (`pre-commit-validation`, "Who Commits"), stop where they say: at the staged change with its message presented, or after the commit.
 
 ### Step 5: Over the Gate — Brief and Stop
 
-A warranted refactor that exceeds the small-tidy bound is **deferred, not attempted**. Name it in the wrap-up in a line or two (the signals, the files) as an action item for the user, and stop. If the user says go, this chat writes it up as a change directory (`prd-writing-standards`, storage convention): a short PRD whose acceptance criteria are "behavior unchanged, suite green", and the brief as its technical design — a session never creates one unasked. The brief carries: the signals observed with their evidence, the files in scope, and the explicit do-not list (no behavior change, no speculative generality, tests frozen). Critically, **the brief must decompose the refactor into a sequence of individually gate-sized tidies**, each independently shippable with the suite green after it — this is Beck's actual prescription (many small tidyings, never one big restructuring), and it's what lets a fresh session execute the brief step by step with `refactor-pass` standalone without tripping the same gate that deferred it. A refactor that cannot be decomposed that way is not a tidy at all — it's a redesign, and it exits this skill entirely (surface it to the user as such). Do not start a big refactor "just to see how far we get" — a half-applied restructuring is worse than none.
+A warranted refactor that exceeds the small-tidy bound is **deferred, not attempted**. Name it in the wrap-up in a line or two (the signals, the files) as an action item for the user, and stop the pass (inside an implement chain, the chain still pushes). If the user says go, this chat writes it up as a change directory (`prd-writing-standards`, storage convention): a short PRD whose acceptance criteria are "behavior unchanged, suite green", and the brief as its technical design — a session never creates one unasked. The brief carries: the signals observed with their evidence, the files in scope, and the explicit do-not list (no behavior change, no speculative generality, tests frozen). Critically, **the brief must decompose the refactor into a sequence of individually gate-sized tidies**, each independently shippable with the suite green after it — this is Beck's actual prescription (many small tidyings, never one big restructuring), and it's what lets a fresh session execute the brief step by step with `refactor-pass` standalone without tripping the same gate that deferred it. A refactor that cannot be decomposed that way is not a tidy at all — it's a redesign, and it exits this skill entirely (surface it to the user as such). Do not start a big refactor "just to see how far we get" — a half-applied restructuring is worse than none.
 
 ### Step 6: Wrap-Up
 
-One paragraph, mirroring the chain's no-loose-ends discipline: the verdict, what was tidied (if anything), confirmation the full suite is green with the command named, and the `refactor(scope):` commit proposal awaiting the user's judgment. Note explicitly that the refactor pass was performed, so the user doesn't re-run it. No FYIs, no inventory of dismissed observations, no adjacent-code commentary.
+When the pass declines, its one-line verdict is the whole wrap-up. Otherwise one paragraph, mirroring the chain's no-loose-ends discipline: what was tidied, confirmation the full suite is green with the command named, and the `refactor(scope):` commit with the repo named and whether it was pushed or held (or the staged change and its message, when the user said not to commit). Note explicitly that the refactor pass was performed, so the user doesn't re-run it. No FYIs, no inventory of dismissed observations, no adjacent-code commentary.
 
 ---
 
@@ -125,7 +125,7 @@ One paragraph, mirroring the chain's no-loose-ends discipline: the verdict, what
 
 ### DO
 
-- Default to declining — "no refactor warranted" in one paragraph is the expected common outcome
+- Default to declining — "no refactor warranted" in one line is the expected common outcome
 - Cite specific, checkable evidence for every signal claimed (files, fragments, edit sites) — and use same-chat experiential evidence when it exists
 - Keep every accepted refactor inside Beck's small-tidy bound; brief-and-stop anything larger
 - Execute in small steps with tests between, and finish with the full suite green
@@ -139,7 +139,7 @@ One paragraph, mirroring the chain's no-loose-ends discipline: the verdict, what
 - Touch tests beyond mechanical renames/imports/moves — assertions and coverage are frozen at what `test-hardening` certified
 - Reach into code this work didn't touch, however messy — stable code earns no refactoring
 - Extract an abstraction from two instances of duplication — the Rule of Three exists because two picks the wrong abstraction
-- Produce an assessment report as the deliverable — the deliverable is either the refactored code or a one-paragraph decline
+- Produce an assessment report as the deliverable — the deliverable is either the refactored code or a one-line decline
 - Big-bang a refactor that's over the small-tidy gate, or leave one half-applied
 
 ---
@@ -150,10 +150,10 @@ This skill is self-contained — the signals and guardrails above are the comple
 
 | Skill | Relationship |
 |-------|-------------|
-| `implement-from-requirements` | Recommends this skill at wrap-up, alongside the feature commit proposal — to run after the user commits, ideally in the same chat. |
-| `implement-from-discovery` | Same recommendation, discovery-triggered work — the anchor is the stated intent of the fix rather than PRD acceptance criteria. |
+| `implement-from-requirements` | Runs this skill at wrap-up, in the same chat, after the feature commit and before any push. |
+| `implement-from-discovery` | Same, for discovery-triggered work — the anchor is the stated intent of the fix rather than PRD acceptance criteria. |
 | `test-hardening` | The preceding step, and the precondition: it certifies the safety net this pass depends on. Standalone invocations with a weak or red suite get routed there first. |
 | `deliverable-review` | Two steps earlier in the chain. It verifies the deliverable matches intent; this pass never revisits that question. |
 | `prd-writing-standards` | Where an over-the-gate refactor lives if the user wants it done (Step 5): a change directory, created on the user's say-so, whose technical design is the brief a fresh standalone invocation executes. |
 | `pre-commit-validation` | Runs at the commit boundary for the refactor commit exactly as for any other — staging hygiene, secrets scan, diff sanity. |
-| `implementation-lifecycle` | The umbrella methodology — the Materiality Gate and No Loose Ends discipline are the general form of this skill's decline bias and one-paragraph wrap-up. |
+| `implementation-lifecycle` | The umbrella methodology — the Materiality Gate and No Loose Ends discipline are the general form of this skill's decline bias and short wrap-up. |

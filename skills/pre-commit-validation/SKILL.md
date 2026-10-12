@@ -25,15 +25,19 @@ This is not optional. Every commit — interactive or autonomous — must follow
 
 ## Who Commits
 
-The user does. Every skill that ends at a commit — implement, review, refinement, split, roadmap, refactor — stages its files, runs these checks, and presents the commit message, so the user can read the diff before it lands. A session runs `git commit` or `git push` itself only when the user has explicitly told it to, in this chat or in the request that started an authorized `phase-chain`. Finishing the work or passing every check is not that instruction.
+**The implement chain commits its own work by default, and pushes it when the push lands on a feature branch.** A session running `implement-from-requirements` or `implement-from-discovery` commits the feature work once these checks pass, runs `refactor-pass` (which makes its own `refactor(scope):` commit when it changes anything), then pushes under the default push below. `refactor-pass` run on its own follows the same default. The default covers finished work: the full suite green apart from failures that predate this work, and the session ending in any terminal state but Blocked (`implementation-lifecycle`, "Terminal States"). A Blocked session stages its work and presents the commit for the user. Every other skill that ends at a commit — requirements refinement, phase split run on its own, PRD roadmap, test audit, and deliverable review or test hardening run on their own — stages its files, runs these checks, and presents the commit message for the user to make.
 
-**Another session's staged files stay staged.** Never unstage a file you did not stage: the shared index is how each session hands its commit to the user, and unstaging silently undoes another chat's hand-off. Stage your own files beside them and hand the user a commit limited to your paths — `git commit -m "<message>" -- <your paths>` — which commits exactly those files and leaves the rest staged. If another session has also changed one of your files, git cannot split the two sets of edits: say so in the hand-off rather than committing either. When the user has told the session to commit, it uses the same path-limited commit (or Step 9's temporary index).
+**The user's instructions override either default**, in this order: what the user says in this chat or in the prompt that started it, then the user's instructions file (a global or repository AGENTS.md or CLAUDE.md; where two disagree, the more restrictive wins), then the skill's default. "Don't commit until I say so" stops the implement chain at a staged changeset with its message presented; "don't push" stops it after its commits; "commit and push this", or a prompt from an orchestrator that authorizes pushing, lets any skill do both, including a push to an integration branch. An authorized `phase-chain` carries its own authorization. For the skills outside the implement chain, finishing the work or passing every check is not an instruction to commit.
+
+**What the default push is.** `git push` of the current branch to its upstream (a branch with no upstream goes to `origin` under the same name, with `-u`), after Step 9's own-commits check — **only when the push lands on a feature branch.** A push that would land on an integration branch — `develop`, `main`, `master`, any branch the repository's instructions name as shared, or any branch whose push releases to production — is held unless the user or an orchestrator authorized it. That covers a shared checkout on `develop` and a worktree chat landing its work on `develop` alike (`implementation-lifecycle`, "Parallel Sessions: Where to Work"). A held push stops after the commits and says so in one line ("committed, not pushed — say push when ready"), so the user reviews before anything reaches the shared branch; the commits stay local and revertible meanwhile. The risk is what a push publishes, not where the chat runs. Never a force push, never another branch, never a merge or pull request. In the shared checkout, a rejected push is reported with the commits left local.
+
+**Another session's staged files stay staged.** Never unstage a file you did not stage: the shared index is how each session hands its commit to the user, and unstaging silently undoes another chat's hand-off. Stage your own files beside them and limit the commit to your paths — `git commit -m "<message>" -- <your paths>` — which commits exactly those files and leaves the rest staged. If another session has also changed one of your files, git cannot split the two sets of edits: say so rather than committing either. Whether the session commits or hands the commit to the user, it uses the same path-limited commit (or Step 9's temporary index).
 
 ---
 
 ## When to Follow These Guidelines
 
-At the point in your workflow where you're ready to stage and commit — after deliverable review passes and before presenting the commit message. In `implement-from-requirements` and `implement-from-discovery`, it's the Phase 8 wrap-up step that stages and presents the commit. This skill encompasses staging; there is no separate staging step.
+At the point in your workflow where you're ready to stage and commit — after deliverable review passes and before committing or presenting the commit message. In `implement-from-requirements` and `implement-from-discovery`, it's the Phase 8 wrap-up step that stages and commits. This skill encompasses staging; there is no separate staging step.
 
 ---
 
@@ -41,7 +45,7 @@ At the point in your workflow where you're ready to stage and commit — after d
 
 ### Step 1: Record HEAD and Inventory What You Changed
 
-**Bring the local branch current first:** Run `git pull --ff-only` before anything else (in a worktree, `git fetch` and rebase onto `origin/<branch>` instead), so the moved-HEAD check below sees the other sessions' commits. If it refuses, see "If the local branch cannot fast-forward" in Step 9 and stop there.
+**Bring the local branch current first:** Run `git pull --ff-only` before anything else (in a worktree, `git fetch` and rebase onto `origin/<branch>` instead), so the moved-HEAD check below sees the other sessions' commits. If the pull refuses, see "If the local branch cannot fast-forward" in Step 9 and stop there. A branch with no upstream has nothing to pull: skip this.
 
 **Record the current HEAD:** Run `git rev-parse HEAD` and note the hash. You'll need this later to detect if another session committed while you were validating.
 
@@ -124,7 +128,7 @@ The commit's parent is the **local** branch, and the local branch moves to it. T
 - **A path-limited commit or a temporary index is fine; a different parent is not.** The path-limited commit ("Who Commits") keeps another session's staged files out. So does committing through a temporary index built from `HEAD`: `export GIT_INDEX_FILE=$(mktemp)`, `git read-tree HEAD`, `git add <your paths>`, `git commit`, then `unset GIT_INDEX_FILE`. Agent tools usually start a fresh shell per call, so an `export` does not survive to the next call: run the whole sequence as one command, or record the temp path once and prefix every git command in it with `GIT_INDEX_FILE=<path>`. `git commit` builds on the current branch and advances it safely even if another session commits at the same moment. Steps 2, 3, 5 and 8 then run against that temporary index rather than the shared one. After unsetting it, run `git reset -q -- <your paths>` so the shared index matches the new `HEAD`; otherwise `git status` shows your own commit as staged changes in reverse.
 - **Never build a commit on `origin/<branch>` and push it by refspec** (`git push origin <sha>:refs/heads/<branch>`). The commit reaches the remote, but the checkout's branch never moves, so every file the user opens shows the old state. In one real case this left a shared checkout dozens of commits behind, and the user saw a finished item as unfinished in their own editor.
 - **The one exception is a chat working in a worktree** (`implementation-lifecycle`, "Parallel Sessions: Where to Work"). A worktree cannot check out the shared branch, so the chat commits on its own `wt/<slug>` branch and lands each piece by pushing `git push origin HEAD:<branch>` as a fast-forward after rebasing. It then fast-forwards the shared checkout (`git -C <shared checkout> merge --ff-only origin/<branch>`) so the editor shows the work; that fast-forward is what keeps this from being the failure above. If the push is rejected, fetch, rebase, re-test and push again, and never force. If the fast-forward is refused, say so in the wrap-up. In a worktree the index is private, so the temporary index above is unnecessary.
-- **Push only when pushing is authorized, and only your own commits.** Before pushing, run `git log --oneline @{u}..HEAD`. If any commit listed is not yours, another session has unpushed work on this branch; stop and tell the user rather than publishing it with yours.
+- **Push only when the default or the user's instructions call for it ("Who Commits"), and only your own commits.** Before pushing, run `git log --oneline @{u}..HEAD` (`git log --oneline HEAD --not --remotes` on a branch with no upstream). If any commit listed is not yours, another session has unpushed work on this branch; stop and tell the user rather than publishing it with yours.
 - **If the local branch cannot fast-forward, stop and tell the user.** Name the cause and let the user decide. It is one of three:
   - another session's modified or untracked files are in the way: list them, and for each say whether it already matches the remote (`git diff --quiet origin/<branch> -- <file>`);
   - your own uncommitted edits touch files the remote changed;
@@ -149,12 +153,12 @@ Pre-commit validation:
 - Diff review: clean [or list what was fixed]
 - Commit message: fix(scope): description ✓
 - Final staging check: [clean | issues found — describe]
-- Local branch: current with remote before commit; commit built on HEAD [push: only own commits in @{u}..HEAD | not authorized]
+- Local branch: current with remote before commit; commit built on HEAD [push: only own commits in @{u}..HEAD (no upstream: HEAD --not --remotes) | not pushed — <reason>]
 ```
 
-**By default:** Include this summary alongside the testing evidence when presenting the commit message to the user, and give the path-limited command to run: `git commit -m "<message>" -- <your paths>`.
+**When the user commits** (every skill outside the implement chain unless the user told it to commit, a Blocked session, or the user said not to commit): Include this summary alongside the testing evidence when presenting the commit message to the user, and give the path-limited command to run: `git commit -m "<message>" -- <your paths>`.
 
-**When the user has explicitly told this session to commit:** If all checks pass, proceed to commit with the path-limited command (or Step 9's temporary index). If any check fails and can be fixed mechanically (a debug print left in), fix it and re-validate. If a check fails and requires judgment (suspicious content, files you can't explain, HEAD moved with overlapping changes), stop and flag to the user.
+**When this session commits** (the implement chain's default, or the user told it to): If all checks pass, announce the repo and message, then commit with the path-limited command (or Step 9's temporary index). If any check fails and can be fixed mechanically (a debug print left in), fix it and re-validate. If a check fails and requires judgment (suspicious content, files you can't explain, HEAD moved with overlapping changes), stop and flag to the user.
 
 ---
 
@@ -171,6 +175,6 @@ Pre-commit validation:
 
 | Skill | Relationship |
 |-------|-------------|
-| `implement-from-requirements` / `implement-from-discovery` | **Callers** — follow these guidelines before presenting the final commit |
+| `implement-from-requirements` / `implement-from-discovery` | **Callers** — follow these guidelines before committing or presenting the final commit |
 | `deliverable-review` | **Complementary** — deliverable review validates work quality earlier in the pipeline; this validates commit hygiene at the commit boundary, after which the working tree state may have shifted due to concurrent work |
 | `engineering-principles` | **Referenced** — its "Git Safety When Several Sessions Share One Clone" is the underlying rule for the staging checks here; coding standards come from it plus the house engineering standards the project names |

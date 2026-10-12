@@ -409,13 +409,13 @@ When neither holds, stay in the shared checkout, even if parallel work seems lik
 - **Where:** `<org directory>/.worktrees/<slug>/<repo>`, one folder per chat, with every repo it edits under it. Create each with `git -C <shared checkout> fetch origin`, then `git -C <shared checkout> worktree add --track -b wt/<slug> <org directory>/.worktrees/<slug>/<repo> origin/<shared branch>`. The `wt/` branch exists only because git refuses to check out the shared branch twice. It is never pushed as a branch.
 - **Session log:** keep writing it in the shared checkout's `.agent-sessions/`, not in the worktree, so signal 2 sees this chat, and put the worktree path on the START line.
 - **Run the code under test from the worktree.** A shared virtual environment or dependency install usually imports the shared checkout's code, not the worktree's. Point the interpreter at the worktree's sources (for Python, `PYTHONPATH=<worktree>/src`), or tests silently test the wrong tree.
-- **Land each finished piece on the shared branch, when committing and pushing are authorized.**
+- **Land each finished piece on the shared branch when pushing to it is authorized** — by the user in this chat or the starting prompt, their instructions file, or an orchestrator's prompt. Landing publishes to an integration branch, so the implement chain's default holds it (`pre-commit-validation`, "Who Commits"): commit in the worktree, then say in one line that it is ready to land.
   1. Fetch, rebase onto `origin/<shared branch>`, and re-run the tests the rebase could affect. Regenerate generated files after the rebase rather than merging them by hand.
   2. Push the result as the shared branch: `git push origin HEAD:<shared branch>`, a fast-forward.
   3. If the push is rejected because another chat pushed first, repeat from step 1. Never force a push to the shared branch.
   4. Fast-forward the shared checkout so the editor shows the work: `git -C <shared checkout> merge --ff-only origin/<shared branch>`. Always attempt it; it succeeds beside another session's uncommitted changes unless they touch the same files. If git refuses, say so in the wrap-up.
 
-  Without authorization, stage in the worktree, present the commit message as usual for the user to commit there, and leave the worktree in place with its path in the wrap-up.
+  When the work is not landed — the push is held for the user's word, the user said not to commit or push, the session ended Blocked, or a skill outside the implement chain has no authorization — stage or commit in the worktree accordingly, present the commit message as usual, and leave the worktree in place with its path in the wrap-up. When the user later says push, land it (steps 1–4 above) and clean up.
 - **Clean up at wrap-up**, once `git log origin/<shared branch>..HEAD` is empty and `git status` is clean. Run the cleanup from the shared checkout, not from inside the worktree: `git -C <shared checkout> worktree remove <path>`, then `git -C <shared checkout> branch -d wt/<slug>`, then delete the chat's empty folder under `.worktrees/`. `-d` refuses to delete work that has not landed; if it refuses, stop and report, and never force it. The wrap-up says whether the worktree was removed. A worktree that outlives its chat shows up in `git worktree list` and in a log with no DONE.
 
 **Parallel work still needs owners.** Worktrees stop two chats writing the same file. They do not stop two chats changing related behaviour that merges cleanly and then breaks. When one chat hands out several prompts, each prompt names the area its chat owns: files, modules, registry blocks. A chat that needs a change outside its area stops and says so.
@@ -430,7 +430,7 @@ Never declare completion and then append a fresh concern ("everything's done —
 
 Past tense, done-work first: what was built/fixed, how it was validated (name the actual commands and tests run), the commit message, the disposition ledger line, then whatever needs the user. No FYI section, no caveat list, and no per-item inventory of dispositions that passed the continuation test — those are represented only by the aggregate ledger line's counts. If you catch yourself writing "I've filed X for later" about an item the continuation will handle — delete the sentence; it's already counted in the ledger line.
 
-**The wrap-up passes a three-question test, sentence by sentence, before it goes out.** Each sentence is about (a) an acceptance criterion and whether it landed, (b) an action only the user can take, or (c) a critical finding labelled as such — money, data loss, production breakage. The fixed items the procedural skill's wrap-up list requires (commit message, disposition ledger line, the review-and-hardening note, kept exploration scripts, pre-existing failures) are exempt. Any other sentence that is none of the three is **deleted.** Not softened, not moved to a footnote, not folded into the ledger, not prefaced with "not blocking, but" — deleted. The reader should not be able to tell from the wrap-up that anything off-topic was seen at all.
+**The wrap-up passes a three-question test, sentence by sentence, before it goes out.** Each sentence is about (a) an acceptance criterion and whether it landed, (b) an action only the user can take, or (c) a critical finding labelled as such — money, data loss, production breakage. The fixed items the procedural skill's wrap-up list requires (commit message, disposition ledger line, the review-and-hardening note, the refactor pass's verdict, kept exploration scripts, pre-existing failures) are exempt. Any other sentence that is none of the three is **deleted.** Not softened, not moved to a footnote, not folded into the ledger, not prefaced with "not blocking, but" — deleted. The reader should not be able to tell from the wrap-up that anything off-topic was seen at all.
 
 If you catch yourself typing "worth noting," "one thing I'd flag," "FYI," "you should know," or "a few things I noticed" — **the answer is to delete the sentence, not to go disposition the item.** An item you were about to mention as an aside is, by that fact, an observation that failed the gate; the correct disposition was silent dismissal, and it already happened. Filing it now — so it can be counted, so it can be "handled" — is the second-worst outcome after mentioning it: a side quest does not earn a disposition by being noticed, and a long ledger line is evidence the gate was loose, not evidence of diligence.
 
@@ -472,8 +472,10 @@ Every implementation task must end in one of these states. No loose ends, no amb
 
 The feature/gap is implemented, tested, and ready to commit. Documents are consistent with code. This is the desired outcome.
 
-“Ready to commit” is not a stopping point when the user has authorized delivery.
-Complete the authorized commit, push, and required project delivery tail first.
+“Ready to commit” is not a stopping point when the user has authorized delivery or
+the implement chain's default covers it (`pre-commit-validation`, "Who Commits").
+Complete the commit, the refactor pass, the push when it is covered, and any required project delivery
+tail first.
 For an authorized sequence across fresh Codex tasks, use `phase-chain`: it owns
 successor dispatch and distinguishes a delivered phase from a completed chain.
 

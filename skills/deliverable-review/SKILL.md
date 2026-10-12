@@ -9,7 +9,7 @@ Verify that completed work accomplishes what was intended, and fix any issues fo
 
 A sub-agent with a fresh context window re-reads the actual output files — avoiding the bias of the agent that produced the work reviewing it from memory. The main agent orchestrates, then fixes whatever the sub-agent finds.
 
-In the standard implementation chain this is the second step (`implement-from-requirements` → `deliverable-review` → `test-hardening`): this skill verifies the deliverable matches intent, then `test-hardening` verifies the tests prove the requirements. (`refactor-pass` follows as an optional post-commit step, after the user has committed the feature work.)
+In the standard implementation chain this is the second step (`implement-from-requirements` → `deliverable-review` → `test-hardening`): this skill verifies the deliverable matches intent, then `test-hardening` verifies the tests prove the requirements. (The chain then commits the feature work, runs `refactor-pass`, and pushes a feature branch.)
 
 ---
 
@@ -75,13 +75,13 @@ If no issues were found, simply confirm the review is complete.
 
 ### Commit Message
 
-Run standalone, provide a concise git commit message for the user to use when the review is complete; inside an implement chain, skip this — the calling skill presents the commit at wrap-up, after `test-hardening` and `pre-commit-validation`.
+Run standalone, provide a concise git commit message for the user to use when the review is complete; inside an implement chain, skip this — the calling skill handles the commit at wrap-up, after `test-hardening` and `pre-commit-validation`.
 
 **Important:**
 - Run `git status` first to see what files are actually staged/modified
 - List the specific files that were changed during this work
 - The commit message should reflect only the current uncommitted changes — not work that was already committed earlier in the conversation
-- Return commit handling to the calling workflow under live user instructions, including explicit authorization carried across an active multi-task workflow. Review completion alone does not authorize a commit or revoke authorization already granted.
+- Return commit handling to the calling workflow, which commits by its own default (`pre-commit-validation`, "Who Commits") or under live user instructions, including explicit authorization carried across an active multi-task workflow. Review completion alone does not authorize a commit or revoke authorization already granted.
 
 ---
 

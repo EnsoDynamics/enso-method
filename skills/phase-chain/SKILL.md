@@ -163,14 +163,15 @@ when the owning skill calls for them.
    `implement-from-requirements`. The prompt must retain exact authorization
    wording even when that makes it longer than the usual one-screen target.
 4. Recheck branch and ownership, then run `pre-commit-validation` for only this
-   task's files. Announce the repo and full proposed message, then commit and push
-   under the established authorization without a new confirmation round. Use
+   task's files. Announce the repo and full proposed message, then commit, run
+   `refactor-pass`, and push under the established authorization without a new
+   confirmation round. Use
    the project's commit convention (`type(scope): concrete change` when none is
    set, per `pre-commit-validation` Step 7); name the PRD/work and qualified phase/subphase
-   in the subject or detailed body. A bare “Phase 2” is insufficient. Recommend
-   `refactor-pass` as optional after the feature commit; do not run it automatically
-   or make it a prerequisite for the next phase.
-5. Verify the scoped commit exists on the intended remote branch. For multiple
+   in the subject or detailed body. A bare “Phase 2” is insufficient. Any tidy
+   `refactor-pass` makes gets its own commit in this delivery; a decline adds no
+   commit. It is not a gate on dispatch.
+5. Verify the scoped commit(s) exist on the intended remote branch. For multiple
    repos, verify every required push. Complete all authorized delivery steps due
    at this boundary under the delivery cadence above. When CI or deployment is an
    actual prerequisite for this handoff, follow `wall-clock-awareness`: stay in

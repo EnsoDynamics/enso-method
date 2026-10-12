@@ -39,7 +39,7 @@ Three stages leave no file: the user's reviews, a finished refinement (its `requ
 - `implement-from-requirements`: sizes the work, splits it with `phase-split` when it is too big for one session, and builds the first phase. Run `phase-split` on its own only to plan the phases without building.
 - `continuation-prompt`: hands each next phase to a fresh session. In Codex, `phase-chain` runs an authorized sequence of phases on its own.
 
-**3. Prove it works.** Inside every build, without being asked: `deliverable-review`, then `test-hardening`, then `pre-commit-validation`. After the user commits, `refactor-pass` is recommended; when the last phase of a PRD closes, `test-audit` is recommended for a fresh chat.
+**3. Prove it works.** Inside every build, without being asked: `deliverable-review`, then `test-hardening`, then `pre-commit-validation`. Then the build commits, runs `refactor-pass`, and pushes a feature branch (a push to `develop` or `main` waits for the user's word), unless the user has said otherwise; when the last phase of a PRD closes, `test-audit` is recommended for a fresh chat.
 
 ## Along the Way
 
@@ -51,6 +51,6 @@ Three stages leave no file: the user's reviews, a finished refinement (its `requ
 
 ## Routing Rules
 
-- **The two reviews are the user's.** The PRD and the technical design are where human judgment goes in. Present each one and move on only when the user is ready. After that the user is not asked about requirements again; they commit the work, start each next phase, and send assumptions to stakeholders.
+- **The two reviews are the user's.** The PRD and the technical design are where human judgment goes in. Present each one and move on only when the user is ready. After that the user is not asked about requirements again; they start each next phase and send assumptions to stakeholders. Builds commit their own work unless the user says not to, and push it when it lands on a feature branch.
 - **Requirements come before the build.** A request to build something new with no PRD starts at `prd-writing-standards`, or `prd-roadmap` when it is bigger than one PRD.
 - **Start at the stage the work has reached.** Existing documents are not rewritten to restart the sequence.
