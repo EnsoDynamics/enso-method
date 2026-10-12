@@ -212,10 +212,10 @@ ingestion acmeCloud prd
 
 In service of: Acme Cloud PRD Roadmap
   Cloud Ingestion — planned PRD, first in the roadmap
-  This chat: writes its PRD.
+  This chat: writes and refines its PRD.
 ```
 
-The prompt names `prd-writing-standards`, points at the planned PRD's roadmap entry, its rows in the coverage matrix when there is one, and the full brief, and says the PRD's directory. The prompt is valid once the roadmap commit lands. The chat it starts writes the PRD (and mockups, if the product needs them); the technical design (reviewed with `review-technical-design` when it makes hard-to-reverse decisions), refinement, phase split, and build follow in the usual chain.
+The prompt names `prd-writing-standards` and `autonomous-prd-refinement`, points at the planned PRD's roadmap entry, its rows in the coverage matrix when there is one, and the full brief, and says the PRD's directory. The prompt is valid once the roadmap commit lands. The chat it starts writes the PRD (and mockups, if the product needs them) and refines it with `autonomous-prd-refinement`; the user's review, the technical design (reviewed with `review-technical-design` when it makes hard-to-reverse decisions), requirements refinement, phase split, and build follow in the usual chain.
 
 ---
 

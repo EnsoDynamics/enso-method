@@ -402,7 +402,7 @@ A script is warranted only when the question is in scope and a one-off read cann
 - Pause merely because business assumptions await asynchronous validation
 - Report completion when the final verification surfaced unresolved work
 - Run `git commit` unless the user explicitly says to — stage only the requirements documents and state file, and hand the user the message
-- Embed client-specific references (credential paths, private repo names) — those belong in your house engineering standards (README, "Plugging in your house engineering standards")
+- Embed client-specific references (credential paths, private repo names) — those belong in your house engineering standards (`docs/enso-method-setup-guide.md`, "Plugging in your house engineering standards")
 
 ---
 

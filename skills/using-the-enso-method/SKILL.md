@@ -16,21 +16,23 @@ Read the repo before choosing. Everything for one piece of work lives in `docs/p
 |---|---|
 | An idea, notes or a brief, no PRD | `prd-roadmap` if it is bigger than one PRD, otherwise `prd-writing-standards` |
 | A new PRD roadmap | `prd-writing-standards` for its first planned PRD. Later ones start only when the user chooses, usually after the previous PRD reaches production |
-| A PRD the user has not yet reviewed | Present it for review |
+| A drafted PRD, not yet refined | `autonomous-prd-refinement`; one `deliverable-review` round is enough for a small PRD. A `{name}-prd-refinement-state.md` in the directory means a run is in progress: resume it |
+| A refined PRD the user has not yet reviewed | Present it for review |
 | A reviewed PRD, no technical design | `technical-design-writing-standards`. A small change that follows an established pattern and adds no new interfaces can skip the design and go to `implement-from-requirements`, which proceeds without one |
-| A reviewed technical design | `autonomous-requirements-refinement`. A `{name}-refinement-state.md` in the directory means a run is in progress: resume it |
+| A reviewed technical design | `autonomous-requirements-refinement`. A `{name}-refinement-state.md` in the directory means a run is in progress: resume it (a `{name}-prd-refinement-state.md` belongs to the PRD refinement row) |
 | Refined requirements | `implement-from-requirements` |
 | Phase documents | `implement-from-requirements` for the first leaf phase, in plan-table order, without a `**Closed:**` line |
 | Every phase closed | Recommend `test-audit` in a fresh chat |
 
-Three stages leave no file: the user's reviews, a finished refinement (its `requirements refinement complete` commit) and a build that was not split (its feature commit). Read them from `git log -- <directory>`, and ask the user when the log doesn't say.
+Four stages leave no file: the user's reviews, a finished PRD refinement (its `PRD refinement complete` commit, or `PRD refinement stopped` when the user ended it with findings open, which its body lists, or, for a small PRD, its one `deliverable-review` round), a finished requirements refinement (its `requirements refinement complete` commit) and a build that was not split (its feature commit). Read them from `git log -- <directory>`, and ask the user when the log doesn't say.
 
 ## The Order
 
 **1. Decide what to build**
 
 - `prd-roadmap`: only when the idea is bigger than one PRD. A PRD is a medium body of work, about the size of an agile epic. Decide which applies with the PRD-sized test in `prd-roadmap` (Step 2) rather than asking the user. Each planned PRD then goes through this whole sequence.
-- `prd-writing-standards`: the PRD, saying what is built and why. **The user reviews it, ideally with whoever owns the business decisions, before the design starts.**
+- `prd-writing-standards`: the PRD, saying what is built and why.
+- `autonomous-prd-refinement`: reviews and fixes the drafted PRD, its assumptions and mockups in rounds until no Medium or High finding is left. **The user then reviews it, ideally with whoever owns the business decisions, before the design starts.**
 - `technical-design-writing-standards`: the technical design, saying how. **The user reviews it.** For a design that makes hard-to-reverse decisions, `review-technical-design` runs first and says which sections need the user's own reading.
 - `autonomous-requirements-refinement`: closes the gaps in both documents without the user. Technical questions are researched; open business decisions become assumptions, and the build proceeds on them. `implementation-readiness-check` is the alternative when the user wants to confirm each open question themselves; only the user can start it.
 

@@ -56,8 +56,10 @@ The fix isn't a better prompt. It's doing the thinking before the build:
 ## How it works
 
 Each step is a skill your agent runs, and each hands the next a document it can trust.
-Refinement is a loop: it finds the gaps, researches each question against the real code and
-data, and writes the answers back into the PRD and design, recording business decisions as
+A drafted PRD first goes through review rounds of its own, fixed between rounds, until no
+reviewer finds a problem that would change what gets built. Requirements refinement is a
+loop: it finds the gaps, researches each question against the real code and data, and
+writes the answers back into the PRD and design, recording business decisions as
 assumptions for stakeholders to confirm, until nothing is left to guess. Stages 2 and 3 run
 once per phase: a phase is built, reviewed, its tests hardened, and committed, then `continuation-prompt`
 hands the next one to a fresh session. An idea too big for one PRD first goes through
@@ -68,7 +70,8 @@ hands the next one to a fresh session. An idea too big for one PRD first goes th
 flowchart TD
   subgraph decide["1 · Decide what to build"]
     direction LR
-    prd["<b>PRD</b><br/>prd-writing-standards"] --> design["<b>Technical design</b><br/>technical-design-writing-standards"]
+    prd["<b>PRD</b><br/>prd-writing-standards"] --> prdref["<b>PRD review rounds</b><br/>autonomous-prd-refinement"]
+    prdref --> design["<b>Technical design</b><br/>technical-design-writing-standards"]
     subgraph refine["Refinement loop · autonomous-requirements-refinement"]
       direction LR
       gaps["<b>Find the gaps</b><br/>implementation-readiness-check"] --> research["<b>Research each question</b><br/>investigate-question"]
@@ -154,7 +157,8 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
 `$enso-method:prd-writing-standards`):
 
 1. **Write the PRD.** Run `/prd-writing-standards` and describe what you want in your own
-   words. Talk it through; the messy version is better than a tidy instruction. Then review it.
+   words. Talk it through; the messy version is better than a tidy instruction. Then run
+   `/autonomous-prd-refinement`, which reviews and fixes it in rounds, and review it yourself.
 2. **Design and refine.** Run `/technical-design-writing-standards` and review the design,
    then `/autonomous-requirements-refinement` to close the gaps.
 3. **Build.** Run `/implement-from-requirements`. It sizes the work, splits it if it must,
@@ -180,6 +184,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `assumptions-document-writing`, `assumptions-document-feedback` — declare business assumptions and fold in stakeholder answers
 
 **Refinement**
+- `autonomous-prd-refinement` — review-and-fix rounds on a drafted PRD, its assumptions and mockups, until no Medium or High finding is left
 - `autonomous-requirements-refinement` — multi-pass refinement of the PRD, design and assumptions until they are ready to build
 - `implementation-readiness-check` — a human checkpoint before implementation: surfaces every open question for you to confirm
 - `investigate-question` — take one question to an answer with a confidence level

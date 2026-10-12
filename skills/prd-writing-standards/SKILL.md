@@ -75,7 +75,7 @@ Other documents then cite `AC-RETURNS-02`, not "the second bullet in the returns
 ### When Later Work Changes an Earlier Criterion
 A later PRD or change directory often changes behavior an earlier one defined: a longer return window, a status that now means something else, a step that no longer happens. The earlier PRD is not rewritten to match. It was true when it was built, and the later document now owns that behavior: **the latest-built document that defines a behavior is its source of truth** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"). Two lines connect them:
 
-- **On the new criterion, written with the PRD:** a `Replaces:` line naming each earlier criterion it changes. It is part of the new PRD's content and changes freely while the PRD is drafted and refined. While writing, add one only where you already know the earlier criterion; don't search the repo for them, because the conflict check does that during refinement or at build.
+- **On the new criterion, written with the PRD:** a `Replaces:` line naming each earlier criterion it changes. It is part of the new PRD's content and changes freely while the PRD is drafted and refined. While writing, add one only where you already know the earlier criterion; don't search the repo for them, because the conflict check does that during requirements refinement or at build.
 - **On the earlier criterion, written when the new one is built:** a `Superseded by:` line naming the new criterion, in the same commit as the code that makes it true. Not before: a PRD that is never built, or waits months, must not mark behavior superseded while the code still does it.
 
 ```markdown
@@ -117,6 +117,16 @@ An explicitly chosen manual step can be a valid requirement. The problem is not 
 Bad: "The user supplies a CSV containing all contacts." This unnecessarily chooses both the actor and the file format.
 
 Good: "The system can access a contact list containing each person's name, company, role, and profile link." This states what the product needs while leaving the acquisition method open.
+
+### Mockups Show What the Criteria Require
+When a PRD has mockups, each state shows what its criteria require, so a reader never has to reconcile the drawing with the text.
+
+- **Correct the drawing; never annotate it.** When a criterion changes, or the work establishes a fact a mockup contradicts, redraw every affected state in the same change. A note saying what a mockup gets wrong leaves two specifications, and a builder may follow the wrong one. The one exception is material from a handoff package. Nothing in a handoff is edited: the whole package stays as received, in its own location named for where it came from and when (such as `source-material/{source}-handoff-{date}/`), never inside the PRD's directory, so nobody mistakes it for the PRD's requirements. The PRD's own mockups and text say where they depart from it.
+- **Draw from the facts.** Sample data comes from real records where the project allows reading them. A state that shows something other than what the first release is expected to do, such as an optional integration already in place, says which scenario it draws.
+- **Regenerate a mockup in its own medium.**
+  - *Code, the usual case for screens* (HTML, SVG, a page generated from data): edit the source or its generator and render it again. Any agent can, and code keeps exact text such as record numbers identical across states, diffs cleanly, and can be measured by script (`deliverable-review`, "Look at Visual Deliverables").
+  - *A mockup that exists only as an image* (a raster concept, a stakeholder's picture): regenerate it with an image-generation tool, then copy the result into the PRD's `mockups/` directory. Claude Code has none of its own. When the Codex CLI is installed and signed in, `codex exec "<prompt>"` uses Codex's built-in image generation under the user's ChatGPT sign-in, with no API key, and saves the image under `~/.codex/generated_images/`.
+  - *No image tool, or it fails:* rebuild the mockup as HTML or SVG and render it to an image. That version can then be corrected and checked like any other. If even that is impossible, the wrong mockup is an open finding that keeps the work from being done, never a note.
 
 ---
 
@@ -316,6 +326,6 @@ If a PRD spans multiple repositories, store it in whichever repo is the primary 
 
 ---
 
-## Next: The Technical Design
+## Next: Refinement, Then the Technical Design
 
-Once the PRD is complete and the user has reviewed it, write its technical design with `technical-design-writing-standards`, as `technical-design.md` in the same directory.
+Once the PRD is drafted, refine it with `autonomous-prd-refinement`, which reviews and fixes the PRD, its assumptions and its mockups until no Medium or High finding is left; for a small PRD, one `deliverable-review` round is enough. Once the user has reviewed it, write its technical design with `technical-design-writing-standards`, as `technical-design.md` in the same directory.
