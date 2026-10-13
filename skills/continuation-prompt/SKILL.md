@@ -107,7 +107,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
 2. **Order tokens by how much they distinguish this chat from the others likely open at the same time.** The specific unit of work comes first: the phase or sub-phase id, the issue or ticket id, the thread's subject noun. The project tag comes after, because every sibling chat shares it. When six tabs are all Phase 2 of one project, a name that opens with the phase spends its best characters saying nothing.
 
    The tag before the activity is the project: the PRD's name, abbreviated per rule 5 (`orderN`, `accountA`). It is the token most tempting to drop, because every sibling shares it, and it is the one that makes the unit id readable. A product tag (`BL`) is a separate token after it, taken from the shared prefix of a repo family (`billing-*`), and it earns its characters only when that family sits beside other products' repos in the same parent directory: `billing-invoice-export` there gives `IE-export BL PRD refine`, and a name that stops at `IE-export` is wrong because `IE` means nothing outside that product. When every repo in the directory belongs to one product, the product is where the chat already lives and says nothing: `ph4b1 accountA impl`, never `ph4b1 accountA <product-tag> impl`. Where no PRD directory supplies a project tag (a ticket, a GitHub issue, an ad-hoc thread) there is none: the name closes on its subject noun, as `PROJ-4271 user import impl` and `dup accounts stage2 ops` do, and a tag is never coined from a lone repo name, a company, or a team. Shorten a tag the work has when the name runs long; never drop it.
-3. **Every name ends with its activity, as one fixed token.** Whether the chat implements, refines the requirements, splits a phase, drafts a design, investigates, or reviews, the reader has to be able to tell, and the activity is the one fact the documents' identifiers do not carry. Implementation gets its token like everything else, so a name has one shape and "every implementation chat" is greppable. Use the same abbreviation every time, six characters or fewer, except the two refinement tokens, which are two words so they read at a glance (`ref` alone reads as *reference*):
+3. **Every name ends with its activity, as one fixed token.** Whether the chat implements, refines the requirements, splits a phase, drafts a design, investigates, or reviews, the reader has to be able to tell, and the activity is the one fact the documents' identifiers do not carry. Implementation gets its token like everything else, so a name has one shape and "every implementation chat" is greppable. Use the fixed labels below; two-word labels distinguish activities that would otherwise be vague (`ref` alone reads as *reference*):
 
    | Next chat runs | Token |
    |----------------|-------|
@@ -117,6 +117,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
    | `phase-split` | `split` |
    | Technical Design writing (`technical-design-writing-standards`) | `design` |
    | PRD writing (`prd-writing-standards`) | `prd` |
+   | `stakeholder-review-package` | `stakeholder pkg` |
    | `prd-roadmap` | `rdmap` |
    | `investigate-question`, an issue or ad-hoc investigation | `invest` |
    | `deliverable-review`, a design, code or PR review | `review` |
