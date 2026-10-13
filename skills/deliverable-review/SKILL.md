@@ -32,7 +32,7 @@ Collect the information the sub-agent will need:
 3. List the key decisions made during the session, including:
    - What WAS decided (features, approaches, values)
    - What was explicitly NOT decided or deferred (scope exclusions, future work)
-4. Note the deliverable type (code, documentation, configuration, visual, mixed). Visual means anything a person looks at rather than reads as text: mockups, prototypes, diagrams, rendered pages, generated images. For each one, note whether it is the product itself or a design reference (Review Checklist, "Look at Visual Deliverables"), how to render it (the file to open; for the product, the screen sizes its spec names; for a design reference, the width its main users work at), and what rendering tools the machine has
+4. Note the deliverable type (code, documentation, configuration, visual, mixed). Treat the work as visual when what it delivers or changes is how something looks: a mockup or prototype, a diagram, a graphic, layout or styling, a new screen. A change to what something says or does is reviewed by reading it and running it, even when it appears on a page: a wording change on a website is text, not a visual deliverable. Rendering costs a lot of time and context, so spend it where the work could plausibly change how something looks; when a non-visual change gives a specific reason to suspect the layout breaks, have the reviewer look once at the affected spot at the main width. For each visual item, note whether it is the product itself or a design reference (Review Checklist, "Look at Visual Deliverables"), how to render it (the file to open; for the product, the screen sizes its spec names; for a design reference, the width its main users work at), and what rendering tools the machine has
 5. Note any facts the session established with high confidence that contradict the material it started from (a handoff's mockups, sample data, an earlier draft), so the reviewer can check the deliverable against the facts rather than against that material
 
 ### Step 3: Launch Sub-Agent
@@ -180,7 +180,7 @@ Read the output as if you weren't part of the conversation. Is anything assuming
 
 ### 6. Look at Visual Deliverables
 
-A mockup, prototype, diagram, rendered page or generated image is reviewed by looking at it the way its audience will: rendered, as images you open and inspect. Its source (HTML, the data a page draws its screens from, SVG markup, a description of it) can show what it says, but never what it looks like. Reading the source is not a review of a visual deliverable, and a review that only read it must say so.
+This section applies to work that Step 2 treats as visual: work whose point is how something looks. A change to what a page says or does is reviewed as text or code, and gets at most one look at the affected spot when there is a specific reason to suspect the layout breaks. A visual deliverable is reviewed by looking at it the way its audience will: rendered, as images you open and inspect. Its source (HTML, the data a page draws its screens from, SVG markup, a description of it) can show what it says, but never what it looks like. Reading the source is not a review of a visual deliverable, and a review that only read it must say so.
 
 **First decide what the visual is for;** that sets how much looking it needs.
 
@@ -195,7 +195,7 @@ Then, for either kind:
 - **Look at each image** for what a viewer would notice: text clipped, overlapping or running off the screen; type too small to read; for the product, a layout that breaks at a narrow width; something the spec requires that isn't on screen; screens that disagree with each other or with the spec; sample data that contradicts the facts the work established ("Mockups and inherited material are references, not truth", above).
 - **Confirm a suspected visual defect** with a second rendering before reporting it (with another method, or, for the product, at another width); screenshot tools have artifacts of their own.
 - **Look at one screen at a time, and write down what it shows before opening the next.** Keep a running notes file of findings per screen and size; a reviewer holding dozens of images in mind at once misses what it saw early and conflates screens. Split a tall screen into pieces that can be read at full size.
-- **Report what was viewed:** which screens, at which sizes. If something could not be rendered, report that as a finding rather than review it from source.
+- **Report what was viewed:** which screens, at which sizes. If something could not be rendered, report that as a finding rather than review it from source. Work that appears on a page but was not rendered says so in one line, with the reason (`not rendered: the change is to wording, not to how the page looks`).
 
 ### 7. Verify Functionality (Code Deliverables)
 
