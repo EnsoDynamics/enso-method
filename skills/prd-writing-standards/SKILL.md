@@ -130,13 +130,21 @@ A PRD can define the required product outcome even when the technical design has
 - State what information, capability, or result the product must have.
 - Name a user, system, partner, or other actor as responsible only when that responsibility is an intentional product decision or an established external constraint.
 - Keep the method open when several approaches could satisfy the same product need and the choice does not change the user-facing outcome.
-- Surface an unknown that could make the outcome infeasible or materially change scope, risk, cost, or the user experience — as an assumption entry (`assumptions-document-writing`) when it is a business question, or in the technical design's Open Questions when it is technical. The PRD-writing task should surface that question; it does not need to perform a technical investigation that belongs elsewhere.
+- Surface an unknown that could make the outcome infeasible or materially change scope, risk, cost, or the user experience — as an assumption entry (`assumptions-document-writing`) when it is a business question below 95% confidence, or in the technical design's Open Questions when it is technical ("Every Decision Is Written Up or Declared" below). The PRD-writing task should surface that question; it does not need to perform a technical investigation that belongs elsewhere.
 
 An explicitly chosen manual step can be a valid requirement. The problem is not user involvement; it is turning the first implementation idea into a user obligation without deciding that the manual step is part of the product.
 
 Bad: "The user supplies a CSV containing all contacts." This unnecessarily chooses both the actor and the file format.
 
 Good: "The system can access a contact list containing each person's name, company, role, and profile link." This states what the product needs while leaving the acquisition method open.
+
+### Every Decision Is Written Up or Declared
+Writing a PRD settles questions its source material leaves open: which case a rule covers, who does a step, what a fee is, which system a change lands in. Each is settled by the 95% rule (`implementation-lifecycle`, "Confidence Thresholds"):
+
+- **95% or more, from the material the PRD is written from** (its sources, records checked, a rule the PRD already states): write it into the PRD as its requirement and move on. It is not an assumption, and it is not listed anywhere as a question that was settled. A PRD has no "settled questions" section.
+- **Below 95%, and a business decision:** it is an assumption. Declare it in the PRD's `assumptions.md`: load `assumptions-document-writing`, run its Four Gates for the entry, and cite the entry's ID where the PRD states the decision. Below 95% and technical, it goes to the technical design's Open Questions.
+
+This holds for every decision, however it arose: while drafting, as a review fix, or as a ruling handed to a writer during refinement. Before handing a PRD over, walk its decisions once: each is either settled from the material at 95% or more and written up, or carries an assumption ID.
 
 ### Mockups Show What the Criteria Require
 When a PRD has mockups, each state shows what its criteria require, so a reader never has to reconcile the drawing with the text.

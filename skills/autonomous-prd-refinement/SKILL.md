@@ -92,7 +92,7 @@ Severity follows `deliverable-review`'s scale ("Rate Each Finding"): rated by th
 
 **When the same area keeps producing findings.** `deliverable-review` asks for a case walk once one part of the work has produced a Medium or High in two rounds running. The orchestrator tells each reviewer which areas did, from the state file's Rounds table, counting fixed findings only.
 
-**When fixes go back and forth.** If one round's fix is undone by the next round's fix (a passage flips between two readings), the passage carries an undecided question. Stop fixing it by review. Settle it as an assumption if it is a business decision (`assumptions-document-writing`), or from the source material if that settles it, and record the outcome in the state file so later reviewers see it.
+**When fixes go back and forth.** If one round's fix is undone by the next round's fix (a passage flips between two readings), the passage carries an undecided question. Stop fixing it by review. Settle it by the 95% rule ("The Scope Gate"): from the source material if that settles it at 95% or more, written into the PRD; otherwise, if it is a business decision, as an assumption (`assumptions-document-writing`). Record in the state file which passage flipped and what settles it, the citation or the assumption ID, so later reviewers see it.
 
 ---
 
@@ -100,9 +100,11 @@ Severity follows `deliverable-review`'s scale ("Rate Each Finding"): rated by th
 
 A fix may make the PRD say precisely what its source material and stated intent already require: an unstated case on a path the product already has, a contradiction, a stale copy, a missing criterion the source asks for. A fix never adds a capability neither asks for. A finding whose fix would add one is recorded under **Noticed, out of scope** in the state file, one line, and left alone. Those lines go to the user in the completion report.
 
-A finding that needs a business decision the sources do not settle becomes an assumption at the best-supported answer, following `assumptions-document-writing` (its gates first: the answer is often already written down). Use a Blocking Open Question only for the rare case that skill defines; it pauses the run.
+A finding that needs a business decision is settled by the 95% rule (`prd-writing-standards`, "Every Decision Is Written Up or Declared"). Settled at 95% or more from the source material, it is written into the PRD as its requirement, with no entry and no list of settled questions. Below 95%, it becomes an assumption at the best-supported answer in the same fix step, written with `assumptions-document-writing` (its gates first: the answer is often already written down). Use a Blocking Open Question only for the rare case that skill defines; it pauses the run.
 
-**Say what settles each fix.** For every Medium or High it fixes, the writer names what settles the fix: the source material (cited), a rule the PRD already states, or a new decision. A new business decision the sources do not settle becomes an assumption, as above, so the person signing off sees it as something to confirm rather than a rule to skim past. A consequence of a rule the PRD already states is not a new decision and gets no assumption of its own: too many entries get approved unread (`assumptions-document-writing`).
+**The orchestrator's rulings follow the same rule.** When it hands a writer a ruling to settle a finding, often the way to stop a passage flipping: at 95% or more from the material the writer writes it into the PRD, and below 95% on a business question the writer declares it as an assumption in that fix step. The state file records the ruling and the citation or assumption ID that settles it. It never stands in for an assumption, and no reviewer is told to treat a business decision as settled unless it has one or the other.
+
+**Say what settles each fix.** For every Medium or High it fixes, the writer names what settles the fix: the source material (cited), a rule the PRD already states, a decision settled at 95% or more from the material, or an assumption ID. A business decision below 95% is an assumption, as above, so the person signing off sees it as something to confirm rather than a rule to skim past. A consequence of a rule the PRD already states is not a new decision and gets no assumption of its own: too many entries get approved unread (`assumptions-document-writing`).
 
 ---
 
@@ -205,8 +207,8 @@ Screens redrawn: {list}   Assumptions added or amended: {IDs}   Rejected Mediums
 | Fact | Record and query, or source | Date | Passages relying on it |
 |---|---|---|---|
 
-## Settled questions
-{Passages that went back and forth, and how each was settled: assumption ID, source, or the user's ruling.}
+## Flipped passages and rulings
+{Each passage that went back and forth, and each ruling given to a writer, with what settles it: the source cited, a decision settled at 95% or more and written into the PRD, the assumption ID, or the user's ruling. Never a business decision held only here.}
 
 ## Hand-offs
 | To | Change | Status |
@@ -270,19 +272,19 @@ The orchestrator plays `deliverable-review`'s main agent for its Steps 1–3: th
    - the intent and decisions, and the **Facts** table
    - the areas that produced a fixed Medium or High in each of the last two rounds
    - rejected findings with their reasons, to raise again only with evidence the reason is wrong
-   - settled questions, and agreed and pending seam wording from Hand-offs
+   - the flipped passages and rulings, each with what settles it, and agreed and pending seam wording from Hand-offs
    - that this run has no conflict check: earlier criteria elsewhere in the repo that this PRD changes are not searched for (`autonomous-design-refinement` does that once the design exists)
    - for a delta round: the previous round's findings and what was changed for each or, for a rejected one, the reason, from the Findings table, and the diff from step 2
    - that mockups are design references, how they render and the main users' width, and, for a delta round, which screens' content changed
    - for a full round, `deliverable-review` Step 6's question: does the deliverable, as it stands, accomplish the intent? A gap is a finding, rated like any other
-   - for a full round, two more questions, with the criteria-word figures from the Rounds table: can the person who signs the PRD off read each criterion once and say what it checks ("Keep It Readable")? And does any assumption's chosen answer now look wrong, given what the run has learned? Either is a finding, rated like any other
+   - for a full round, three more questions, with the criteria-word figures from the Rounds table: can the person who signs the PRD off read each criterion once and say what it checks ("Keep It Readable")? Does any assumption's chosen answer now look wrong, given what the run has learned? And does the deliverable make any business decision that is neither settled at 95% or more from the source material nor declared as an assumption? Each is a finding, rated like any other
 4. **Record the findings** in the state file: a Rounds row with the round and its kind, each new finding in the Findings table as Open, the facts the reviewer verified added to Facts, and the snapshot from step 1 as the **Delta base**.
 
 ### Phase 3: Fix
 
-1. **Launch one writer** with the open findings, the documents, the Facts table, the Scope Gate, the settled questions, the agreed and pending seam wording from Hand-offs, the rules in "Working Beside Other Sessions", the previous round's fixes (so it can see a passage flipping back), and the instruction to fix by `deliverable-review` Step 5: each visual fixed in its own medium, a propagation sweep for every term, figure, name or rule a fix changed, and a check of each sentence a fix adds against its neighbours. Fixes follow `prd-writing-standards` and, for assumptions, `assumptions-document-writing`, and keep the PRD readable ("Keep It Readable"). The writer returns, beyond its fixes, what settles each Medium or High it fixed ("The Scope Gate") and the words in the acceptance criteria after its fixes.
+1. **Launch one writer** with the open findings, the documents, the Facts table, the Scope Gate, the flipped passages and rulings, the agreed and pending seam wording from Hand-offs, the rules in "Working Beside Other Sessions", the previous round's fixes (so it can see a passage flipping back), and the instruction to fix by `deliverable-review` Step 5: each visual fixed in its own medium, a propagation sweep for every term, figure, name or rule a fix changed, and a check of each sentence a fix adds against its neighbours. Fixes follow `prd-writing-standards` and, for assumptions, `assumptions-document-writing`, and keep the PRD readable ("Keep It Readable"). The writer returns, beyond its fixes, what settles each Medium or High it fixed ("The Scope Gate") and the words in the acceptance criteria after its fixes.
 2. **The writer fixes every finding, Lows included, rejects it with a reason, or hands it off when only another session can fix it.** A finding is rejected only when the governing text, a fact, a stakeholder's ruling or the scope gate shows it is wrong, and the reason names which.
-3. **Record the result:** the Rounds row is completed (fixed counts, rejected, handed off whole, areas with a fixed Medium or High, criteria words before and after); the previous round's Fixed rows are removed, and this round's fixed findings are marked Fixed with what changed; rejected and handed-off ones keep their reason or Hand-offs row; screens redrawn, assumptions changed and rejected Mediums and Highs go in Run totals; new facts go in Facts; files the writer created or edited that are not yet listed go in Documents; passages it settled after flipping go in Settled questions; out-of-scope lines and hand-offs in their sections. Set **Next round** from The Loop (and **Delta rounds run** once one has), and **Next action**.
+3. **Record the result:** the Rounds row is completed (fixed counts, rejected, handed off whole, areas with a fixed Medium or High, criteria words before and after); the previous round's Fixed rows are removed, and this round's fixed findings are marked Fixed with what changed; rejected and handed-off ones keep their reason or Hand-offs row; screens redrawn, assumptions changed and rejected Mediums and Highs go in Run totals; new facts go in Facts; files the writer created or edited that are not yet listed go in Documents; passages it settled after flipping, and rulings given to it, go in Flipped passages and rulings with what settles each; out-of-scope lines and hand-offs in their sections. Set **Next round** from The Loop (and **Delta rounds run** once one has), and **Next action**.
 4. **Report the round in one line:** `Round {N} ({kind}): fixed High {h} · Medium {m} · Low {l}; rejected {r} ({severities}); handed off whole {k}. Next: {kind}`.
 
 ### Phase 4: Continue or Stop
@@ -332,6 +334,7 @@ Next: the user reviews the PRD, ideally with whoever owns the business decisions
 - Record each verified fact with the exact record and query, and reuse it
 - Keep the state file current after every step; resume from it, never restart
 - Keep the PRD readable for the person who signs it off: sharpen a rule, split it or give its cases a table, rather than add a clause
+- Write every decision settled at 95% or more into the PRD, and declare every business decision below 95% as an assumption with `assumptions-document-writing`, whoever made it
 - Stop at the round cap and say what is still open
 
 ### DO NOT
@@ -339,6 +342,7 @@ Next: the user reviews the PRD, ideally with whoever owns the business decisions
 - End the run on a delta round, or on a full round that had a Medium or High to fix, even once it is fixed, unless the user says to stop
 - Re-rate a finding to end the loop sooner; fix it at the reviewer's rating, and reject only a finding that is wrong
 - Grow a criterion one clause per case, or spell out a case a rule the PRD already states settles
+- Hold a business decision only in the state file, or tell a reviewer to treat one as settled, without its citation or assumption ID
 - Add a capability neither the source material nor the stated intent asks for
 - Review mockups at every screen size the PRD names; those sizes are requirements on the product
 - Run two writers at once, or edit another session's lines in a shared document
