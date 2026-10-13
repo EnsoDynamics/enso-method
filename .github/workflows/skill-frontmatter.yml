@@ -75,3 +75,6 @@ jobs:
           print('\n'.join(bad) or f'manifests OK: {names.pop()}')
           sys.exit(1 if bad else 0)
           EOF
+
+      - name: Check stakeholder review renderer
+        run: python3 -m unittest discover -s skills/stakeholder-review-package/scripts -p 'test_*.py'

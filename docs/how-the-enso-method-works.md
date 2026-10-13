@@ -43,6 +43,8 @@ The PRD and technical design are the source of truth. Code implements what they 
 
 You review the PRD and the technical design before the build; that is where a person's judgment goes in. Nobody waits on a stakeholder's review to start: assumptions keep the work moving, and corrections are folded in when they arrive.
 
+For business stakeholders, `stakeholder-review-package` can turn selected PRD requirements, every open assumption and contextual mockups into a single HTML review with downloadable feedback. This optional review package is a dated view of the source documents; implementation still uses the full PRD and technical design.
+
 These documents colocate inside `docs/prds/{prd-name}/` (a program) or `docs/changes/{name}/` (a bounded delivery — a ticket, a bug, a small enhancement — identical layout) so everything tied to a piece of work lives in one place. See `prd-writing-standards` for the full directory structure.
 
 ## Confidence Thresholds

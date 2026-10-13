@@ -45,7 +45,7 @@ Four stages leave no file: the user's reviews, a finished PRD refinement (its `P
 
 ## Along the Way
 
-- Assumptions go to stakeholders on their own schedule (the user sends them); their answers come back through `assumptions-document-feedback`. Nothing waits on them.
+- When preparing material for business stakeholders, `stakeholder-review-package` can package selected PRD requirements, every open assumption and contextual mockups into one HTML review. It is an optional review aid, not another implementation document or approval gate. The user sends it; assumption answers come back through `assumptions-document-feedback`, and requirements or mockup corrections go through `prd-writing-standards`. Stakeholders respond on their own schedule; nothing waits on them.
 - A change to behavior an existing PRD already owns: amend that PRD and its design first (`prd-writing-standards`, "Document Storage Convention"), then build. A separate `docs/changes/` directory is the user's call; never create one unasked.
 - A fix already identified, mid-work or from a bug report, that fits one session: `implement-from-discovery`. With only a symptom, `investigate-question` first. Anything bigger goes back to the user to open a PRD or change directory.
 - One question to research to an answer with a confidence level: `investigate-question`.
