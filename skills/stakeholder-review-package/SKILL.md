@@ -37,7 +37,17 @@ A reviewer must be able to answer without opening the full PRD. Source links off
 
 Put a visible notice near the start: **For business review. Selected requirements and all open assumptions. Implementation must use the full PRD and technical design.** Make clear that the complete review includes every question, while partial feedback is welcome and unreviewed items remain unanswered.
 
-Store the brief and its editorial input beside the PRD in the project's own repository. Use descriptive filenames, such as `{product}-stakeholder-review.html` and `{product}-stakeholder-review.json`. The input holds condensed prose and mappings, not another canonical assumptions register. Each displayed rule and assumption points to its source, using criterion IDs and assumption IDs; link to actual sections rather than an entire long document where possible.
+Store the single HTML file beside the canonical PRD in the project's own Git repository. Derive `{name}` from the PRD filename by removing `.md` and a trailing `-prd`, if present. Use exactly `{name}-stakeholder-review.html`. For the method's standard layout:
+
+```text
+docs/prds/{name}/
+  {name}-prd.md
+  {name}-stakeholder-review.html
+```
+
+The same filename applies in `docs/changes/{name}/` or the PRD's existing directory. Refresh this file in place; the preparation date and version belong inside the HTML, with earlier versions retained by Git. Keep it in version control when committing is authorized.
+
+**Keep and send only the HTML.** It embeds the review content, images, scripts and non-executable authoring data. The renderer reads that authoring data to regenerate the review and check freshness; no companion JSON is needed. Use temporary JSON for the first build or while editing the embedded authoring data, then remove it after verifying the HTML retains it. The authoring data holds condensed prose and source mappings, not another canonical assumptions register. Each displayed rule and assumption points to its source, using criterion IDs and assumption IDs; link to actual sections rather than an entire long document where possible.
 
 A self-contained file is a snapshot. Show its preparation date and version and link to the current canonical documents. Record source hashes, including mockup sources and their dependencies, and check freshness before sharing. Refresh the brief after source changes; do not claim that links to a moving branch make embedded content live. Previous feedback keeps its version and IDs; compare against current sources before applying it through `assumptions-document-feedback`. Never carry a confirmation onto a changed question automatically.
 

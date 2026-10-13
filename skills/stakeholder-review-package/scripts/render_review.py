@@ -26,6 +26,27 @@ def json_safe(value):
     return json.dumps(value, ensure_ascii=True).replace('<', '\\u003c').replace('>', '\\u003e').replace('&', '\\u0026')
 
 
+def authoring_digest(data):
+    # Hash the authoring content, not the HTML containing its own manifest.
+    return digest(json.dumps(data, sort_keys=True, ensure_ascii=True).encode())
+
+
+def embedded_json(text, ident):
+    blocks = re.findall(r'<script\b[^>]*\bid="' + re.escape(ident) + r'"[^>]*>(.*?)</script>', text, re.S)
+    if len(blocks) != 1:
+        raise ValueError(f'Expected exactly one embedded {ident} block; older reviews need their original authoring JSON for a one-time rebuild')
+    return json.loads(blocks[0])
+
+
+def load_authoring(path):
+    text = path.read_text()
+    if path.suffix.lower() in ('.html', '.htm'):
+        return embedded_json(text, 'authoring-data')
+    if path.suffix.lower() == '.json':
+        return json.loads(text)
+    raise ValueError('Authoring input must be a review HTML file or temporary JSON file')
+
+
 def open_ids(text):
     active = re.split(r'^##\s+Validated Assumptions\s*$', text, flags=re.M | re.I)[0]
     return re.findall(r'^#{2,6}\s+([A-Z][A-Z0-9]*-\d{3})[.\s:]', active, re.M)
@@ -84,10 +105,10 @@ def validate(data, root):
         raise ValueError(f'Assumption coverage differs: missing={sorted(set(expected)-set(actual))}, extra={sorted(set(actual)-set(expected))}')
 
 
-def manifest(data, root, input_path, images=None):
+def manifest(data, root, images=None):
     return {
         'sources': {s['path']: digest((root / s['path']).read_bytes()) for s in data['sources'].values()},
-        'editorial': digest(input_path.read_bytes()),
+        'editorial': authoring_digest(data),
         'template': digest(TEMPLATE.read_bytes()),
         'renderer': digest(Path(__file__).read_bytes()),
         'images': images if images is not None else {},
@@ -104,11 +125,11 @@ def refs_markup(refs, sources):
     return '<span class="source-links">' + ' · '.join(links) + '</span>'
 
 
-def render(data, root, input_path, images_dir):
+def render(data, root, images_dir):
     validate(data, root)
     image_hashes = {screen['id']: digest((images_dir / screen['file']).read_bytes())
                     for section in data['sections'] for screen in section['mockups']}
-    proof = manifest(data, root, input_path, image_hashes)
+    proof = manifest(data, root, image_hashes)
     version = digest(json.dumps(proof, sort_keys=True).encode())[:12]
     sources = data['sources']
     navigation, sections = [], []
@@ -146,7 +167,7 @@ def render(data, root, input_path, images_dir):
 <div class="decisions"><h3 class="column-heading">Assumptions to confirm</h3>{''.join(cards)}</div></div></section>''')
     source_links = ' · '.join(f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["label"])}</a>' for s in sources.values() if s.get('show', True))
     payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in data['sections']], 'sources':sources}
-    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(len(decisions)), 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof)}
+    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(len(decisions)), 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
     output = TEMPLATE.read_text()
     # One pass: authored text must never become another template substitution.
     return re.sub(r'@@([A-Z_]+)@@', lambda m: replacements[m[1]], output)
@@ -179,29 +200,33 @@ class EmbeddedImages(HTMLParser):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--repo-root', required=True, type=Path)
-    parser.add_argument('--input', required=True, type=Path)
+    parser.add_argument('--input', required=True, type=Path, help='Existing review HTML, or temporary authoring JSON for its first build')
     parser.add_argument('--output', required=True, type=Path)
     parser.add_argument('--images-dir', type=Path)
     parser.add_argument('--check', action='store_true')
     args = parser.parse_args()
-    data = json.loads(args.input.read_text())
+    data = load_authoring(args.input)
     validate(data, args.repo_root)
     if args.check:
-        match = re.search(r'<script type="application/json" id="source-manifest">(.*?)</script>', args.output.read_text(), re.S)
+        output = args.output.read_text()
+        proof = embedded_json(output, 'source-manifest')
+        stored_data = embedded_json(output, 'authoring-data')
+        if authoring_digest(stored_data) != authoring_digest(data):
+            raise SystemExit('STALE: embedded authoring data differs from the input; rebuild before sharing.')
         images = EmbeddedImages()
-        images.feed(args.output.read_text())
+        images.feed(output)
         if args.images_dir is not None:
             current_images = {screen['id']: digest((args.images_dir / screen['file']).read_bytes())
                               for section in data['sections'] for screen in section['mockups']}
             if current_images != images.hashes:
                 raise SystemExit('STALE: embedded images differ from current captures; rebuild.')
-        if not match or json.loads(match[1]) != manifest(data, args.repo_root, args.input, images.hashes):
+        if proof != manifest(data, args.repo_root, images.hashes):
             raise SystemExit('STALE: sources, editorial input or rendering assets changed; rebuild before sharing.')
         print('Freshness OK: current sources and rendering assets match this snapshot.')
     else:
         if any(s['mockups'] for s in data['sections']) and args.images_dir is None:
             parser.error('--images-dir is required when mockups are included')
-        output = render(data, args.repo_root, args.input, args.images_dir)
+        output = render(data, args.repo_root, args.images_dir)
         args.output.write_text(output)
         print(f'Built {args.output.name}: {len(output.encode())} bytes; all open assumptions covered.')
 

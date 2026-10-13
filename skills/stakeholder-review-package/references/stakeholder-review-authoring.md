@@ -1,6 +1,6 @@
 # Stakeholder Review Package Authoring Contract
 
-The renderer uses Python's standard library. Keep the editorial JSON in the project, not in the public skill. All prose fields are plain text and HTML-escaped. Source citations use a source key, optional section fragment, and a human-readable label (usually criterion or assumption IDs).
+The renderer uses Python's standard library. Keep only the generated HTML beside the PRD, using the exact naming rule in [Preserve sources and freshness](../SKILL.md#preserve-sources-and-freshness). It retains the complete authoring object below in its non-executable `authoring-data` block. The renderer can read this HTML directly; temporary JSON is an authoring convenience, never a required repository file or attachment. All prose fields are plain text and HTML-escaped. Source citations use a source key, optional section fragment, and a human-readable label (usually criterion or assumption IDs).
 
 ```json
 {
@@ -41,15 +41,25 @@ Every section may have zero or more rules, mockups and decisions. The renderer l
 Build and check (substitute actual paths):
 
 ```bash
+# First build: write the authoring object to a temporary JSON file.
 python3 <skill>/scripts/render_review.py \
-  --repo-root <project> --input <editorial-json> \
-  --images-dir <temporary-rendered-screens> --output <review-html>
+  --repo-root <project> --input <temporary-authoring-json> \
+  --images-dir <temporary-rendered-screens> --output <prd-directory>/<name>-stakeholder-review.html
+
+# Thereafter: use the single stored HTML as both input and output.
 python3 <skill>/scripts/render_review.py \
-  --repo-root <project> --input <editorial-json> \
-  --output <review-html> --check
+  --repo-root <project> --input <prd-directory>/<name>-stakeholder-review.html \
+  --images-dir <temporary-rendered-screens> --output <prd-directory>/<name>-stakeholder-review.html
+python3 <skill>/scripts/render_review.py \
+  --repo-root <project> --input <prd-directory>/<name>-stakeholder-review.html \
+  --output <prd-directory>/<name>-stakeholder-review.html --check
 python3 -m unittest discover -s <skill>/scripts -p 'test_*.py'
 ```
 
-Source paths must be repo-relative; URLs must be HTTPS. The generated source manifest records file hashes, the editorial input hash, template/renderer hashes and hashes of the actual embedded images. Changing a capture changes the review version. The freshness check verifies embedded bytes against that manifest; also pass `--images-dir` to compare against newly rendered captures. The visible version identifies this snapshot, not an approval. Current-source links can change later; exported feedback records the version and exact proposal reviewed. The freshness command needs the current local checkout and editorial input; the HTML makes no live freshness claim.
+For changed requirements, update the embedded authoring object to match the current sources before rebuilding. It can be extracted with the renderer's `load_authoring(Path(...))` helper, edited as temporary JSON and passed back to `--input`; verify that the generated HTML retains the object, then remove the temporary file. Do not hand-edit the rendered content while leaving its authoring data unchanged. Re-render canonical mockups when rebuilding. A rebuild starts unanswered; it never applies answers embedded in a reviewer's saved copy.
+
+Older HTML without `authoring-data` needs its original JSON for one rebuild. Verify that the new HTML retains the authoring object and passes freshness checks before removing that old sidecar.
+
+Source paths must be repo-relative; URLs must be HTTPS. The generated source manifest records file hashes, the canonical authoring-content hash, template/renderer hashes and hashes of the actual embedded images. Changing a capture changes the review version. The freshness check verifies embedded bytes against that manifest; also pass `--images-dir` to compare against newly rendered captures. The visible version identifies this snapshot, not an approval. Current-source links can change later; exported feedback records the version and exact proposal reviewed. The freshness command needs the current local checkout and the stored review HTML; the HTML makes no live freshness claim.
 
 For shareable links, use the repository's current shared branch and checked section anchors. Before sending, ensure the canonical files are published and accessible to the intended readers. Keep unpublished pilot artifacts local until their release is authorized.
