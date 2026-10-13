@@ -12,7 +12,7 @@ Guidelines for validating understanding before writing code.
 
 ## What Is This Skill?
 
-This skill is the **human-checkpoint validation gate**, for when the user explicitly wants to confirm answers before implementation begins. `autonomous-requirements-refinement` also runs it once per pass.
+This skill is the **human-checkpoint validation gate**, for when the user explicitly wants to confirm answers before implementation begins. `autonomous-design-refinement` also runs it once per pass.
 
 Its purpose: find gaps and unclear assumptions in the requirements before implementation begins. The AI identifies what's uncertain, proposes how it would handle each item (with a confidence level and impact assessment), and gives the human a chance to confirm or redirect. Implementation moves fast—this is the last chance to get aligned before assumptions become code.
 
@@ -68,7 +68,7 @@ Surface those questions, propose how you'd answer them, and give the human a cha
 
 Confirm you've reviewed the PRD, technical design, the phase document when the work is split, and relevant existing code.
 
-**Then run the conflict check** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements") against the whole PRD, unless the caller says it runs its own (`autonomous-requirements-refinement` does). It finds criteria in the repo's other PRDs and change directories that this PRD changes. An unintended conflict, where this PRD would break behavior someone asked for, is a Business question like any other, with your proposed answer. Intended ones are listed in the output as the `Replaces:` lines to add (`prd-writing-standards`), and added when the user asks you to update the documents.
+**Then run the conflict check** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements") against the whole PRD, unless the caller says it runs its own (`autonomous-design-refinement` does). It finds criteria in the repo's other PRDs and change directories that this PRD changes. An unintended conflict, where this PRD would break behavior someone asked for, is a Business question like any other, with your proposed answer. Intended ones are listed in the output as the `Replaces:` lines to add (`prd-writing-standards`), and added when the user asks you to update the documents.
 
 **If foundational documents (PRD, technical design) cannot be located**, include a prominent warning at the top of the output stating which documents were unavailable. Without these documents, all confidence assessments are suspect. Still complete the check—don't refuse to produce output.
 

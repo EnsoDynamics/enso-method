@@ -95,7 +95,7 @@ Other documents then cite `AC-RETURNS-02`, not "the second bullet in the returns
 ### When Later Work Changes an Earlier Criterion
 A later PRD or change directory often changes behavior an earlier one defined: a longer return window, a status that now means something else, a step that no longer happens. The earlier PRD is not rewritten to match. It was true when it was built, and the later document now owns that behavior: **the latest-built document that defines a behavior is its source of truth** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"). Two lines connect them:
 
-- **On the new criterion, written with the PRD:** a `Replaces:` line naming each earlier criterion it changes. It is part of the new PRD's content and changes freely while the PRD is drafted and refined. While writing, add one only where you already know the earlier criterion; don't search the repo for them, because the conflict check does that during requirements refinement or at build.
+- **On the new criterion, written with the PRD:** a `Replaces:` line naming each earlier criterion it changes. It is part of the new PRD's content and changes freely while the PRD is drafted and refined. While writing, add one only where you already know the earlier criterion; don't search the repo for them, because the conflict check does that during design refinement or at build.
 - **On the earlier criterion, written when the new one is built:** a `Superseded by:` line naming the new criterion, in the same commit as the code that makes it true. Not before: a PRD that is never built, or waits months, must not mark behavior superseded while the code still does it.
 
 ```markdown

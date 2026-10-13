@@ -29,7 +29,7 @@ Use this skill when:
 
 **Do NOT use this skill when:**
 
-- The PRD or technical design haven't been written or refined yet — do that first (`prd-writing-standards`, `technical-design-writing-standards`, then `autonomous-requirements-refinement`, or `implementation-readiness-check` for an explicit human checkpoint).
+- The PRD or technical design haven't been written or refined yet — do that first (`prd-writing-standards`, `technical-design-writing-standards`, then `autonomous-design-refinement`, or `implementation-readiness-check` for an explicit human checkpoint).
 - The work comfortably fits in one AI session — skip phasing entirely and go straight to `implement-from-requirements`. Don't manufacture phases for work that doesn't need them.
 - The work is a single bounded fix with no requirements directory behind it — `implement-from-discovery` builds that without phases.
 - The source is bigger than one PRD — a brief or idea that would run to dozens of phases before anything reaches production. Cut it into planned PRDs with `prd-roadmap` first; this skill then splits each PRD once it is written.
@@ -439,6 +439,6 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 | `prd-writing-standards` | Owns the `docs/prds/` and `docs/changes/` directory convention that phase docs live in, the `AC-<AREA>-<NN>` labels phase docs reference, and the plain-English readability standard that phase Summaries and plan tables follow. |
 | `technical-design-writing-standards` | Defines the single technical design per PRD that phase docs point into by section heading — the design is never split or duplicated per phase. |
 | `prd-roadmap` | The same job one level up: it cuts an idea too big for one PRD into right-sized planned PRDs, reusing this skill's seam principles at PRD scale. Each planned PRD, once written, comes here to be split into phases. |
-| `autonomous-requirements-refinement` / `implementation-readiness-check` | Should already have run against the PRD and technical design before this skill is invoked — this skill assumes the requirements are implementation-ready, it just decides whether they're too large for one session. |
+| `autonomous-design-refinement` / `implementation-readiness-check` | Should already have run against the PRD and technical design before this skill is invoked — this skill assumes the requirements are implementation-ready, it just decides whether they're too large for one session. |
 | `test-audit` | Audits a finished phase or PRD criterion by criterion: a phase document's "Acceptance criteria covered" list is the scope of a phase audit, and the one-phase-per-criterion rule is what makes a PRD audit add up. |
 | `continuation-prompt` | Produces the first leaf's copy-paste prompt when this skill was invoked directly: a chat-name line first (`ph2a1 …`), then the lineage block (PRD and phase by full title), pointers into the phase doc, valid once the phase-docs commit lands. |

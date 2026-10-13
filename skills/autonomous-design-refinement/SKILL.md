@@ -1,12 +1,14 @@
 ---
-name: autonomous-requirements-refinement
-description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state, run once the user has reviewed the PRD and design, before implement-from-requirements — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
+name: autonomous-design-refinement
+description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state, run once the user has reviewed the PRD and design, before implement-from-requirements; the design-stage counterpart of autonomous-prd-refinement, which refines a draft PRD before any design exists — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
 user-invocable: true
 ---
 
-# Autonomous Requirements Refinement
+# Autonomous Design Refinement
 
 Multi-pass workflow that refines requirements documents (PRD, technical design, assumptions, and any supporting materials they reference) to implementation-ready state. Each pass runs `implementation-readiness-check` for a small, ranked batch of questions, investigates them one at a time, folds each answer into the documents the moment it is known, and records progress in a state file on disk — so an interrupted run loses at most the questions in flight (three or fewer) and resumes from where it stopped.
+
+The name says which stage it serves. `autonomous-prd-refinement` refines a draft PRD on its own, before any design exists; this skill runs once the technical design exists and refines the PRD, design and assumptions together.
 
 ---
 
@@ -114,7 +116,7 @@ An area can be mixed; record it per component ("Salvage for the retry worker; Pr
 
 ## State File
 
-**Location:** alongside the PRD — `{feature}-refinement-state.md` in its directory, under `docs/prds/` or `docs/changes/`.
+**Location:** alongside the PRD — `{feature}-design-refinement-state.md` in its directory, under `docs/prds/` or `docs/changes/`.
 
 **Lifecycle:** created in Phase 1, updated after every question, staged with the documents at each pass checkpoint, and **deleted in Phase 7** when the run completes. It is scaffolding, not a deliverable.
 
@@ -123,7 +125,7 @@ An area can be mixed; record it per component ("Salvage for the retry worker; Pr
 ### Template
 
 ```markdown
-# Refinement State — {feature}
+# Design Refinement State — {feature}
 
 Started: {date}   Current pass: {N}   Status: {In progress | Paused: reason}
 Branch: {branch the documents are on}
@@ -286,7 +288,7 @@ Conformance also confirms that the Technical Design's Open Questions section, an
 ### Phase 5: Checkpoint
 
 1. Update the Passes table and **Next action** in the state file.
-2. Stage the requirements documents and the state file — only those files; exploration scripts are the user's to stage — and include a proposed commit message in the checkpoint summary: `docs({feature}): requirements refinement pass {N} — {one-line summary}`, with a body naming what changed. **The skill does not run `git commit` unless the user explicitly says to.** The pass boundary is the user's review point; committing there is what protects the work from other sessions' git operations in the same checkout, so make the message good enough to use as-is.
+2. Stage the requirements documents and the state file — only those files; exploration scripts are the user's to stage — and include a proposed commit message in the checkpoint summary: `docs({feature}): design refinement pass {N} — {one-line summary}`, with a body naming what changed. **The skill does not run `git commit` unless the user explicitly says to.** The pass boundary is the user's review point; committing there is what protects the work from other sessions' git operations in the same checkout, so make the message good enough to use as-is.
 3. Output the checkpoint summary:
 
 ```
@@ -324,11 +326,11 @@ The ordinary count of business assumptions awaiting validation is never a reason
 3. **Final verification** — one more `implementation-readiness-check` subagent, scope-gated, against the finished documents. If it surfaces new questions below the threshold and passes remain, treat them as a new pass and go to Phase 3. If the maximum is reached with questions still below threshold, report `Maximum passes reached` and mark the documents not ready. Never label that result `Converged`.
 4. **Write the completion report** (below) from the state file, while it still exists.
 5. **Delete the state file.** The questions that mattered are in the documents; the rest is in the report.
-6. **Final staging** — stage the requirements documents and the state-file deletion, and propose `docs({feature}): requirements refinement complete — {passes} passes, {questions} questions` for the user to review and commit. Put the **Noticed, out of scope** lines in the message body — once the state file is gone, the commit is their only durable home. Put the conflict check's result in the body too, as one line starting `Conflict check:` (`Conflict check: 3 earlier criteria replaced, 1 raised as a question`, or `Conflict check: no earlier criteria changed`): `implement-from-requirements` reads that line to narrow its own check. Write the line only when both checks ran.
+6. **Final staging** — stage the requirements documents and the state-file deletion, and propose `docs({feature}): design refinement complete — {passes} passes, {questions} questions` for the user to review and commit. Put the **Noticed, out of scope** lines in the message body — once the state file is gone, the commit is their only durable home. Put the conflict check's result in the body too, as one line starting `Conflict check:` (`Conflict check: 3 earlier criteria replaced, 1 raised as a question`, or `Conflict check: no earlier criteria changed`): `implement-from-requirements` reads that line to narrow its own check. Write the line only when both checks ran.
 7. **Output the completion report:**
 
 ```
-=== Autonomous Requirements Refinement Complete ===
+=== Autonomous Design Refinement Complete ===
 
 Passes: {N}   Final status: {Converged | Maximum passes reached}
 Existing code posture: {posture} (source: {source})   PRD words: {start} → {end}
@@ -441,7 +443,7 @@ State file:   (none — fresh run)
 
 - Phase 1 finds the state file: Q11 is Investigating, **Next action** says "re-run Q11, then Q12, then conformance." Q11 is re-run — the only cost of the interruption, because Q10 had already been folded.
 - **Conformance** moves one API rate-limit detail from the assumption into the Technical Design; fixes a missing confidence line.
-- **Checkpoint**: documents and state file staged; proposed message `docs(user notifications): requirements refinement pass 1 — preference mapping, deactivated-account policy, 9 of 12 resolved`. The user reviews and commits.
+- **Checkpoint**: documents and state file staged; proposed message `docs(user notifications): design refinement pass 1 — preference mapping, deactivated-account policy, 9 of 12 resolved`. The user reviews and commits.
 
 ### Pass 2
 

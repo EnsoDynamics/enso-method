@@ -43,7 +43,7 @@ Use this skill when:
 **Do NOT use this skill when:**
 
 - One `deliverable-review` round is enough for the PRD's size. Run that instead
-- A technical design already exists. `autonomous-requirements-refinement` refines the PRD and the design together
+- A technical design already exists. `autonomous-design-refinement` refines the PRD and the design together
 - You want to judge each finding yourself. Run `deliverable-review` round by round
 
 ---
@@ -271,7 +271,7 @@ The orchestrator plays `deliverable-review`'s main agent for its Steps 1–3: th
    - the areas that produced a fixed Medium or High in each of the last two rounds
    - rejected findings with their reasons, to raise again only with evidence the reason is wrong
    - settled questions, and agreed and pending seam wording from Hand-offs
-   - that this run has no conflict check: earlier criteria elsewhere in the repo that this PRD changes are not searched for (`autonomous-requirements-refinement` does that once the design exists)
+   - that this run has no conflict check: earlier criteria elsewhere in the repo that this PRD changes are not searched for (`autonomous-design-refinement` does that once the design exists)
    - for a delta round: the previous round's findings and what was changed for each or, for a rejected one, the reason, from the Findings table, and the diff from step 2
    - that mockups are design references, how they render and the main users' width, and, for a delta round, which screens' content changed
    - for a full round, `deliverable-review` Step 6's question: does the deliverable, as it stands, accomplish the intent? A gap is a finding, rated like any other
@@ -357,7 +357,7 @@ Next: the user reviews the PRD, ideally with whoever owns the business decisions
 | `deliverable-review` | Every round, full or delta; owns the severity scale, the visual review and the fix discipline |
 | `assumptions-document-writing` | When a fix needs a business decision the sources do not settle |
 | `prd-roadmap` | Hands each planned PRD to `prd-writing-standards`; this skill refines it before the user's review |
-| `autonomous-requirements-refinement` | Runs later, once the technical design exists, and refines the PRD and design together |
+| `autonomous-design-refinement` | Runs later, once the technical design exists, and refines the PRD and design together |
 
 ---
 

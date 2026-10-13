@@ -1,6 +1,6 @@
 # Autonomous PRD refinement, and deliverable review's severity scale, delta rounds and design references (decision record, 2026-10-12)
 
-Maintainer notes for `skills/autonomous-prd-refinement/SKILL.md` and the changes it needed in `skills/deliverable-review/SKILL.md` ("Rate Each Finding", "Delta Rounds", the product and design-reference split in "Look at Visual Deliverables", and "Carry each fix to every copy" in Step 5), with their touch points in `using-the-enso-method`, `prd-writing-standards`, `prd-roadmap`, `continuation-prompt`, `implementation-lifecycle`, `autonomous-requirements-refinement` (one pointer), `docs/how-the-enso-method-works.md` and the README. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the stopping rule, the severity scale or how design references are reviewed.
+Maintainer notes for `skills/autonomous-prd-refinement/SKILL.md` and the changes it needed in `skills/deliverable-review/SKILL.md` ("Rate Each Finding", "Delta Rounds", the product and design-reference split in "Look at Visual Deliverables", and "Carry each fix to every copy" in Step 5), with their touch points in `using-the-enso-method`, `prd-writing-standards`, `prd-roadmap`, `continuation-prompt`, `implementation-lifecycle`, `autonomous-design-refinement` (one pointer), `docs/how-the-enso-method-works.md` and the README. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the stopping rule, the severity scale or how design references are reviewed.
 
 ## The problem
 
@@ -15,8 +15,8 @@ A PRD with 34 criteria, an assumptions document, 20 mockup states and lines in a
 ## Options considered
 
 1. **More rules in `deliverable-review` alone.** Rejected: that skill is one round, used for code, documents and tests alike. A stopping rule, a state file and a round cap belong to the caller that loops.
-2. **Run `autonomous-requirements-refinement` early.** Rejected: it needs a technical design, and it surfaces implementation questions through `implementation-readiness-check`. A draft PRD needs reviewing against its source material, before any design exists.
-3. **Chosen:** a new orchestrator that loops `deliverable-review`, mirroring how `autonomous-requirements-refinement` loops the readiness check, and four generic additions to `deliverable-review` that any caller can use.
+2. **Run `autonomous-design-refinement` early.** Rejected: it needs a technical design, and it surfaces implementation questions through `implementation-readiness-check`. A draft PRD needs reviewing against its source material, before any design exists.
+3. **Chosen:** a new orchestrator that loops `deliverable-review`, mirroring how `autonomous-design-refinement` loops the readiness check, and four generic additions to `deliverable-review` that any caller can use.
 
 ## Decisions and why
 
@@ -26,7 +26,7 @@ A PRD with 34 criteria, an assumptions document, 20 mockup states and lines in a
 - **No fixed number of delta rounds.** A cap of two was proposed and withdrawn: the user found it arbitrary, and a delta round is cheap enough to run while its findings are real.
 - **A round cap of 12, which reports.** It is a safety net for a loop that does not converge. Reaching it pauses the run and lists what is open; it never ends the run silently.
 - **Rejected findings never drive the loop.** A writer that rejects a Medium with a reason would otherwise force rounds until the cap. The reason travels to every later reviewer, who can challenge it with evidence, and the completion report lists rejected Mediums and Highs for the user.
-- **No conflict check in this skill.** `autonomous-requirements-refinement` runs it once the design exists, against the PRD as refined; run on a draft, it would chase criteria the review rounds are still changing.
+- **No conflict check in this skill.** `autonomous-design-refinement` runs it once the design exists, against the PRD as refined; run on a draft, it would chase criteria the review rounds are still changing.
 - **Lows are fixed every round but never drive the loop.** They are cheap to fix, and a stopping rule that waited for zero Lows would not stop.
 
 **Severity**

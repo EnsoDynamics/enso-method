@@ -1,6 +1,6 @@
 ---
 name: technical-design-writing-standards
-description: Standards and process for writing technical design documents — architecture decisions, interfaces, data models, and integration points, including designs for changes to an existing system. Use to write a design from a PRD the user has reviewed, or to check one; autonomous-requirements-refinement follows the user's review of the design. Not implementation instructions.
+description: Standards and process for writing technical design documents — architecture decisions, interfaces, data models, and integration points, including designs for changes to an existing system. Use to write a design from a PRD the user has reviewed, or to check one; autonomous-design-refinement follows the user's review of the design. Not implementation instructions.
 user-invocable: true
 ---
 
@@ -37,7 +37,7 @@ Most designs change a system that already exists. Before writing, know how to tr
 - **Preserve:** the code is in production, or other work relies on it. Its behavior is a constraint the design keeps.
 - **Salvage:** the code is unreleased, or left over from earlier work being restarted. Reuse what fits the PRD; anything else gets one line saying it is switched off or left alone, and the design never works around it.
 
-A system can be mixed; say which parts are which. `autonomous-requirements-refinement` uses the same two terms.
+A system can be mixed; say which parts are which. `autonomous-design-refinement` uses the same two terms.
 
 ### Steps
 
@@ -46,8 +46,8 @@ A system can be mixed; say which parts are which. `autonomous-requirements-refin
 3. **Write the sections in the example structure below, designing only the difference**: the new or changed interfaces, data models and decisions, each decision with its rationale. For an existing system, add a short **Existing Code** section that records decisions, not a description: the posture in one line; what is reused, named in a line each; what is switched off (Salvage); and, under Preserve, behavior the design must keep that the code alone would not tell you. Don't describe how the existing code works, anywhere in the design; the implementer reads the code, and a description only goes stale. Keep the section to about a dozen lines.
 4. **Keep to the PRD.** The design never adds a requirement, and behavior the PRD doesn't ask for is out of scope. Technical choices you can make, make, and record why. A gap in the PRD goes in Open Questions; a business uncertainty also goes in the assumptions document per `assumptions-document-writing`.
 5. **Check before handing it over.** Every acceptance criterion is covered by something in the design, nothing is designed that no criterion asks for, and it can be read in one sitting.
-6. **For a design with hard-to-reverse decisions** — a new service, a schema or data model, a public interface — run `review-technical-design` next, before `autonomous-requirements-refinement`. It is optional; a design that follows an established pattern can skip it.
-7. **Once the user has reviewed the design** (with `review-technical-design`'s triage, when it ran), `autonomous-requirements-refinement` refines the PRD and design together to implementation-ready.
+6. **For a design with hard-to-reverse decisions** — a new service, a schema or data model, a public interface — run `review-technical-design` next, before `autonomous-design-refinement`. It is optional; a design that follows an established pattern can skip it.
+7. **Once the user has reviewed the design** (with `review-technical-design`'s triage, when it ran), `autonomous-design-refinement` refines the PRD and design together to implementation-ready.
 
 ---
 

@@ -18,7 +18,7 @@ The user's concern: a PRD nobody will read gets no real sign-off, and clause-on-
 
 1. **Raise the Medium bar across the board.** Rejected: most of the run's Mediums were real gaps. The trouble was narrower, in cases a stated rule already settled and in what the fixes wrote.
 2. **A length limit on criteria.** Rejected as a limit: a hard number invites padding or cramming. Kept as a tripwire in words a reader recognizes ("no longer reads as one short paragraph").
-3. **Leave the leftover edge cases to `autonomous-requirements-refinement`.** Partly: the technical design applies a stated rule to each place it touches, so a case a rule settles needs no PRD text. But a PRD that is not crisp makes everything downstream worse, so the readability rules apply while the PRD is written and refined, not later.
+3. **Leave the leftover edge cases to `autonomous-design-refinement`.** Partly: the technical design applies a stated rule to each place it touches, so a case a rule settles needs no PRD text. But a PRD that is not crisp makes everything downstream worse, so the readability rules apply while the PRD is written and refined, not later.
 4. **Chosen:** readability rules in the writing standard, two calibrations in the severity scale, and the refinement loop tracking growth and asking about readability and assumptions at full rounds.
 
 ## Decisions and why

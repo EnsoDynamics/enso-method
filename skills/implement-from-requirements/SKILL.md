@@ -8,7 +8,7 @@ user-invocable: true
 
 The default skill for taking implementation-ready requirements and producing working, tested code.
 
-This skill assumes the requirements have already been refined (typically via `autonomous-requirements-refinement`, or `implementation-readiness-check` for a human checkpoint). Its job is to load full context, decide whether the work fits in one AI session, phase it if not, then implement, test, and verify the deliverable.
+This skill assumes the requirements have already been refined (typically via `autonomous-design-refinement`, or `implementation-readiness-check` for a human checkpoint). Its job is to load full context, decide whether the work fits in one AI session, phase it if not, then implement, test, and verify the deliverable.
 
 This skill is one procedural arm of the `implementation-lifecycle` framework — **read that skill first if it isn't already loaded.** It's the umbrella for the whole methodology: the four entities (PRD, Technical Design, Assumptions, and Phase Documents when split), the confidence thresholds, and the session discipline (disposition of loose ends, the ask-gate, no hollow promises, the continuation test) that this entire session runs under. A user pointing you at a requirements doc should never need to name another skill — loading this one pulls the whole methodology with it.
 
@@ -69,11 +69,11 @@ If you can find no orienting context at all (no overview, no meaningful README, 
 
 ## Assumed Starting State
 
-This skill assumes the PRD and Technical Design are **implementation-ready** — they've been through `autonomous-requirements-refinement`, or `implementation-readiness-check` for an explicit human checkpoint. Gaps and questions have been resolved, and any remaining business uncertainties are captured in an assumptions document.
+This skill assumes the PRD and Technical Design are **implementation-ready** — they've been through `autonomous-design-refinement`, or `implementation-readiness-check` for an explicit human checkpoint. Gaps and questions have been resolved, and any remaining business uncertainties are captured in an assumptions document.
 
 The skill does NOT preemptively run a readiness check. That would burn context and tokens for the common case where the user has already done the refinement work — and the user has explicitly chosen this skill to *implement*, not to re-validate.
 
-**If during Phase 1 (loading context) you find the docs are clearly under-baked** — vague acceptance criteria, multiple TBDs, missing technical design sections, obvious questions that haven't been addressed and aren't captured as assumptions — pause and recommend the user run `autonomous-requirements-refinement` before continuing. Catch this in Phase 1, before any implementation work begins.
+**If during Phase 1 (loading context) you find the docs are clearly under-baked** — vague acceptance criteria, multiple TBDs, missing technical design sections, obvious questions that haven't been addressed and aren't captured as assumptions — pause and recommend the user run `autonomous-design-refinement` before continuing. Catch this in Phase 1, before any implementation work begins.
 
 **Don't add a mid-implementation guard for this.** Some uncertainty only surfaces during implementation — the readiness check wouldn't have caught it either, so asking "did you run the readiness check?" mid-implementation isn't useful. Handle that uncertainty using the pattern below.
 
@@ -364,7 +364,7 @@ When everything is done (and at any other terminal state, append the session mar
 |-------|-----------------------|
 | `implementation-lifecycle` | The umbrella — defines the four entities (PRD, Technical Design, Assumptions, Phase Documents), confidence thresholds, decision flow, and the session discipline. This skill is one procedural arm of that framework. Read it first; reload it if the session drifts. |
 | `implementation-readiness-check` | Alternative predecessor — used when the user explicitly wants a human review checkpoint before implementation |
-| `autonomous-requirements-refinement` | Heavyweight predecessor — multi-pass refinement for bringing draft documents to implementation-ready state |
+| `autonomous-design-refinement` | Heavyweight predecessor — multi-pass refinement for bringing draft documents to implementation-ready state |
 | `phase-split` | Delegated to from Phase 3 when the work is too large for one session, at any depth. It owns the entire sizing/seam-finding/phase-doc-writing procedure and the phase id and file layout (`phase-{id}-{short-name}.md`, one file per phase) — this skill does not reproduce it. After it writes the docs, this skill builds the first leaf in the same chat and one leaf per fresh chat after that. |
 | `prd-writing-standards` | Defines PRD format and the `docs/prds/` and `docs/changes/` colocated directory convention referenced by phase docs |
 | `technical-design-writing-standards` | Defines Technical Design conventions referenced during implementation |

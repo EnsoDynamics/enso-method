@@ -52,7 +52,7 @@ The second question, asked of the unit the prompt is for: **what does it serve, 
 
 1. The PRD, by the full title in its H1 (`Order Notifications`), never the directory slug or the chat-name abbreviation.
 2. The phase, by its id **and** the full title from the phase doc's H1 (`Phase 2a1 — Delivery receipts from the SMS provider`). For a leaf below a split parent, the leaf's own title; a positional id already carries the ancestry. An unsplit PRD has no phase: line 2 reads `whole PRD, not split`. A test audit of a whole split PRD reads `whole PRD, all phases`.
-3. What this chat does for them, in one line: `implements it`, or `fixes <the thing> that blocks AC-DLV-04 of it`. A fix names the acceptance criterion it unblocks — the label, from the phase doc's "Acceptance criteria covered" — not a symptom. Chats that do not build use their activity's verb: `refines its requirements`, `splits it into phases`, `drafts its technical design`, `investigates <x> for it`, `reviews it`.
+3. What this chat does for them, in one line: `implements it`, or `fixes <the thing> that blocks AC-DLV-04 of it`. A fix names the acceptance criterion it unblocks — the label, from the phase doc's "Acceptance criteria covered" — not a symptom. Chats that do not build use their activity's verb: `refines its PRD` (PRD refinement), `refines its PRD and design` (design refinement), `splits it into phases`, `drafts its technical design`, `investigates <x> for it`, `reviews it`.
 
 The shapes that legitimately have no PRD phase are listed in `implementation-lifecycle` ("Every Session Names What It Serves"): ticket-tracked work, a declared ops thread with a session file, a component defect reported from outside, requirements work on the PRD itself, methodology work. Each puts its own lineage on line 1 in place of the PRD, and `no phase — <shape>` on line 2; Step 3 item 2 shows the rendered block. One variant: writing a planned PRD from a PRD roadmap, where the PRD does not exist yet, puts the roadmap's full title on line 1 and the planned PRD on line 2 — `In service of: Acme Cloud PRD Roadmap` / `Cloud Ingestion — planned PRD, first in the roadmap` / `This chat: writes and refines its PRD.`
 
@@ -112,7 +112,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
    | Next chat runs | Token |
    |----------------|-------|
    | `implement-from-requirements`, `implement-from-discovery` | `impl` |
-   | `autonomous-requirements-refinement` | `TDD refine` |
+   | `autonomous-design-refinement` | `TDD refine` |
    | `autonomous-prd-refinement` | `PRD refine` |
    | `phase-split` | `split` |
    | Technical Design writing (`technical-design-writing-standards`) | `design` |
@@ -133,7 +133,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
 | Work | Name |
 |------|------|
 | A PRD phased under `phase-split`'s positional ids: phase 2b1 of User Onboarding (the id already carries its parents, so no separate phase token) | `ph2b1 userO impl` |
-| Order Notifications phase 3b2, but the chat refines its requirements before any code | `ph3b2 orderN TDD refine` |
+| Order Notifications phase 3b2, but the chat refines its PRD and design before any code | `ph3b2 orderN TDD refine` |
 | Phase 2 of the same project, being split into sub-phases (the phase is the unit, so it leads) | `ph2 orderN split` |
 | Billing product, invoice-export PRD drafted, in review rounds before its design | `IE-export BL PRD refine` |
 | Writing the Cloud Ingestion PRD, a planned PRD in the Acme Cloud PRD roadmap (the planned PRD's short-name is the unit; the roadmap is the project tag) | `ingestion acmeCloud prd` |

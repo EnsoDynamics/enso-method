@@ -172,7 +172,7 @@ It runs at these points, and each skill carries its own step:
 
 | Where | What it checks |
 |---|---|
-| `autonomous-requirements-refinement`, pass 1 | The whole PRD, with findings resolved as questions in the run; at completion, again for criteria the run added or changed after pass 1 |
+| `autonomous-design-refinement`, pass 1 | The whole PRD, with findings resolved as questions in the run; at completion, again for criteria the run added or changed after pass 1 |
 | `implementation-readiness-check`, when run on its own | The whole PRD |
 | `implement-from-requirements`, after sizing and before building | The criteria this session builds, narrowed by the last recorded check; with none, the whole PRD, recorded for later phases |
 | `implement-from-discovery`, `test-audit`, and anywhere else code is about to change to match a criterion | Amending: the criterion, both ways. Matching code to a criterion it consistently contradicts: only whether a later-built criterion changed it; the shipped-behavior rule covers the rest. Skipped when a check in this session already covered it |
@@ -446,9 +446,9 @@ The typical sequence for implementing a feature or closing a gap:
 
 2. **Check the Assumptions Document** — treat all assumptions as decided facts.
 
-3. **Establish readiness — but note this is a state, not a step that always runs.** "Implementation-ready" means the gaps have been thought through and remaining business uncertainty is captured as assumptions. Two skills can establish it, and **both are explicit user choices, not automatic**: `implementation-readiness-check` is the human checkpoint, surfacing everything below 95% for you to confirm or redirect (deliberately user-invoke-only); `autonomous-requirements-refinement` is the heavier multi-pass version that drives docs to ready state on its own.
+3. **Establish readiness — but note this is a state, not a step that always runs.** "Implementation-ready" means the gaps have been thought through and remaining business uncertainty is captured as assumptions. Two skills can establish it, and **both are explicit user choices, not automatic**: `implementation-readiness-check` is the human checkpoint, surfacing everything below 95% for you to confirm or redirect (deliberately user-invoke-only); `autonomous-design-refinement` is the heavier multi-pass version that drives docs to ready state on its own.
 
-   **The implement skills do NOT re-run a readiness check.** If you're going straight from a refined PRD to building, you don't need one: the same investigate → declare-an-assumption → proceed logic runs continuously inside the implement skill's own uncertainty handling, so no separate automated gate is needed (the build's narrow conflict check, `implement-from-requirements` Phase 4, is not a readiness check). Reach for a readiness check when you specifically want the gap analysis front-loaded as its own step — before deciding whether to phase-split, before handing requirements to someone else, or when you want a checkpoint before any code is written. And if an implement session finds the docs clearly under-baked, it stops and recommends `autonomous-requirements-refinement` (or a readiness check, for a human checkpoint) rather than pressing on.
+   **The implement skills do NOT re-run a readiness check.** If you're going straight from a refined PRD to building, you don't need one: the same investigate → declare-an-assumption → proceed logic runs continuously inside the implement skill's own uncertainty handling, so no separate automated gate is needed (the build's narrow conflict check, `implement-from-requirements` Phase 4, is not a readiness check). Reach for a readiness check when you specifically want the gap analysis front-loaded as its own step — before deciding whether to phase-split, before handing requirements to someone else, or when you want a checkpoint before any code is written. And if an implement session finds the docs clearly under-baked, it stops and recommends `autonomous-design-refinement` (or a readiness check, for a human checkpoint) rather than pressing on.
 
 4. **Size for a single AI session** — if the work is too large for one focused session, `phase-split` cuts it into phases (`implement-from-requirements` runs this sizing gate automatically, and neither skill stops to ask whether to split — the cut is declared and the session carries on with the first leaf). Sizing isn't one-and-done: mid-implementation you may discover that even a single phase is bigger than the split assumed. When that happens, re-invoke `phase-split` to cut the remaining work into child phases (`2a` under `2`, `2a1` under `2a`, one file each) rather than grinding on past coherent context. Re-cutting covers only the work the phase was already scoped to carry — it is never a vehicle for turning mid-implementation discoveries into new phases; those go through the Materiality Gate and disposition rule, and most are dismissed.
 
@@ -458,7 +458,7 @@ The typical sequence for implementing a feature or closing a gap:
 
 7. **Bring to terminal state** — every task must end cleanly (see next section), and the session marker's DONE line names the state reached.
 
-For fully autonomous multi-pass document refinement, the `autonomous-requirements-refinement` skill orchestrates the readiness-check/investigate/update loop with state tracking and verification passes. Implementation itself runs through the implement skills — `implement-from-requirements` or `implement-from-discovery`.
+For fully autonomous multi-pass document refinement, the `autonomous-design-refinement` skill orchestrates the readiness-check/investigate/update loop with state tracking and verification passes. Implementation itself runs through the implement skills — `implement-from-requirements` or `implement-from-discovery`.
 
 ---
 
@@ -512,8 +512,8 @@ This skill provides the **framework context**. Other skills provide the **proced
 | `assumptions-document-writing` | When writing or updating assumptions — formatting standards |
 | `prd-roadmap` | Before any PRD, when an idea is too big for one: cuts it into right-sized planned PRDs beside a full brief that stays whole |
 | `autonomous-prd-refinement` | After a PRD is drafted and before the user reviews it: review-and-fix rounds until no Medium or High finding is left |
-| `review-technical-design` | Optional, after the technical design is written and before `autonomous-requirements-refinement`: reviews a design that makes hard-to-reverse decisions |
-| `autonomous-requirements-refinement` | Refining docs from draft to implementation-ready state |
+| `review-technical-design` | Optional, after the technical design is written and before `autonomous-design-refinement`: reviews a design that makes hard-to-reverse decisions |
+| `autonomous-design-refinement` | Refining docs from draft to implementation-ready state |
 | `implement-from-requirements` | Default skill when starting from a fresh PRD |
 | `implement-from-discovery` | Implementing a fix or change identified during research/investigation |
 | `phase-split` | Splitting a too-large PRD into AI-session-sized phases — and re-cutting when a phase turns out bigger than the original split assumed. Future phase docs are the preferred destination for discovered follow-up work that survives the Materiality Gate. |

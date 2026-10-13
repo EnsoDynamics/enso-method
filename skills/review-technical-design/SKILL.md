@@ -1,6 +1,6 @@
 ---
 name: review-technical-design
-description: "Optional senior review of a technical design before refinement — make an independent would-I-build-it-this-way architecture pass, verify the design's load-bearing claims against the real codebase and infrastructure (read-only), test proposed data-model changes against the current ecosystem and future evolution, evaluate the design against the project's house engineering standards, and produce a triage the human can act on without reading the whole document: verdict, ranked findings with proposed resolutions, and the short list of sections worth reading personally. Use after technical-design-writing-standards and before autonomous-requirements-refinement, for designs that make hard-to-reverse decisions (a new service, a schema or data model, a public interface). Treats every design as authored by a junior engineer directing an AI. Not for writing designs, and not for reviewing code or pull requests of code."
+description: "Optional senior review of a technical design before refinement — make an independent would-I-build-it-this-way architecture pass, verify the design's load-bearing claims against the real codebase and infrastructure (read-only), test proposed data-model changes against the current ecosystem and future evolution, evaluate the design against the project's house engineering standards, and produce a triage the human can act on without reading the whole document: verdict, ranked findings with proposed resolutions, and the short list of sections worth reading personally. Use after technical-design-writing-standards and before autonomous-design-refinement, for designs that make hard-to-reverse decisions (a new service, a schema or data model, a public interface). Treats every design as authored by a junior engineer directing an AI. Not for writing designs, and not for reviewing code or pull requests of code."
 user-invocable: true
 ---
 
@@ -9,12 +9,12 @@ user-invocable: true
 ## Where this fits, and when to run it
 
 This step is **optional**. Run it after `technical-design-writing-standards` has
-produced a design and before `autonomous-requirements-refinement`, when the design
+produced a design and before `autonomous-design-refinement`, when the design
 makes decisions that are expensive to reverse: a new service, a schema or data
 model, a public interface. Small designs that follow an established pattern don't
 need it.
 
-The order matters. `autonomous-requirements-refinement` fills gaps *inside* the
+The order matters. `autonomous-design-refinement` fills gaps *inside* the
 design's frame and deliberately never asks "would it be better if…". This skill is
 the one that questions the frame. Refining a design that the review then
 restructures wastes the refinement.

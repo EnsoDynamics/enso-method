@@ -12,7 +12,7 @@ Every skill that ended at a commit staged its files and handed the commit to the
 ## Options considered
 
 1. **Keep "the user commits" and tighten the wording.** Rejected: the inconsistency came from a default the user overrode in most sessions anyway, and it leaves the refactor pass dependent on a recommendation nobody takes.
-2. **Every skill that ends at a commit commits and pushes by default.** Rejected for now: requirements refinement, phase split and PRD roadmap produce documents the user is about to review, and a test audit's fixes are reviewed against its report. The friction that motivated the change was in the implement chain.
+2. **Every skill that ends at a commit commits and pushes by default.** Rejected for now: design refinement, phase split and PRD roadmap produce documents the user is about to review, and a test audit's fixes are reviewed against its report. The friction that motivated the change was in the implement chain.
 3. **Commit and push everywhere, by default.** Rejected: a push to `develop` or `main` publishes to the branch everyone builds on, and a person running one session on `develop` wants to look before that happens.
 4. **Commit and push only off `develop` and `main`, judged by the branch the session is on.** Rejected: the motivating sessions were manual ones on `develop`, so they would go back to not committing and the refactor pass would stop running again. And a worktree chat sits on a `wt/` branch but lands straight on `develop`, so the session's branch doesn't say what the push publishes.
 5. **Chosen:** the implement chain (`implement-from-requirements`, `implement-from-discovery`, and the `refactor-pass` they run) always commits and runs the refactor pass by default, and pushes by default only when the push lands on a feature branch. Every other skill keeps handing the commit to the user.
@@ -22,7 +22,7 @@ Every skill that ended at a commit staged its files and handed the commit to the
 **Scope**
 
 - **The implement chain only.** It is where the method runs end to end without the user, after the PRD and design reviews, so it is where a stop for a commit costs the most and buys the least.
-- **The other skills are unchanged and say so.** "Who Commits" names them: requirements refinement, phase split, PRD roadmap, test audit, and `deliverable-review` or `test-hardening` run on their own present the commit for the user. A phase split called from an implement session needs no rule of its own: its phase docs ride the implement session's commit.
+- **The other skills are unchanged and say so.** "Who Commits" names them: design refinement, phase split, PRD roadmap, test audit, and `deliverable-review` or `test-hardening` run on their own present the commit for the user. A phase split called from an implement session needs no rule of its own: its phase docs ride the implement session's commit.
 
 **Precedence**
 
