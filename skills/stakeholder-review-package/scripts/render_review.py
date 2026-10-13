@@ -161,9 +161,9 @@ def render(data, root, images_dir):
 <textarea id="comment-{ident}" rows="2" placeholder="Describe the change, or what you’re unsure about."></textarea>
 </article>''')
         screens = '<div class="gallery">' + ''.join(gallery) + '</div>' if gallery else ''
-        sections.append(f'''<section class="workflow" id="{sid}"><header class="section-heading"><span class="eyebrow">{index:02} / THE WORKFLOW</span><h2>{esc(section['title'])}</h2><p>{esc(section['intro'])}</p></header>
-<div class="workflow-layout"><div class="context"><h3 class="column-heading">Key requirements &amp; mockups</h3><div class="context-content"><ul class="rules">{rules}</ul>{screens}</div>
-<div class="workflow-feedback"><label for="note-{sid}">Feedback on requirements or mockups</label><p id="note-help-{sid}">What should work or look differently in this part of the workflow?</p><textarea id="note-{sid}" rows="3" aria-describedby="note-help-{sid}" placeholder="Optional — describe the requirement or screen and your suggested change"></textarea></div></div>
+        sections.append(f'''<section class="workflow" id="{sid}"><header class="section-heading"><span class="eyebrow">{index:02} / SECTION</span><h2>{esc(section['title'])}</h2><p>{esc(section['intro'])}</p></header>
+<div class="workflow-layout"><div class="context"><h3 class="column-heading">Key acceptance criteria &amp; mockups</h3><div class="context-content"><ul class="rules">{rules}</ul>{screens}</div>
+<div class="workflow-feedback"><label for="note-{sid}">Feedback on acceptance criteria or mockups</label><p id="note-help-{sid}">What should work or look differently in this section?</p><textarea id="note-{sid}" rows="3" aria-describedby="note-help-{sid}" placeholder="Optional — describe the acceptance criterion or screen and your suggested change"></textarea></div></div>
 <div class="decisions"><h3 class="column-heading">Assumptions to confirm</h3>{''.join(cards)}</div></div></section>''')
     source_links = ' · '.join(f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["label"])}</a>' for s in sources.values() if s.get('show', True))
     payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in data['sections']], 'sources':sources}

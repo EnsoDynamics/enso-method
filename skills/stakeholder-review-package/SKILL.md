@@ -19,13 +19,13 @@ A genuine **Blocking Open Question** has no proposed answer to confirm. Surface 
 
 ## Organize around the work
 
-Use one brief per PRD by default. Start with two sentences on the outcome and scope, followed by a few workflow sections. Each section brings together:
+Use one brief per PRD by default. Start with two sentences on the outcome and scope, followed by a few sections organized around workflows, features or business topics. Each section brings together:
 
 - A short account of what the person will do and what changes.
 - The relevant mockup beside that explanation, with readable text and an enlargement control. Group alternate screens in a labelled gallery; avoid a separate wall of screenshots.
-- The assumptions for that part of the workflow, each shown once with its proposed answer and response controls.
+- The assumptions for that section, each shown once with its proposed answer and response controls.
 
-Label the columns **Key requirements & mockups** and **Assumptions to confirm**. The first is selected; the second contains every open assumption relevant to that workflow. Do not call the assumptions “highlights” or “most relevant assumptions.” Keep a prominent, labelled **Feedback on requirements or mockups** box in the requirements/mockups column, beside the material it refers to. On narrow screens, it stays with that material before the assumptions.
+Label the navigation **In this review** and the section eyebrows **Section**. Label the columns **Key acceptance criteria & mockups** and **Assumptions to confirm**. The first is selected; the second contains every open assumption relevant to that section. Do not call the assumptions “highlights” or “most relevant assumptions.” Keep a prominent, labelled **Feedback on acceptance criteria or mockups** box in the acceptance criteria/mockups column, beside the material it refers to. On narrow screens, it stays with that material before the assumptions.
 
 When an assumption already states a behavior, let its card do that work: do not repeat the proposal in the overview, a highlights list and an assumptions appendix. Link back to the card when needed elsewhere. Prioritize through section order and a small, explained emphasis on consequential decisions; never hide lesser assumptions behind a filter, an accordion or a link to another document. Every question, proposal and answer control is visible by default. Evidence and longer examples may use expandable details.
 
@@ -35,7 +35,7 @@ A reviewer must be able to answer without opening the full PRD. Source links off
 
 ## Preserve sources and freshness
 
-Put a visible notice near the start: **For business review. Selected requirements and all open assumptions. Implementation must use the full PRD and technical design.** Make clear that the complete review includes every question, while partial feedback is welcome and unreviewed items remain unanswered.
+Put a visible notice near the start: **For business review. Selected acceptance criteria and all open assumptions. Implementation must use the full PRD and technical design.** Make clear that the complete review includes every question, while partial feedback is welcome and unreviewed items remain unanswered.
 
 Store the single HTML file beside the canonical PRD in the project's own Git repository. Derive `{name}` from the PRD filename by removing `.md` and a trailing `-prd`, if present. Use exactly `{name}-stakeholder-review.html`. For the method's standard layout:
 
@@ -59,9 +59,9 @@ Use [the authoring contract](references/stakeholder-review-authoring.md) and the
 
 Use inline CSS and small vanilla JavaScript, system fonts and embedded images. No CDN, telemetry, server, third-party form or client-specific branding. Retain the template’s small “Prepared with the Enso Method” footer, embedded Enso mark and link to https://ensomethod.org; keep the review itself visually neutral. Compress images without making screen text hard to read; prefer a file under 1 MB when feasible and report its actual size. Do not omit a necessary screen to hit a byte target. All substantive content remains readable without JavaScript; enhanced controls should explain when JavaScript is needed.
 
-Feedback controls start unanswered and offer only **Confirm** and **Change**. Uncertainty belongs under Change with a comment; there is no separate discussion or defer option. Never default to approval or provide "approve all." Mark Change with no explanation as incomplete. Export every ID, including unanswered ones, the question and proposal the person saw, their response/comment and the source version. Include requirements/mockup feedback, clearly distinguished from assumption answers and labelled with its workflow.
+Feedback controls start unanswered and offer only **Confirm** and **Change**. Uncertainty belongs under Change with a comment; there is no separate discussion or defer option. Never default to approval or provide "approve all." Mark Change with no explanation as incomplete. Export every ID, including unanswered ones, the question and proposal the person saw, their response/comment and the source version. Include acceptance criteria and mockup feedback, clearly distinguished from assumption answers and labelled with its section.
 
-Explain the two downloads by purpose: **Save editable copy (.html)** keeps the review and answers for the reviewer to reopen and edit; **Download reply (.txt)** produces the response to return to the requester. Put a short explanation beside each button. Keep them separate; no ZIP or automatic paired download. Downloading saves a local file; it does not send anything or update canonical sources. State that beside the actions. If browser storage fails, say so and name the editable-copy action.
+Explain the two downloads by purpose: **Save editable copy (.html)** keeps the review and answers for the reviewer to reopen and edit; **Download reply (.txt)** produces the response to return to the requester. Put a short explanation beside each button. Keep them separate; no ZIP or automatic paired download. Downloading saves a local file; it does not send anything or update canonical sources. State that beside the actions, followed by: **Send the downloaded reply (.txt) to the person who requested this review.** This instruction works for email, chat or another sharing channel. If browser storage fails, say so and name the editable-copy action.
 
 ## Check before handing over
 
