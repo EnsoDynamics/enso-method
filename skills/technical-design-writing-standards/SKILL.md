@@ -56,7 +56,7 @@ A system can be mixed; say which parts are which. `autonomous-design-refinement`
 ### Overview
 Brief summary of what's being built and the key technical decisions. Link to the parent PRD.
 
-When the PRD comes from a PRD roadmap (`prd-roadmap`), the design also honors the full brief's settled decisions and the roadmap's seams. It decides the shared contracts the roadmap says this PRD owns, and extends — never redesigns — contracts an earlier PRD owns. It covers only what this PRD ships, not the whole roadmap.
+When the PRD comes from a PRD roadmap (`prd-roadmap`), the design also honors the full brief's settled decisions and the seams in the PRD contracts beside the roadmap (`{name}-prd-contracts.md`). It decides the shared contracts that document says this PRD owns, and extends — never redesigns — contracts an earlier PRD owns. It covers only what this PRD ships, not the whole roadmap.
 
 ### Architecture Decisions
 What choices are we making and why? Each decision should include rationale — not just "we chose X" but "we chose X because Y."

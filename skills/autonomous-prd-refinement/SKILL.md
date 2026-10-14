@@ -12,7 +12,7 @@ A review-and-fix loop for a drafted PRD and everything that travels with it: its
 
 ## What Is This Skill?
 
-A PRD written from source material (a brief, a roadmap entry, a stakeholder's handoff, interviews) is rarely right on the first draft. Some cases go unstated, two passages disagree, a fix in one place leaves a stale copy in another, and a mockup shows something the criteria no longer say. One review round finds some of this; the fixes then create a few new problems of their own. This skill runs the rounds until they stop finding anything that matters, without the user.
+A PRD written from source material (a brief, its entry in a roadmap's PRD contracts, a stakeholder's handoff, interviews) is rarely right on the first draft. Some cases go unstated, two passages disagree, a fix in one place leaves a stale copy in another, and a mockup shows something the criteria no longer say. One review round finds some of this; the fixes then create a few new problems of their own. This skill runs the rounds until they stop finding anything that matters, without the user.
 
 **The goal:** when the run ends, no Medium or High problem a reviewer found in the PRD, its assumptions or its mockups is left unfixed, apart from any rejected with a stated reason or handed off whole to another session, so the user's review is spent on the product decisions, not on defects. And the PRD is still one a person can read and sign off: a run that covers every case but leaves the criteria unreadable has not reached its goal ("Keep It Readable").
 
@@ -53,8 +53,8 @@ Use this skill when:
 1. **The PRD's path.** The skill also finds, from the PRD's directory and its links:
    - the assumptions document, if any
    - the mockups and whatever generates them
-   - the source material the PRD was written from: the brief, its roadmap entry and coverage matrix, a handoff package
-   - neighbouring documents the PRD adds lines to, such as its roadmap entry, seam rows and coverage-matrix rows
+   - the source material the PRD was written from: the brief, its entry in the PRD contracts and the coverage matrix, a handoff package
+   - neighbouring documents the PRD adds lines to, such as its roadmap row, its PRD-contracts entry and seam rows, and coverage-matrix rows
 2. **Read access to the systems the PRD describes**, where the project allows it (`engineering-principles`, "Production Data"), so facts and sample data can be checked. Credential discovery follows `investigate-question`.
 
 ---
@@ -148,9 +148,9 @@ A wrong mockup is redrawn in its own medium, never annotated (`prd-writing-stand
 
 ## Working Beside Other Sessions
 
-A PRD in a roadmap is often refined while sessions for its neighbours are writing theirs, and fixes reach into shared documents: a roadmap's seams, a coverage matrix. A sibling PRD's criterion that this one changes is named only in a `Replaces:` line on this PRD's own criterion; the sibling's `Superseded by:` line is written when this PRD is built, never during refinement (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion").
+A PRD in a roadmap is often refined while sessions for its neighbours are writing theirs, and fixes reach into shared documents: the seams in a roadmap's PRD contracts, a coverage matrix. A sibling PRD's criterion that this one changes is named only in a `Replaces:` line on this PRD's own criterion; the sibling's `Superseded by:` line is written when this PRD is built, never during refinement (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion").
 
-- **Before editing a document this PRD does not own,** check it for another session's uncommitted changes (`git status`, `git diff`). Edit only the lines this PRD owns: its own roadmap entry, seam rows and coverage-matrix rows. Never revert, restage or reformat another session's work.
+- **Before editing a document this PRD does not own,** check it for another session's uncommitted changes (`git status`, `git diff`). Edit only the lines this PRD owns: its roadmap row, its PRD-contracts entry and seam rows, and its coverage-matrix rows. Detail goes into the PRD; an entry stays within `prd-roadmap`'s size cap. Never revert, restage or reformat another session's work.
 - **A change another session's document needs** (a seam both sides must state the same way, a criterion of theirs that must change to fit this PRD, not one this PRD replaces) goes to that session as a message, through whatever channel the tooling offers, or as a note for the user to relay. Record it under **Hand-offs** in the state file.
 - **Agree a seam once.** When two PRDs must state a handoff the same way, settle the wording with the other session and record it under Hand-offs, so later rounds review against the agreed wording.
 - **A finding only another session can fix** (its side of a seam, a criterion of theirs that must change): the writer fixes this PRD's side, if it has one, and sends the rest as a hand-off with the proposed wording. When this PRD changed, the finding is marked `Fixed; rest handed off: {Hand-offs row}` and counts as fixed, so the change is reviewed like any other. Only when nothing in this PRD changed is it marked `Handed off: {Hand-offs row}`. Reviewers get the pending wording, so they do not raise it again each round.
@@ -278,8 +278,8 @@ The orchestrator plays `deliverable-review`'s main agent for its Steps 1–3: th
    - that mockups are design references, how they render and the main users' width, and, for a delta round, which screens' content changed
    - for a full round, `deliverable-review` Step 6's question: does the deliverable, as it stands, accomplish the intent? A gap is a finding, rated like any other
    - for a full round, three more questions, with the criteria-word figures from the Rounds table: can the person who signs the PRD off read each criterion once and say what it checks ("Keep It Readable")? Does any assumption's chosen answer now look wrong, given what the run has learned? And does the deliverable make any business decision that is neither settled at 95% or more from the source material nor declared as an assumption? Each is a finding, rated like any other
-   - for a full round, when a coverage matrix maps rows to this PRD: is each row covered by a criterion, declared as an assumption where the PRD departs from it, or moved to a neighbour with both roadmap entries and the matrix updated? An uncovered row is a finding. The answer stays in the round: no coverage-trace table or file is written (`prd-writing-standards`, "Before You Write: Is This One PRD?")
-   - for a full round, when the PRD is in a roadmap: does its `**Depends on:**` line agree with its roadmap entry, and say `None` in words when it depends on nothing? A missing line or a disagreement is a finding
+   - for a full round, when a coverage matrix maps rows to this PRD: is each row covered by a criterion, declared as an assumption where the PRD departs from it, or moved to a neighbour with both PRD-contracts entries and the matrix updated? An uncovered row is a finding. The answer stays in the round: no coverage-trace table or file is written (`prd-writing-standards`, "Before You Write: Is This One PRD?")
+   - for a full round, when the PRD is in a roadmap: does its `**Depends on:**` line agree with its PRD-contracts entry and its roadmap row, and say `None` in words when it depends on nothing? A missing line or a disagreement is a finding
 4. **Record the findings** in the state file: a Rounds row with the round and its kind, each new finding in the Findings table as Open, the facts the reviewer verified added to Facts, and the snapshot from step 1 as the **Delta base**.
 
 ### Phase 3: Fix
@@ -303,7 +303,7 @@ Using the state file only:
 ### Phase 5: Completion
 
 1. **Write the completion report** (below) from the state file while it still exists.
-2. **Delete the state file.**
+2. **Delete the state file.** When the PRD is in a roadmap, also delete its entry's scope lines (directory, Reaches production, In and Not in this PRD, Depends on) from the PRD contracts, keeping **Shared contracts it owns** and **Questions it answers** (`prd-roadmap`, Step 5): the PRD now holds its own scope.
 3. **Stage** the run's own files and propose `docs({feature}): PRD refinement complete — {rounds} review rounds, {findings} findings fixed`. Put the **Noticed, out of scope** lines, the open hand-offs and handed-off findings, and the rejected Mediums and Highs with their reasons in the message body: once the state file is gone, the commit is their only durable home. **The skill does not run `git commit` unless the user explicitly says to.**
 4. **Output the report:**
 
@@ -375,7 +375,7 @@ Next: the user reviews the PRD, ideally with whoever owns the business decisions
 PRD:          docs/prds/customer-returns/customer-returns-prd.md   (24 criteria)
 Assumptions:  docs/prds/customer-returns/assumptions.md            (9 entries)
 Mockups:      docs/prds/customer-returns/mockups/                  (14 screens, generated from one script)
-Source:       a stakeholder's handoff package and the roadmap entry
+Source:       a stakeholder's handoff package and its PRD-contracts entry
 State file:   (none, fresh run)
 ```
 

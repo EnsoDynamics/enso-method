@@ -1,6 +1,6 @@
 ---
 name: prd-roadmap
-description: Cut an idea that is bigger than one PRD — a brief, a context package, a pile of design notes, or a draft PRD that outgrew itself — into an ordered PRD roadmap of right-sized planned PRDs, each one finishing with something that can be promoted to production. Consolidates the input documents (whatever they are called) into one full brief that stays whole, renames and moves it to docs/roadmaps/{name}/, writes the PRD roadmap beside it, and hands off to prd-writing-standards for the first planned PRD. Decides the cut itself and does not stop to ask. Does not write PRDs, technical designs, or phase documents. The planning step above phase-split. Use when the user says "this is too big for one PRD", "break this into PRDs", "roadmap this", or hands over a large brief to turn into requirements.
+description: Cut an idea that is bigger than one PRD — a brief, a context package, a pile of design notes, or a draft PRD that outgrew itself — into an ordered PRD roadmap of right-sized planned PRDs, each one finishing with something that can be promoted to production. Consolidates the input documents (whatever they are called) into one full brief that stays whole, renames and moves it to docs/roadmaps/{name}/, writes beside it the PRD roadmap (the ordered list people read) and the PRD contracts (each PRD's scope, owned contracts and seams, for the sessions that write and design the PRDs), and hands off to prd-writing-standards for the first planned PRD. Decides the cut itself and does not stop to ask. Does not write PRDs, technical designs, or phase documents. The planning step above phase-split. Use when the user says "this is too big for one PRD", "break this into PRDs", "roadmap this", or hands over a large brief to turn into requirements.
 user-invocable: true
 ---
 
@@ -12,11 +12,11 @@ This skill owns three things:
 
 1. **The PRD-sized test** — deciding whether an idea is one PRD or several.
 2. **The cut** — finding the seams, ordering the planned PRDs, and writing the roadmap.
-3. **The full brief and PRD roadmap naming and layout** — what the two documents (and the optional coverage matrix) are called, where they live, and how an input with any name becomes the full brief.
+3. **The full brief, PRD roadmap and PRD contracts naming and layout** — what the three documents (and the optional coverage matrix) are called, where they live, and how an input with any name becomes the full brief.
 
 **Terminology note:** A planned PRD is a medium body of work, and its phases (`phase-split`) are what agile teams would call stories, sized for one AI session instead of a sprint.
 
-It sits one level above `phase-split` and works the same way: `phase-split` cuts one PRD into session-sized phases and never implements; this skill cuts one idea into PRD-sized pieces and never writes a PRD. **It does not stop to ask whether to cut, or how.** It decides, declares the cut, writes the two documents, and hands off. The review point is the handoff: the user reads the roadmap before pasting the prompt that writes the first PRD, and a redirect costs a few minutes of rewriting uncommitted markdown.
+It sits one level above `phase-split` and works the same way: `phase-split` cuts one PRD into session-sized phases and never implements; this skill cuts one idea into PRD-sized pieces and never writes a PRD. **It does not stop to ask whether to cut, or how.** It decides, declares the cut, writes the documents, and hands off. The review point is the handoff: the user reads the roadmap before pasting the prompt that writes the first PRD, and a redirect costs a few minutes of rewriting uncommitted markdown.
 
 ---
 
@@ -47,7 +47,8 @@ Written as one PRD, a big idea produces a plan of 50 to 100 phases, one technica
 ```
 docs/roadmaps/{name}/
   {name}-full-brief.md        ← the whole idea: what, why, every settled decision. Never split.
-  {name}-prd-roadmap.md       ← the full brief cut into ordered planned PRDs, plus the seams between them
+  {name}-prd-roadmap.md       ← for people: the ordered list of planned PRDs — tables and checkpoints, nothing else
+  {name}-prd-contracts.md     ← for the sessions that write and design the PRDs: scope entries, owned contracts, question assignments, seams
   {name}-coverage-matrix.md   ← when the input has many discrete items: each one mapped to exactly one planned PRD (Step 4)
 docs/prds/{name}-{short-name}/   ← NOT created here; created when that planned PRD is written
 ```
@@ -56,8 +57,8 @@ Worked example: `docs/roadmaps/acme-cloud/acme-cloud-full-brief.md` and `acme-cl
 
 Hard rules about the output:
 
-- **The full brief is not split.** There are no per-PRD briefs. The brief holds decisions that apply to every PRD (principles, invariants, privacy rules, data-model direction); splitting it copies them into every piece, where they drift, or orphans them. Roadmap entries point into it by section heading and never restate it. This is the same rule `phase-split` applies to a PRD.
-- **No PRD is written, and no PRD directory is created.** The roadmap names each planned PRD's future directory; `prd-writing-standards` creates it when that PRD is written. Writing the first PRD is a separate chat, started from this skill's handoff prompt.
+- **The full brief is not split.** There are no per-PRD briefs. The brief holds decisions that apply to every PRD (principles, invariants, privacy rules, data-model direction); splitting it copies them into every piece, where they drift, or orphans them. Scope entries point into it by section heading and never restate it. This is the same rule `phase-split` applies to a PRD.
+- **No PRD is written, and no PRD directory is created.** Each planned PRD's scope entry names its future directory; `prd-writing-standards` creates it when that PRD is written. Writing the first PRD is a separate chat, started from this skill's handoff prompt.
 - **No target dates, estimates, or owners.** The roadmap sets order, not a schedule; the `in production` stamp is its only date.
 
 ### The names
@@ -65,14 +66,15 @@ Hard rules about the output:
 | Name | What it is | Filename |
 |---|---|---|
 | **Full brief** | The whole idea, consolidated from every input document. Stays whole and governs every PRD cut from it. | `{name}-full-brief.md` |
-| **PRD roadmap** | The full brief cut into an ordered list of planned PRDs, plus the seams between them. | `{name}-prd-roadmap.md` |
+| **PRD roadmap** | The full brief cut into an ordered list of planned PRDs, written for people: order, priority groups, what each delivers, dependencies, status. | `{name}-prd-roadmap.md` |
+| **PRD contracts** | What the PRDs owe each other, written for the sessions that write, refine and design them: each planned PRD's scope until it is written, the contracts each PRD owns, which open questions each settles, and the seams. | `{name}-prd-contracts.md` |
 | **Coverage matrix** | Optional: each discrete input item mapped to one planned PRD, deferred, out of scope, or an open question. | `{name}-coverage-matrix.md` |
-| **Planned PRD** | One entry in the roadmap: a right-sized PRD not yet written. Once written, it is simply a PRD. | becomes `docs/prds/{name}-{short-name}/` |
+| **Planned PRD** | One row in the roadmap, with a scope entry in the PRD contracts: a right-sized PRD not yet written. Once written, it is simply a PRD. | becomes `docs/prds/{name}-{short-name}/` |
 
 - **`{name}`** is a short kebab-case name for the thing being built, never for the document type: `acme-cloud`, not `product-brief` or `context-package`.
 - **Planned PRDs have names, not numbers.** The order will change as earlier PRDs ship and teach you something, and a numbered id would have to be renumbered. The roadmap's table owns the order. The PRD directory is `{name}-{short-name}`, where short-name is one to three words naming what it delivers (`ingestion`, `hosted-reporting`), so the directories group together in a listing and each reads on its own. In prose and commit messages, when the position matters, write it out: "Cloud Ingestion PRD, first in the Acme Cloud PRD roadmap". Never a bare "PRD 2".
 - **Never call a planned PRD a phase, stage, release, milestone, track, or MVP.** "Phase" belongs to `phase-split`; "track" already means something else in these skills (`continuation-prompt`); "release" names the brief's own release labels ("V1", "beta"), which the roadmap maps onto planned PRDs under "Checkpoints"; "MVP" fits only the first.
-- **Titles match filenames.** H1s are `# {Title} Full Brief` and `# {Title} PRD Roadmap`, and each document's first line under the H1 links the other, so opening either one says how they relate. A coverage matrix is `# {Title} Coverage Matrix`, its first line linking the roadmap.
+- **Titles match filenames.** H1s are `# {Title} Full Brief` and `# {Title} PRD Roadmap`, and each document's first line under the H1 links the other, so opening either one says how they relate. The PRD contracts is `# {Title} PRD Contracts` and a coverage matrix is `# {Title} Coverage Matrix`, each with a first line linking the roadmap.
 
 ---
 
@@ -140,26 +142,57 @@ The guiding principle is `phase-split`'s, one level up: **cut vertically.** Ever
 - **Size every planned PRD, not just the idea.** Apply the Step 2 test to each candidate and re-cut until every one passes, in both directions: a planned PRD that fails the band on the high side is two PRDs; one that would split into only a phase or two is too small and merges into a neighbor (or, if it genuinely stands alone and belongs outside this idea, leaves the roadmap to become its own small PRD or change later).
 - **The brief's own sequencing is input, not the answer.** Keep its order where it holds, and regroup where its units are layers or too small to reach production on their own. Several of a brief's "phases" often make one PRD.
 - **Dependencies point backward.** A planned PRD depends only on PRDs earlier in the order, and a sequential walkthrough (build them one at a time, in order) must read as the natural way to build the thing at every step. The same two checks as `phase-split` Step 3.
-- **Say what must come first, and say None in words.** Each entry's **Depends on:** line names every earlier PRD, one or more, that must be done before this one can be built, or says `None; can be built at any point in the order.` It is never blank or left out. Once every PRD it names is done (in production), the order is priority, not a constraint: the PRD can be built before, after or alongside any other PRD whose dependencies are done. Whether they are done is checked, not looked up: when the user considers starting a PRD, check its Depends on PRDs against the code and production then. The Status column is a record and can lag.
+- **Say what must come first, and say None in words.** Each entry's **Depends on:** line, and its row's Depends on column in the roadmap, names every earlier PRD, one or more, that must be done before this one can be built, or says `None; can be built at any point in the order.` It is never blank or left out. Once every PRD it names is done (in production), the order is priority, not a constraint: the PRD can be built before, after or alongside any other PRD whose dependencies are done. Whether they are done is checked, not looked up: when the user considers starting a PRD, check its Depends on PRDs against the code and production then. The Status column is a record and can lag.
 - **Build the Seams table bottom-up, then compare.** Do not fill the Seams table only from the boundaries the cut drew. List every shared component, every shared backend foundation (stores, permissions, upload, messaging, configuration) and every handoff where one part of the input produces something another consumes, and give each to the first planned PRD that uses it. Every consumer then either ships after its producer or carries an interim rule saying what it does until the producer exists, written in its entry's **Depends on:** line ("None; can be built at any point in the order. Until Hosted Reporting ships, …"). With that rule it does not depend on the later PRD, so dependencies still point backward; the producer, whose switch-over changes the consumer, depends on it. A handoff whose producer ships later and has no interim rule is a dangling seam, and it surfaces mid-build as a blocked PRD. Compare that list with the Seams table: anything on the list the table lacks is a missing row.
 - **Plan the far end coarsely.** Entries past the first learning point can be short and broad ("Windows agent", "team features"); they get re-cut when they are reached. Entries up to the first learning point should be specific enough that their PRDs can be written without redoing the cut. The size band applies strictly up to the first learning point and loosely past it: a far-end entry only has to be plausibly one or two PRDs, and it is sized properly when it is reached. An entry before the first learning point is sized now, not left at "plausibly one or two": apply the band and write it as one entry or two. A borderline entry stays one; if its PRD outgrows the band while it is being written, the size check in `prd-writing-standards` sends it back here to be re-cut.
 - **Planned-PRD count is an output, not a target.** See "PRD Size Calibration".
 
-### Step 5: Write the PRD Roadmap
+### Step 5: Write the PRD Roadmap and the PRD Contracts
 
-`docs/roadmaps/{name}/{name}-prd-roadmap.md`. It is a pointer document, like a phase doc: it points into the full brief and never restates it.
+Two documents, for two readers. **The PRD roadmap is for people**: the list someone opens to see every PRD in the idea, its priority, what it delivers and where it stands. **The PRD contracts is for sessions**: what a session needs to write a planned PRD, and what a technical design must honor so the PRDs fit together. Keep each to its reader. Per-PRD scope prose and the Seams table in the roadmap make a document no person reads end to end, and the list they came for gets lost in it.
+
+#### The PRD roadmap
+
+`docs/roadmaps/{name}/{name}-prd-roadmap.md`. Tables and checkpoints, nothing else.
 
 ```markdown
 # {Title} PRD Roadmap
 
-The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each one ends with something that can be promoted to production. The order is priority: a PRD whose Depends on PRDs are done can be built at any time, and the order may change as each one ships. The full brief stays whole and governs every PRD below. [When the roadmap has one:] Item-level coverage: [{Title} Coverage Matrix]({name}-coverage-matrix.md).
+The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each one ends with something that can be promoted to production. The order is priority: a PRD whose Depends on PRDs are done can be built at any time, and the order may change as each one ships. What the PRDs owe each other: [{Title} PRD Contracts]({name}-prd-contracts.md). [When the roadmap has one:] Item-level coverage: [{Title} Coverage Matrix]({name}-coverage-matrix.md).
 
-## PRDs in order
+## Priority group
 
-| Order | Planned PRD | Depends on | What reaches production | Status |
+[One sentence: who set the priority and what it covers.]
+
+| Order | PRD | Depends on | What reaches production | Status |
 |---|---|---|---|---|
-| 1 | [Cloud Ingestion](#cloud-ingestion) | None | The desktop agent uploads activity to the cloud and nothing is lost offline; the owner's history is backed up. | planned |
-| 2 | [Hosted Reporting](#hosted-reporting) | Cloud Ingestion | ... | planned |
+| 1 | [Cloud Ingestion]({name}-prd-contracts.md#cloud-ingestion) | None | The desktop agent uploads activity to the cloud and nothing is lost offline; the owner's history is backed up. | planned |
+| 2 | [Hosted Reporting]({name}-prd-contracts.md#hosted-reporting) | Cloud Ingestion | ... | planned |
+
+## Later group
+
+[One sentence: why these come later.]
+
+| Order | PRD | Depends on | What reaches production | Status |
+|---|---|---|---|---|
+| 3 | ... | ... | ... | planned |
+
+## Checkpoints
+[Only when the brief has learning points or release labels: where, between which PRDs, the user decides whether the next planned PRD still stands as written. When the brief names releases ("V1", "V1.x", "beta"), map each to the planned PRDs it covers here, e.g. "V1 = Cloud Ingestion through macOS App". One line each.]
+```
+
+- **Group headings only when the brief sets tiers** (a stakeholder's "first" list, a release label). Without tiers, one heading, `## PRDs in order`, and one table. Order numbers run through the groups without restarting.
+- **The PRD column links the PRD file once it is written**, and the planned PRD's scope entry in the PRD contracts until then.
+- **What reaches production** is one plain sentence. **Depends on** names PRDs only; what each provides is in the scope entry, and later in the PRD's own `**Depends on:**` line.
+
+#### The PRD contracts
+
+`docs/roadmaps/{name}/{name}-prd-contracts.md`. It points into the full brief and never restates it.
+
+```markdown
+# {Title} PRD Contracts
+
+What the PRDs in the [{Title} PRD Roadmap]({name}-prd-roadmap.md) owe each other: the scope of each PRD not yet written, the contracts each PRD owns, the open questions each settles, and the seams between them. Read by the sessions that write, refine and design these PRDs. Each written PRD is the source of truth for its own scope.
 
 ## Cloud Ingestion
 
@@ -179,23 +212,24 @@ The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each o
 | Between | What crosses the seam | Owned by | What the later PRD may assume |
 |---|---|---|---|
 | Cloud Ingestion → Hosted Reporting | Raw event schema and storage layout | Cloud Ingestion | Raw events are stored, deduplicated, and attributed to a device. |
-
-## Checkpoints
-[Only when the brief has learning points or release labels: where, between which PRDs, the user decides whether the next planned PRD still stands as written. When the brief names releases ("V1", "V1.x", "beta"), map each to the planned PRDs it covers here, e.g. "V1 = Cloud Ingestion through macOS App". One line each.]
 ```
+
+The first five lines of an entry (directory through Depends on) are its **scope lines**: they exist so the PRD can be written, and they go once it is (Keeping the Roadmap Current). **Shared contracts it owns** and **Questions it answers** stay for the life of the roadmap: the technical designs of later PRDs read them, and no PRD carries them.
 
 **Questions that span PRDs.** An open question that several PRDs extend (overall infrastructure layout, observability, the testing approach) is assigned to the first PRD that must answer it; later entries list it as "extends Q1". This is the same pattern as shared contracts.
 
 **Status** takes three values: `planned`, `PRD written` (with a link to the PRD file), and `in production YYYY-MM-DD`.
 
-**Leave out the fluff.** No background or motivation (the brief's job), no restated brief content, no target dates or estimates, no narrative defending the cut (that was the declaration in the response). An entry runs about 6 to 15 lines. The first planned PRD, which owns most of the foundation, can run to about 25. Past that, the entry is restating the brief.
+**Leave out the fluff.** No background or motivation (the brief's job), no restated brief content, no target dates or estimates, no narrative defending the cut (that was the declaration in the response). An entry runs about 6 to 15 lines. The first planned PRD, which owns most of the foundation, can run to about 25. Past that, the entry is restating the brief. The same cap holds while the PRDs are written and refined: a session that adds detail to an entry instead of to its PRD is restating the PRD.
+
+**A roadmap written before the two were separate** has its scope entries and Seams table inline. It still works; when it is next revised, move the entries and the Seams table into a PRD contracts document, drop the scope lines of PRDs already written, and point the PRDs' `**Roadmap:**` lines at the roadmap file.
 
 ### Step 6: Update the Full Brief So the Two Never Disagree
 
 - **Add the link line** under its H1: `Cut into PRDs by the [{Title} PRD Roadmap]({name}-prd-roadmap.md).`
 - **Replace its ordered plan with a pointer.** A section like "Recommended phases" or "Milestones" becomes one line pointing at the roadmap, which now owns the order. Keep any decision that section held — a gate, a constraint, an "X before Y because Z" — as a decision in the brief; only the sequencing moves.
-- **Keep its open-questions list, with stable labels.** The roadmap assigns each question to a planned PRD; the brief stays the one list. If the questions have no labels, give them `Q1`, `Q2`, … in their current order. Labels are assigned once and never renumbered: a question that gets answered or dropped keeps its label, the way PRD acceptance-criterion labels work (`prd-writing-standards`).
-- **Retarget guidance written for one PRD and one design.** A brief written as input to a single PRD often has sections such as "Guidance for the PRD", "Guidance for the technical design", or "Questions the PRD and technical design must resolve". Left as written, they tell the first PRD's author to cover everything, which is the failure this skill exists to prevent. Retitle and reword them so they apply to each PRD cut from this brief, within the scope of its roadmap entry. Do this with a heading change and one sentence at the top of each section, not a rewrite of its contents.
+- **Keep its open-questions list, with stable labels.** The PRD contracts assigns each question to a planned PRD; the brief stays the one list. If the questions have no labels, give them `Q1`, `Q2`, … in their current order. Labels are assigned once and never renumbered: a question that gets answered or dropped keeps its label, the way PRD acceptance-criterion labels work (`prd-writing-standards`).
+- **Retarget guidance written for one PRD and one design.** A brief written as input to a single PRD often has sections such as "Guidance for the PRD", "Guidance for the technical design", or "Questions the PRD and technical design must resolve". Left as written, they tell the first PRD's author to cover everything, which is the failure this skill exists to prevent. Retitle and reword them so they apply to each PRD cut from this brief, within the scope of its entry in the PRD contracts. Do this with a heading change and one sentence at the top of each section, not a rewrite of its contents.
 - **Remove the word "phase"** wherever it named the brief's own ordered units, so the word stays reserved for `phase-split`.
 
 After this, the brief changes only when a decision changes. If a PRD later overturns a brief decision on purpose, the brief is amended at that point (`implementation-lifecycle`, documents before code).
@@ -204,7 +238,7 @@ After this, the brief changes only when a decision changes. If a PRD later overt
 
 State the cut in the response as a decision: a table of order, planned PRD, what reaches production, and one line on why the cut falls there. Then list the renames and removals from Step 3. Do not end the turn to ask whether the cut is acceptable.
 
-Stage the documents and validate per `pre-commit-validation`; commit and push only under live user authorization, otherwise present the commit message for approval.
+Stage the documents (brief, roadmap, PRD contracts, and the coverage matrix when there is one) and validate per `pre-commit-validation`; commit and push only under live user authorization, otherwise present the commit message for approval.
 
 Then give the copy-paste prompt for writing the first planned PRD, using `continuation-prompt`. Its chat name takes the planned PRD's short-name as the unit and the roadmap's name as the project tag, and its lineage block names the roadmap and the planned PRD:
 
@@ -216,17 +250,17 @@ In service of: Acme Cloud PRD Roadmap
   This chat: writes and refines its PRD.
 ```
 
-The prompt names `prd-writing-standards` and `autonomous-prd-refinement`, points at the planned PRD's roadmap entry, its rows in the coverage matrix when there is one, and the full brief, and says the PRD's directory. The prompt is valid once the roadmap commit lands. The chat it starts writes the PRD (and mockups, if the product needs them) and refines it with `autonomous-prd-refinement`; the user's review, the technical design (reviewed with `review-technical-design` when it makes hard-to-reverse decisions), design refinement, phase split, and build follow in the usual chain.
+The prompt names `prd-writing-standards` and `autonomous-prd-refinement`, points at the planned PRD's entry in the PRD contracts, its rows in the coverage matrix when there is one, and the full brief, and says the PRD's directory. The prompt is valid once the roadmap commit lands. The chat it starts writes the PRD (and mockups, if the product needs them) and refines it with `autonomous-prd-refinement`; the user's review, the technical design (reviewed with `review-technical-design` when it makes hard-to-reverse decisions), design refinement, phase split, and build follow in the usual chain.
 
 ---
 
 ## Keeping the Roadmap Current
 
-- **When a planned PRD is written**, the chat writing it sets the row to `PRD written` with a link (`prd-writing-standards` carries this rule).
+- **When a planned PRD is written**, the chat writing it sets the roadmap row to `PRD written` and points the row's link at the PRD file (`prd-writing-standards` carries this rule). **When its refinement finishes**, the same chat deletes the entry's scope lines from the PRD contracts, keeping **Shared contracts it owns** and **Questions it answers** (`autonomous-prd-refinement`, Completion). The PRD now holds its own scope; a second copy would only drift.
 - **When a PRD's work reaches production**, its row becomes `in production YYYY-MM-DD`: set by the session that promoted it, or named as the user's one-line action when promotion happens outside a session (`implement-from-requirements` wrap-up).
 - **The next planned PRD is the user's decision**, not an automatic continuation. When a PRD's last phase closes, the wrap-up says the PRD is complete and names the roadmap's next planned PRD; it does not write that chat's prompt unless asked (`continuation-prompt`, "A PRD roadmap is not a track").
-- **Reordering, adding, or dropping a planned PRD is the user's call**, applied by re-running this skill to revise the roadmap and its coverage matrix, when there is one. Names never change on a reorder. A reorder keeps every PRD after the PRDs it depends on; moving one ahead of one it depends on is a re-cut. Discoveries made while building never become planned PRDs on their own (the Materiality Gate in `implementation-lifecycle`); only the user adds one.
-- **A written PRD that moves scope to or from a neighbor** updates both entries, and the coverage matrix when there is one, in the same change.
+- **Reordering, adding, or dropping a planned PRD is the user's call**, applied by re-running this skill to revise the roadmap, the PRD contracts and the coverage matrix, when there is one. Names never change on a reorder. A reorder keeps every PRD after the PRDs it depends on; moving one ahead of one it depends on is a re-cut. Discoveries made while building never become planned PRDs on their own (the Materiality Gate in `implementation-lifecycle`); only the user adds one.
+- **A written PRD that moves scope to or from a neighbor** updates both PRDs (or the neighbor's scope entry, while it is planned), their contract and seam lines, and the coverage matrix when there is one, in the same change.
 - **Re-cutting a far-end entry** when it is reached is normal. It becomes two or three specific planned PRDs in its place, keeping the rest of the order.
 
 ---
@@ -253,7 +287,7 @@ This section holds the concrete numbers, the only part of this skill that ages. 
 - Size every planned PRD against the calibration band and re-cut until all pass.
 - Name planned PRDs, never number them; name their future directories `{name}-{short-name}`.
 - Keep the full brief whole; point into it by section heading; replace its ordered plan with a pointer to the roadmap.
-- Declare the cut, write both documents (and the coverage matrix when the input calls for one), and hand off with a prompt for writing the first planned PRD.
+- Declare the cut, write the roadmap and the PRD contracts (and the coverage matrix when the input calls for one), and hand off with a prompt for writing the first planned PRD.
 
 ### DO NOT
 
@@ -263,6 +297,7 @@ This section holds the concrete numbers, the only part of this skill that ages. 
 - Stop to ask whether to cut, or which cut to use.
 - Call planned PRDs phases, stages, releases, milestones, tracks, or MVPs, or refer to one by a bare number.
 - Put target dates, estimates, or owners in the roadmap.
+- Put scope prose, contract lists or the Seams table in the roadmap; they belong in the PRD contracts.
 - Turn discoveries into planned PRDs; only the user adds one.
 
 ---
@@ -271,9 +306,9 @@ This section holds the concrete numbers, the only part of this skill that ages. 
 
 | Skill | How This Skill Relates |
 |-------|-------------------------|
-| `prd-writing-standards` | Downstream consumer. Writes each planned PRD from its roadmap entry and the full brief, sets the roadmap row to `PRD written`, and documents the `docs/roadmaps/` root alongside `docs/prds/` and `docs/changes/` (this skill owns that root's internal layout). Its size check sends oversized ideas and drafts here. |
+| `prd-writing-standards` | Downstream consumer. Writes each planned PRD from its entry in the PRD contracts and the full brief, sets the roadmap row to `PRD written`, and documents the `docs/roadmaps/` root alongside `docs/prds/` and `docs/changes/` (this skill owns that root's internal layout). Its size check sends oversized ideas and drafts here. |
 | `phase-split` | The same job one level down: it cuts one PRD into session-sized phases. Its seam principles (vertical slices, walking skeleton, backward dependencies, sequential walkthrough) are reused here at PRD scale, and its Session Capacity Calibration defines the phase size this skill's band counts in. |
-| `technical-design-writing-standards` | Each planned PRD gets its own single technical design. A design honors the full brief's settled decisions and the roadmap's seams: it decides the shared contracts its PRD owns and extends, never redesigns, contracts an earlier PRD owns. |
+| `technical-design-writing-standards` | Each planned PRD gets its own single technical design. A design honors the full brief's settled decisions and the seams in the PRD contracts: it decides the shared contracts its PRD owns and extends, never redesigns, contracts an earlier PRD owns. |
 | `implementation-lifecycle` | Lists writing a planned PRD as requirements work with its own lineage, and supplies the Materiality Gate that keeps discoveries from becoming planned PRDs. |
 | `implement-from-requirements` | When it closes a roadmap PRD's last phase, its wrap-up names the next planned PRD (no prompt) and handles the `in production` status. |
 | `continuation-prompt` | Produces the handoff prompt for writing the first planned PRD. At the end of a PRD, treats the roadmap's next planned PRD as the user's decision, not the next unit of the finished track. |
