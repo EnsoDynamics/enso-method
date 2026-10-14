@@ -15,11 +15,12 @@ The first large roadmap (19 planned PRDs, every one written and refined) reached
 
 1. **Delete the entries and the Seams table.** Rejected: loses the only record of contract ownership while most designs are unwritten, and the scope source for PRDs not yet written.
 2. **Keep everything in the roadmap, move it below a "for sessions" heading.** Rejected: the file stays 100 KB, and the people reading it still scroll past it.
-3. **Chosen: two documents.** The roadmap holds tables (grouped when the brief sets priority tiers) and checkpoints. A new `{name}-prd-contracts.md` holds each planned PRD's scope entry, the contracts each PRD owns, the question assignments, and the Seams table.
+3. **Chosen: two documents.** The roadmap holds tables, grouped when the brief sets priority tiers. A new `{name}-prd-contracts.md` holds each planned PRD's scope entry, the contracts each PRD owns, the question assignments, and the Seams table.
 
 ## Decisions and why
 
 - **Scope lines go when the PRD's refinement finishes**, not when it is first written: `autonomous-prd-refinement` checks the draft against its entry. Contract and question lines stay for the roadmap's life, since later designs read them.
 - **The PRD column links the PRD file once written**, so a person goes straight from the list to the PRD (or its stakeholder review package beside it).
 - **Group headings only when the brief sets tiers**, numbering continuing across groups, replacing prose bullets that explained the groups above one table.
+- **No checkpoints or releases section.** The roadmap's Checkpoints section grew into a log of re-cuts and shared-piece owners, and even trimmed to one line each it named decisions a person makes anyway, in conversation with the stakeholder, whenever priorities change. Every PRD ends in production, so mapping release labels onto PRDs would repeat the table. Learning points still shape the cut (Step 4); they get no section.
 - **Older roadmaps keep working**; they move to the split when next revised.

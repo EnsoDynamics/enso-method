@@ -47,7 +47,7 @@ Written as one PRD, a big idea produces a plan of 50 to 100 phases, one technica
 ```
 docs/roadmaps/{name}/
   {name}-full-brief.md        ← the whole idea: what, why, every settled decision. Never split.
-  {name}-prd-roadmap.md       ← for people: the ordered list of planned PRDs — tables and checkpoints, nothing else
+  {name}-prd-roadmap.md       ← for people: the ordered list of planned PRDs — tables, nothing else
   {name}-prd-contracts.md     ← for the sessions that write and design the PRDs: scope entries, owned contracts, question assignments, seams
   {name}-coverage-matrix.md   ← when the input has many discrete items: each one mapped to exactly one planned PRD (Step 4)
 docs/prds/{name}-{short-name}/   ← NOT created here; created when that planned PRD is written
@@ -73,7 +73,7 @@ Hard rules about the output:
 
 - **`{name}`** is a short kebab-case name for the thing being built, never for the document type: `acme-cloud`, not `product-brief` or `context-package`.
 - **Planned PRDs have names, not numbers.** The order will change as earlier PRDs ship and teach you something, and a numbered id would have to be renumbered. The roadmap's table owns the order. The PRD directory is `{name}-{short-name}`, where short-name is one to three words naming what it delivers (`ingestion`, `hosted-reporting`), so the directories group together in a listing and each reads on its own. In prose and commit messages, when the position matters, write it out: "Cloud Ingestion PRD, first in the Acme Cloud PRD roadmap". Never a bare "PRD 2".
-- **Never call a planned PRD a phase, stage, release, milestone, track, or MVP.** "Phase" belongs to `phase-split`; "track" already means something else in these skills (`continuation-prompt`); "release" names the brief's own release labels ("V1", "beta"), which the roadmap maps onto planned PRDs under "Checkpoints"; "MVP" fits only the first.
+- **Never call a planned PRD a phase, stage, release, milestone, track, or MVP.** "Phase" belongs to `phase-split`; "track" already means something else in these skills (`continuation-prompt`); "release" means putting something into production, which every PRD ends with; "MVP" fits only the first.
 - **Titles match filenames.** H1s are `# {Title} Full Brief` and `# {Title} PRD Roadmap`, and each document's first line under the H1 links the other, so opening either one says how they relate. The PRD contracts is `# {Title} PRD Contracts` and a coverage matrix is `# {Title} Coverage Matrix`, each with a first line linking the roadmap.
 
 ---
@@ -153,7 +153,7 @@ Two documents, for two readers. **The PRD roadmap is for people**: the list some
 
 #### The PRD roadmap
 
-`docs/roadmaps/{name}/{name}-prd-roadmap.md`. Tables and checkpoints, nothing else.
+`docs/roadmaps/{name}/{name}-prd-roadmap.md`. Tables, nothing else.
 
 ```markdown
 # {Title} PRD Roadmap
@@ -176,12 +176,9 @@ The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each o
 | Order | PRD | Depends on | What reaches production | Status |
 |---|---|---|---|---|
 | 3 | ... | ... | ... | planned |
-
-## Checkpoints
-[Only when the brief has learning points or release labels: where, between which PRDs, the user decides whether the next planned PRD still stands as written. When the brief names releases ("V1", "V1.x", "beta"), map each to the planned PRDs it covers here, e.g. "V1 = Cloud Ingestion through macOS App". One line each.]
 ```
 
-- **Group headings only when the brief sets tiers** (a stakeholder's "first" list, a release label). Without tiers, one heading, `## PRDs in order`, and one table. Order numbers run through the groups without restarting.
+- **Group headings only when the brief sets tiers** (a stakeholder's "first" list). Without tiers, one heading, `## PRDs in order`, and one table. Order numbers run through the groups without restarting.
 - **The PRD column links the PRD file once it is written**, and the planned PRD's scope entry in the PRD contracts until then.
 - **What reaches production** is one plain sentence. **Depends on** names PRDs only; what each provides is in the scope entry, and later in the PRD's own `**Depends on:**` line.
 
@@ -220,7 +217,7 @@ The first five lines of an entry (directory through Depends on) are its **scope 
 
 **Status** takes three values: `planned`, `PRD written` (with a link to the PRD file), and `in production YYYY-MM-DD`.
 
-**Leave out the fluff.** No background or motivation (the brief's job), no restated brief content, no target dates or estimates, no narrative defending the cut (that was the declaration in the response). An entry runs about 6 to 15 lines. The first planned PRD, which owns most of the foundation, can run to about 25. Past that, the entry is restating the brief. The same cap holds while the PRDs are written and refined: a session that adds detail to an entry instead of to its PRD is restating the PRD. Checkpoints stay one line each, a decision a person makes and when: the history of a re-cut lives in version control, and what the PRDs owe each other lives in the PRD contracts.
+**Leave out the fluff.** No background or motivation (the brief's job), no restated brief content, no target dates or estimates, no narrative defending the cut (that was the declaration in the response). An entry runs about 6 to 15 lines. The first planned PRD, which owns most of the foundation, can run to about 25. Past that, the entry is restating the brief. The same cap holds while the PRDs are written and refined: a session that adds detail to an entry instead of to its PRD is restating the PRD.
 
 **A roadmap written before the two were separate** has its scope entries and Seams table inline. It still works; when it is next revised, move the entries and the Seams table into a PRD contracts document, drop the scope lines of PRDs already written, and point the PRDs' `**Roadmap:**` lines at the roadmap file.
 
