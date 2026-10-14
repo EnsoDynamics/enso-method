@@ -1,6 +1,6 @@
 # PRD roadmap: cutting an idea too big for one PRD (decision record, 2026-09-27)
 
-Maintainer notes for `skills/prd-roadmap/SKILL.md` and its touch points in `prd-writing-standards`, `phase-split`, `continuation-prompt`, `implementation-lifecycle`, and `technical-design-writing-standards`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the skill's rules or names.
+Maintainer notes for `skills/prd-roadmap/SKILL.md` and its touch points in `prd-writing-standards`, `phase-split`, `continuation-prompt`, `implementation-lifecycle`, `technical-design-writing-standards`, and `autonomous-prd-refinement`. **This file is deliberately outside every skill directory and nothing in a `SKILL.md` links to it**, so it never loads into a running session. Read it before changing the skill's rules or names.
 
 ## The problem
 
@@ -36,3 +36,8 @@ From using the skill on a large rebuild of a live system, where the first cut ha
 - **Near-term entries are sized now.** A priority entry had been left as "plausibly two PRDs". It is now sized and written as one or two, and a borderline entry stays one, because `prd-writing-standards`' size check sends an outgrown draft back here. An earlier draft of this rule said "if it might be two, cut it now"; that was rejected as the same over-splitting bias `phase-split` had to remove.
 - **Rejected: sizing from counts of screens, endpoints or tests.** It reads as a threshold and repeats the failure of the old phase file-count band (see `phase-sizing-and-one-phase-one-session-decision-2026-10-02.md`). Size stays measured in phases, estimated by walking the work.
 
+## Amendment (2026-10-14): no per-PRD coverage trace
+
+The skills said a planned PRD's scope includes its coverage-matrix rows but not how a PRD shows it covers them, so PRD sessions improvised: one wrote a separate trace file, fifteen others appended a `## Coverage Trace` table mapping each row to criteria, and two wrote nothing. The traces were read once, in review, and then went stale (they cite matrix line numbers) while repeating departures the assumptions already hold. The check now runs in `autonomous-prd-refinement`'s full rounds and leaves no document; the matrix's row-to-PRD mapping is the lasting record.
+
+- **Rejected: a standard trace section in every PRD.** It would fix the inconsistency but keep the staleness and the duplication; a check that leaves no document has neither.
