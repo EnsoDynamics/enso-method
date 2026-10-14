@@ -41,3 +41,11 @@ From using the skill on a large rebuild of a live system, where the first cut ha
 The skills said a planned PRD's scope includes its coverage-matrix rows but not how a PRD shows it covers them, so PRD sessions improvised: one wrote a separate trace file, fifteen others appended a `## Coverage Trace` table mapping each row to criteria, and two wrote nothing. The traces were read once, in review, and then went stale (they cite matrix line numbers) while repeating departures the assumptions already hold. The check now runs in `autonomous-prd-refinement`'s full rounds and leaves no document; the matrix's row-to-PRD mapping is the lasting record.
 
 - **Rejected: a standard trace section in every PRD.** It would fix the inconsistency but keep the staleness and the duplication; a check that leaves no document has neither.
+
+## Amendment (2026-10-14): what must come first, and None in words
+
+Each planned PRD reaches production on its own, but the user still needs to know whether two can be built at once and whether a reorder is safe. On a nineteen-PRD roadmap the Depends on lines answered it only after close reading, and one PRD had no line at all. Each entry and each written PRD now names the PRDs that must be done first, or says `None; can be built at any point in the order.`; the order table gains a Depends on column; and once a PRD's dependencies are done the order is priority, not a constraint. A producer whose switch-over changes an earlier consumer depends on it.
+
+- **Rejected: deciding from tracked state whether a dependency is done** (a `built` or `live in production` marker, or the Status column). Recorded state relies on someone updating the roadmap at every release, and Status can lag a release made outside a session. Instead, when the user considers starting a PRD, its dependencies are checked against the code and production then.
+- **Rejected: an optional-dependency category** ("uses if shipped first", either-of-two requirements, conditional criteria). Tried in review: every version left a case where the connecting work landed in no build or two, and the existing interim-rule wording in the Seams rule already covers the need.
+- **Rejected: a list of build waves in the roadmap.** It goes stale on every reorder; the Depends on column is enough to read it from.

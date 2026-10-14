@@ -140,7 +140,8 @@ The guiding principle is `phase-split`'s, one level up: **cut vertically.** Ever
 - **Size every planned PRD, not just the idea.** Apply the Step 2 test to each candidate and re-cut until every one passes, in both directions: a planned PRD that fails the band on the high side is two PRDs; one that would split into only a phase or two is too small and merges into a neighbor (or, if it genuinely stands alone and belongs outside this idea, leaves the roadmap to become its own small PRD or change later).
 - **The brief's own sequencing is input, not the answer.** Keep its order where it holds, and regroup where its units are layers or too small to reach production on their own. Several of a brief's "phases" often make one PRD.
 - **Dependencies point backward.** A planned PRD depends only on PRDs earlier in the order, and a sequential walkthrough (build them one at a time, in order) must read as the natural way to build the thing at every step. The same two checks as `phase-split` Step 3.
-- **Build the Seams table bottom-up, then compare.** Do not fill the Seams table only from the boundaries the cut drew. List every shared component, every shared backend foundation (stores, permissions, upload, messaging, configuration) and every handoff where one part of the input produces something another consumes, and give each to the first planned PRD that uses it. Every consumer then either ships after its producer or carries an interim rule saying what it does until the producer exists, written in its entry's **Depends on:** line ("None; until Hosted Reporting ships, …"). With that rule it does not depend on the later PRD, so dependencies still point backward. A handoff whose producer ships later and has no interim rule is a dangling seam, and it surfaces mid-build as a blocked PRD. Compare that list with the Seams table: anything on the list the table lacks is a missing row.
+- **Say what must come first, and say None in words.** Each entry's **Depends on:** line names every earlier PRD, one or more, that must be done before this one can be built, or says `None; can be built at any point in the order.` It is never blank or left out. Once every PRD it names is done (in production), the order is priority, not a constraint: the PRD can be built before, after or alongside any other PRD whose dependencies are done. Whether they are done is checked, not looked up: when the user considers starting a PRD, check its Depends on PRDs against the code and production then. The Status column is a record and can lag.
+- **Build the Seams table bottom-up, then compare.** Do not fill the Seams table only from the boundaries the cut drew. List every shared component, every shared backend foundation (stores, permissions, upload, messaging, configuration) and every handoff where one part of the input produces something another consumes, and give each to the first planned PRD that uses it. Every consumer then either ships after its producer or carries an interim rule saying what it does until the producer exists, written in its entry's **Depends on:** line ("None; can be built at any point in the order. Until Hosted Reporting ships, …"). With that rule it does not depend on the later PRD, so dependencies still point backward; the producer, whose switch-over changes the consumer, depends on it. A handoff whose producer ships later and has no interim rule is a dangling seam, and it surfaces mid-build as a blocked PRD. Compare that list with the Seams table: anything on the list the table lacks is a missing row.
 - **Plan the far end coarsely.** Entries past the first learning point can be short and broad ("Windows agent", "team features"); they get re-cut when they are reached. Entries up to the first learning point should be specific enough that their PRDs can be written without redoing the cut. The size band applies strictly up to the first learning point and loosely past it: a far-end entry only has to be plausibly one or two PRDs, and it is sized properly when it is reached. An entry before the first learning point is sized now, not left at "plausibly one or two": apply the band and write it as one entry or two. A borderline entry stays one; if its PRD outgrows the band while it is being written, the size check in `prd-writing-standards` sends it back here to be re-cut.
 - **Planned-PRD count is an output, not a target.** See "PRD Size Calibration".
 
@@ -151,14 +152,14 @@ The guiding principle is `phase-split`'s, one level up: **cut vertically.** Ever
 ```markdown
 # {Title} PRD Roadmap
 
-The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each one ends with something that can be promoted to production. Build them in this order; the order may change as each one ships. The full brief stays whole and governs every PRD below. [When the roadmap has one:] Item-level coverage: [{Title} Coverage Matrix]({name}-coverage-matrix.md).
+The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each one ends with something that can be promoted to production. The order is priority: a PRD whose Depends on PRDs are done can be built at any time, and the order may change as each one ships. The full brief stays whole and governs every PRD below. [When the roadmap has one:] Item-level coverage: [{Title} Coverage Matrix]({name}-coverage-matrix.md).
 
 ## PRDs in order
 
-| Order | Planned PRD | What reaches production | Status |
-|---|---|---|---|
-| 1 | [Cloud Ingestion](#cloud-ingestion) | The desktop agent uploads activity to the cloud and nothing is lost offline; the owner's history is backed up. | planned |
-| 2 | [Hosted Reporting](#hosted-reporting) | ... | planned |
+| Order | Planned PRD | Depends on | What reaches production | Status |
+|---|---|---|---|---|
+| 1 | [Cloud Ingestion](#cloud-ingestion) | None | The desktop agent uploads activity to the cloud and nothing is lost offline; the owner's history is backed up. | planned |
+| 2 | [Hosted Reporting](#hosted-reporting) | Cloud Ingestion | ... | planned |
 
 ## Cloud Ingestion
 
@@ -166,7 +167,7 @@ The [{Title} Full Brief]({name}-full-brief.md) cut into right-sized PRDs. Each o
 **Reaches production:** [One or two plain-English sentences: what someone can do or rely on once it ships.]
 **In this PRD:** [Bullets naming full-brief sections by heading, and which parts of each.]
 **Not in this PRD:** [What a neighbor carries, by the neighbor's name.]
-**Depends on:** [Earlier planned PRDs by name, with what each provides, or "None."]
+**Depends on:** [Earlier planned PRDs that must be done first, by name, with what each provides, or "None; can be built at any point in the order."]
 **Shared contracts it owns:** [Only if any: contracts later PRDs rely on, such as an event schema or device identity. Decided in this PRD's technical design; later PRDs extend them, not redesign them.]
 **Questions it answers:** [The full brief's open questions this PRD must settle, by their stable labels (Step 6), e.g. "Q3–Q9, Q26; first answer to Q1 and Q28".]
 
@@ -224,7 +225,7 @@ The prompt names `prd-writing-standards` and `autonomous-prd-refinement`, points
 - **When a planned PRD is written**, the chat writing it sets the row to `PRD written` with a link (`prd-writing-standards` carries this rule).
 - **When a PRD's work reaches production**, its row becomes `in production YYYY-MM-DD`: set by the session that promoted it, or named as the user's one-line action when promotion happens outside a session (`implement-from-requirements` wrap-up).
 - **The next planned PRD is the user's decision**, not an automatic continuation. When a PRD's last phase closes, the wrap-up says the PRD is complete and names the roadmap's next planned PRD; it does not write that chat's prompt unless asked (`continuation-prompt`, "A PRD roadmap is not a track").
-- **Reordering, adding, or dropping a planned PRD is the user's call**, applied by re-running this skill to revise the roadmap and its coverage matrix, when there is one. Names never change on a reorder. Discoveries made while building never become planned PRDs on their own (the Materiality Gate in `implementation-lifecycle`); only the user adds one.
+- **Reordering, adding, or dropping a planned PRD is the user's call**, applied by re-running this skill to revise the roadmap and its coverage matrix, when there is one. Names never change on a reorder. A reorder keeps every PRD after the PRDs it depends on; moving one ahead of one it depends on is a re-cut. Discoveries made while building never become planned PRDs on their own (the Materiality Gate in `implementation-lifecycle`); only the user adds one.
 - **A written PRD that moves scope to or from a neighbor** updates both entries, and the coverage matrix when there is one, in the same change.
 - **Re-cutting a far-end entry** when it is reached is normal. It becomes two or three specific planned PRDs in its place, keeping the rest of the order.
 
