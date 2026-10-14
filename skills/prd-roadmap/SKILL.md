@@ -220,7 +220,7 @@ The first five lines of an entry (directory through Depends on) are its **scope 
 
 **Status** takes three values: `planned`, `PRD written` (with a link to the PRD file), and `in production YYYY-MM-DD`.
 
-**Leave out the fluff.** No background or motivation (the brief's job), no restated brief content, no target dates or estimates, no narrative defending the cut (that was the declaration in the response). An entry runs about 6 to 15 lines. The first planned PRD, which owns most of the foundation, can run to about 25. Past that, the entry is restating the brief. The same cap holds while the PRDs are written and refined: a session that adds detail to an entry instead of to its PRD is restating the PRD.
+**Leave out the fluff.** No background or motivation (the brief's job), no restated brief content, no target dates or estimates, no narrative defending the cut (that was the declaration in the response). An entry runs about 6 to 15 lines. The first planned PRD, which owns most of the foundation, can run to about 25. Past that, the entry is restating the brief. The same cap holds while the PRDs are written and refined: a session that adds detail to an entry instead of to its PRD is restating the PRD. Checkpoints stay one line each, a decision a person makes and when: the history of a re-cut lives in version control, and what the PRDs owe each other lives in the PRD contracts.
 
 **A roadmap written before the two were separate** has its scope entries and Seams table inline. It still works; when it is next revised, move the entries and the Seams table into a PRD contracts document, drop the scope lines of PRDs already written, and point the PRDs' `**Roadmap:**` lines at the roadmap file.
 
