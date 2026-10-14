@@ -195,6 +195,8 @@ The orchestrator stays thin. It reads the state file, decides what to do next, l
 | Fold one answer | One writer subagent, never more than one at a time | What changed, where — a few lines |
 | Conformance | One subagent per pass | Issues found and fixed — a short list |
 | Convergence, checkpoint | Orchestrator | — |
+| Consolidation (last, once) | One writer subagent per document, one at a time within a document | Repeats replaced, deletions by category, disagreements raised, words before and after |
+| Consolidation check | One subagent | Pass or the hunks that failed, each with its reason |
 
 Subagents return distilled results, not transcripts. If a subagent's result would run past a page, it is doing too much per call — split the work.
 
@@ -214,6 +216,8 @@ If a subagent fails, retry once. If it fails again:
 - **Conflict check:** record `not run` and the error under **Conflict check**, and say so in the completion report. The completion commit then carries no `Conflict check:` line, so the build runs its own full check.
 - **Conformance:** skip it for this pass, note the skip in the state file, and run it at the next checkpoint.
 - **Final verification:** report the documents as not verified; do not mark them ready.
+- **Consolidation writer:** leave that document as the completion commit has it and say so in the consolidation summary.
+- **Consolidation check:** do not stage the consolidation; report it as unchecked.
 
 Never let one failure end a pass.
 
@@ -351,12 +355,43 @@ Items below threshold (if any): {question — confidence — why}
 Blockers not resolved (if any): {blocker — what's needed}
 
 Ready for implementation? {Yes | No — items needing attention}
+Next: consolidation (Phase 8), once this commit lands
 
 Recommended next steps:
 1. Review assumptions awaiting business validation
 2. Address blockers or final-verification items
 3. Start the build with `implement-from-requirements`, which sizes the work and splits it with `phase-split` if needed
 ```
+
+### Phase 8: Consolidation (the run's last step, after the completion commit)
+
+Refinement folds each answer where it is needed, so after several passes the same rule is often stated in several places. This pass removes those repeats. It is the last thing the run does, it runs once, and it runs whatever the final status.
+
+**It starts from a commit.** The completion commit is its baseline, so the pass's whole effect is one diff the user can review and one revert. A session that may not commit stops after Phase 7 and runs this phase as soon as the user's commit lands. Never run it on uncommitted refinement work.
+
+**It does two things and nothing else:**
+
+1. **Replaces a repeat with a pointer.** When a rule, value, contract or behavior is stated in more than one place, one statement stays, word for word, in the section that owns its subject. Each other statement becomes a pointer to it: the section heading within the design, or the criterion label or assumption ID in another document. A repeat that carries anything the kept statement lacks (a case, condition, number, exception or example) is not a pure repeat: that part stays where it is or, within the same document, moves into the kept statement word for word. A short phrase that names a rule so its sentence reads ("refused as busy, §Locks") is already a pointer, not a repeat.
+2. **Deletes what the writing standards already exclude:** decision history, descriptions of how existing code works (Phase 4's table), and narration about the document itself ("as noted above", "this section describes").
+
+**It never rewords.** No summarizing, paraphrasing, tightening, or merging sentences into shorter ones. Every sentence that stays reads exactly as it did, except where a pointer replaces a repeated clause. The precision the passes built lives in the exact wording, and shorter wording is how it gets lost.
+
+**Two statements that disagree are not repeats.** Leave both and add the disagreement to the design's Open Questions; choosing between them is design work.
+
+**The PRD and the design stay separate.** The PRD says what is being built and why; the design says how. Consolidation never moves text from one into the other. A rule both state belongs to the PRD: its wording stays there, and the design points to the criterion and keeps only how the rule is built. Stakeholders read the PRD and assumptions document on their own, so neither ever gains a pointer into the design. Repeats within the PRD consolidate under the same rules. Criteria labels, `Replaces:` and `Superseded by:` lines and assumption IDs are already pointers and stay. The design's criteria coverage table stays too: its test definitions say what each test proves, which is not a repeat of the rule.
+
+**Writers.** One per document; documents can run side by side, but writers on the same document run one at a time. For a design too long for one careful read, give each writer a range of top-level sections to edit; each still reads the whole document to find where else a rule is stated. A writer replaces a statement with a pointer only when the target still holds the full statement and no pointer already leads to the one it would replace, so two writers never each point at the other's copy and lose the rule.
+
+**The check**, a separate subagent, compares the documents with the completion commit:
+- Every identifier in the baseline is still present: error codes, field and parameter names, numbers with their units, criteria labels, assumption IDs, named tests, quoted user-facing text, and any heading a pointer names.
+- Every removed or changed line's content exists word for word where its pointer leads, or falls under item 2.
+- Every pointer resolves.
+
+A failed hunk is put back as the completion commit has it; the check never rewrites text to repair it.
+
+If the session ends mid-pass, the edits already made stay. Resume with the documents not yet done, then run the check, which compares everything with the completion commit.
+
+**Finish** by staging the documents and proposing `docs({feature}): consolidate repeats after design refinement — design {before} → {after} words`, with a body giving each document's words before and after, the number of repeats replaced, the deletions by category, any disagreements added to Open Questions, and the check's result.
 
 ---
 
@@ -387,6 +422,7 @@ A script is warranted only when the question is in scope and a one-off read cann
 - Document evidence and sources for findings
 - Stop cleanly on a session-limit warning with the state file updated
 - Delete the state file at completion
+- End with the consolidation pass, on top of the completion commit (Phase 8)
 
 ### DO NOT
 
@@ -394,12 +430,13 @@ A script is warranted only when the question is in scope and a one-off read cann
 - Perform write operations (INSERT, UPDATE, DELETE, POST, PUT) against external systems
 - Hold investigation results in memory for a later batch fold
 - Run more than the configured concurrent investigations
-- Run more than one writer at a time, or discard a known answer because its fold failed
+- Run more than one fold writer at a time, or discard a known answer because its fold failed
 - Fan discovery out across multiple parallel reviewers to be "thorough"
 - Treat an exhaustive or "ultracode" session mode as license to exceed the caps or fan out discovery
 - Investigate or script anything that fails the scope gate
 - Regenerate the state file wholesale; update it in place
 - Delete content during conformance cleanup, other than the decision history, descriptions of existing code, and superseded assumption-entry text and edit narratives Phase 4 names
+- Reword, summarize or tighten a sentence during consolidation, or start consolidation before the completion commit lands
 - Continue past the maximum number of passes
 - Pause merely because business assumptions await asynchronous validation
 - Report completion when the final verification surfaced unresolved work
@@ -457,3 +494,7 @@ State file:   (none — fresh run)
 ### Completion
 
 - Final conformance clean. Final verification clean. State file deleted. Final staging. Report: 3 passes, Converged; 31 questions — 25 resolved, 6 captured as assumptions (4 awaiting validation), 0 still below threshold; ready for implementation.
+
+### Consolidation
+
+- The user commits. One writer replaces 41 repeats in the design with pointers and removes two dated correction notes; the PRD has none. The check finds every identifier present and every removed line's content where its pointer leads. Design 14,200 → 12,900 words, staged with its own proposed message.
