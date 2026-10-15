@@ -19,7 +19,7 @@ Three problems it exists to fix:
 ## When to Use
 
 - The user asks for a prompt to paste into a **new** chat, in any wording that means starting a fresh session.
-- A skill hands work to a fresh chat: `phase-split` after writing phase docs when the user invoked it directly (called from an implement session it produces no prompt — that session builds the first leaf, and its wrap-up produces the next one), `implement-from-requirements` at wrap-up when a next phase exists, `test-audit` when its remediation outlasts the chat.
+- A skill hands work to a fresh chat: `phase-split` after writing phase docs when the user invoked it directly (called from an implement session it produces no prompt — that session builds the first leaf, and its wrap-up produces the next one), `implement-from-requirements` at wrap-up when a next phase exists, `prd-roadmap` for the first planned PRD of the roadmap it just wrote, `test-audit` when its remediation outlasts the chat.
 - A prompt already given was wrong (bad name, too long, stale) and the user wants it regenerated. Re-run the whole skill; if only the name was wrong, only the name changes.
 - A skill or the user invokes it at the **end of a track** — the unit just finished has no successor in its own chain. That is a legitimate invocation, and its correct output is a statement that the track is complete and **no prompt**. See the gate below.
 
@@ -44,7 +44,7 @@ The one exception is an explicit ask. If the user names what to continue with �
 
 **A PRD roadmap is not a track.** When the last phase of a PRD that came from a PRD roadmap (`prd-roadmap`) closes, the roadmap's next planned PRD is not the next unit of that track. Moving on to it is a decision the user makes after the finished PRD reaches production, and the roadmap may be reordered by then. Say the PRD is complete, name the roadmap's next planned PRD in one line, and write no prompt unless asked.
 
-The calling skills already agree: `implement-from-requirements` invokes this skill "when a next phase exists", `phase-split`, when invoked directly, for the first leaf it just wrote, and `prd-roadmap` for the first planned PRD of the roadmap it just wrote. If a caller invokes it and the answer to the question above is no, the caller's premise was wrong, and the right output is still no prompt.
+If a calling skill invokes it and the answer to the question above is no, the caller's premise was wrong, and the right output is still no prompt.
 
 ### The lineage gate
 
@@ -146,7 +146,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
 | Ticket PROJ-4288, phone-number truncation | `PROJ-4288 phone impl` |
 | Ad-hoc thread: duplicate account cleanup, stage 2 | `dup accounts stage2 ops` |
 
-A name whose first token is `ph2` is wrong under rule 2 unless the phase really is the distinguishing token among the chats open at that moment; one that opens on the project tag is wrong unless the PRD itself is the unit. A name with no activity token is wrong under rule 3 whatever the chat does; nothing else in the tab says what the session is for. `invoiceE prd refine` is wrong under rule 2 in that mixed-product directory: the product tag is missing. `ph4b1 accountA <product-tag> impl` is wrong under rule 2 as well: the product is the whole directory, and its characters belonged to the project name.
+A name whose first token is `ph2` is wrong under rule 2 unless the phase really is the distinguishing token among the chats open at that moment; one that opens on the project tag is wrong unless the PRD itself is the unit. `invoiceE prd refine` is wrong under rule 2 in that mixed-product directory: the product tag is missing. `ph4b1 accountA <product-tag> impl` is wrong under rule 2 as well: the product is the whole directory, and its characters belonged to the project name.
 
 ---
 
@@ -197,7 +197,7 @@ What never appears:
 
 ## Step 4: Output Block
 
-For an active, authorized Codex `phase-chain`, return the composed prompt to that orchestrator for actual task creation after delivery; do not ask the user to paste it. Otherwise, present the result as one paste. With the title hook installed (see Adopting This Skill), the name line *is* the rename, so there is nothing to paste first:
+For an active, authorized Codex `phase-chain`, return the composed prompt to that orchestrator for actual task creation after delivery; do not ask the user to paste it. Otherwise, present the result as one paste. With the title hook installed, the name line *is* the rename, so there is nothing to paste first:
 
 ````
 Paste into the new chat:
@@ -239,11 +239,11 @@ prompt points at).
 
 In that example the lineage block is the only place the PRD and phase appear by full title; the directory, branch, and Node-version lines are machine truth (prompt only); every other line is a pointer or a goal. The predecessor's findings and the proof standard live in the phase doc's named sections, which is where Step 1 put them.
 
-The name line does double duty: the hook turns it into the session title, and it tells a reader who scrolls to the top what the chat is even if a tool later regenerates its own title. To rename a running session, send a message whose first line is `Chat: <new name>`; the bare form applies only to a session's first prompt, so an ordinary short reply never renames anything. Only when the user is on a tool without the hook (see the table below) does the output add a `/rename <name>` line above the prompt, to be typed first. In Claude Code, treat the hook as installed when `~/.claude/settings.json` mentions `session-title-from-chat-line`; check with a grep rather than asking.
+The name line does double duty: the hook turns it into the session title, and it tells a reader who scrolls to the top what the chat is even if a tool later regenerates its own title. To rename a running session, send a message whose first line is `Chat: <new name>`; the bare form applies only to a session's first prompt, so an ordinary short reply never renames anything. In Claude Code, treat the hook as installed when `~/.claude/settings.json` mentions `session-title-from-chat-line`; check with a grep rather than asking.
 
 ### Naming mechanics by tool
 
-State only the line for the tool the user is on when you know it. For Claude Code with the hook installed there is no line to state; without it, give the `/rename` form and note the others in a clause.
+State only the line for the tool the user is on when you know it. For Claude Code with the hook installed there is no line to state; without it, add a `/rename <name>` line above the prompt, to be typed first, and note the other tools in a clause.
 
 | Tool | How the name gets set |
 |------|------------------------|
@@ -297,7 +297,7 @@ So: **the doc edits from Step 1 go into the commit this session is already makin
 - Fill the lineage block with a phase id alone, a slug, or the chat-name abbreviation; the titles go there in full
 - Open the name with a verb, the phase, or the project tag when a more specific id exists
 - Leave the activity off the name, spell it out in full, or improvise a token the table's rows or its last-row rule do not produce
-- Drop a project or product tag the work has, or invent one it does not; a unit abbreviation alone (`IE`) means nothing outside its product
+- Drop a project or product tag the work has, or invent one it does not
 - Spend characters on a product tag when every repo in the directory belongs to that product
 - Carry dismissed observations into the prompt as FYIs
 - Present a prompt whose facts live only in the chat or in an uncommitted file, unless the one-shot exception in Step 1 applies and the prompt itself carries them
@@ -311,34 +311,7 @@ So: **the doc edits from Step 1 go into the commit this session is already makin
 
 ## Adopting This Skill
 
-Two one-time steps.
-
-**1. The instructions line.** Skills load on demand, so the assistant has to know to reach for this one when the user asks for a prompt in passing. Put this line in the instructions file your tools read (`~/.claude/CLAUDE.md` for Claude Code, `~/.codex/AGENTS.md` for Codex, or whatever single file you symlink to both); the README of this repository carries the same text:
-
-> CONTINUATION PROMPTS: Whenever asked for a prompt to paste into a new chat, or when a skill hands work to a fresh chat, use the `continuation-prompt` skill. If a prompt you receive opens with a short name alone on its first line (or a `Chat:` line) and you have a tool that sets the thread or session title, set it to that name before anything else; if you have no such tool, say nothing about it (where the optional title hook is installed, it has already set the title).
-
-**2. The title hook (Claude Code).** The assistant cannot rename its own session, but a `UserPromptSubmit` hook may return `sessionTitle` (Claude Code 2.1.94 and later), which sets exactly what `/rename` sets. The script in this skill's `hooks/` directory does only that, by two rules: on a session's first prompt, a bare first line that looks like a name (40 characters or fewer, no trailing punctuation, not a slash command, @-mention or pasted attachment tag, followed by a blank line and the body) becomes the title; on any prompt, a first line of `Chat: <name>` sets the title explicitly. Both rules read past a leading `<pasted_content id="...">` tag, which the VS Code extension wraps around pasted text, and past whole context blocks a client prepends to the message, such as the `<browser_instruction>` block the VS Code extension adds to a session's first message when Claude in Chrome is enabled (2.1.287 and later). Every other prompt passes through untouched and the hook never blocks one. Merge this into `~/.claude/settings.json`, keeping any hooks already there (this is the whole `hooks` key; if you already have one, add the group to its `UserPromptSubmit` list). Adjust the path if this skill is not linked under `~/.claude/skills`; if you installed the Enso Method as a plugin, point it at a clone of the repository (`<clone>/skills/continuation-prompt/hooks/…`), because the plugin's own copy moves with every update. The hook is global to Claude Code: one registration serves every skills repo.
-
-```json
-{
-  "hooks": {
-    "UserPromptSubmit": [
-      { "hooks": [ { "type": "command",
-                     "command": "python3 ~/.claude/skills/continuation-prompt/hooks/session-title-from-chat-line.py",
-                     "timeout": 5 } ] }
-    ]
-  }
-}
-```
-
-Test it without Claude Code (`printf`, not `echo`: zsh and sh turn the `\n` into a real newline, which strict JSON rejects):
-
-```
-printf '%s' '{"prompt":"ph3b2 orderN impl\n\nUse implement-from-requirements."}' \
-  | python3 ~/.claude/skills/continuation-prompt/hooks/session-title-from-chat-line.py
-```
-
-It prints a `hookSpecificOutput` object carrying the title. With the hook in place the name line is the rename and the user pastes once. Sending a later message that starts with `Chat: <new name>` renames the session.
+The instructions line that makes assistants reach for this skill, and the optional title hook's registration, are in `docs/enso-method-setup-guide.md` ("Recommended global instructions", "Optional Claude Code hooks"); the hook's own header documents its matching rules and a test command.
 
 ---
 
@@ -347,6 +320,4 @@ It prints a `hookSpecificOutput` object carrying the title. With the hook in pla
 | Skill | Relationship |
 |-------|--------------|
 | `implementation-lifecycle` | Defines which document owns which kind of fact (phase doc: work state; Technical Design: durable design facts; assumptions: business logic). Step 1 sorts into those homes. Also the Materiality Gate that keeps dismissed items out of the prompt, and "Every Session Names What It Serves", which the lineage gate applies at the handoff. |
-| `implement-from-requirements` | Calls this skill at wrap-up when a next phase exists |
-| `phase-split` | Calls this skill after the phase docs are written, for the first leaf's prompt — only when the user invoked it directly; called from an implement session it produces no prompt |
 | `pre-commit-validation` | The doc edits from Step 1 ride in the commit that skill validates |

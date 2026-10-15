@@ -141,6 +141,12 @@ already there:
 }
 ```
 
+Adjust the paths if the skills are not linked under `~/.claude/skills`. If you installed the
+Enso Method as a plugin, point them at a clone of the repository
+(`<clone>/skills/<skill>/hooks/…`), because the plugin's own copy moves with every update.
+The hooks are global to Claude Code: one registration serves every skills repo. Each hook's
+header documents what it matches and how to test it without Claude Code.
+
 ## Forking and adding a skill
 
 1. Create a directory under `skills/` with a plain, descriptive name (lowercase, hyphens).
