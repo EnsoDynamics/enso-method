@@ -106,37 +106,39 @@ The name is the first line of the prompt and the argument to the tool's rename c
 1. **Twenty characters is the target for everything before the activity token; thirty is the cap on the whole name.** Count them. A tab strip shows roughly the first twenty, and the token is the part allowed to fall past them.
 2. **Order tokens by how much they distinguish this chat from the others likely open at the same time.** The specific unit of work comes first: the phase or sub-phase id, the issue or ticket id, the thread's subject noun. The project tag comes after, because every sibling chat shares it. When six tabs are all Phase 2 of one project, a name that opens with the phase spends its best characters saying nothing.
 
-   The tag before the activity is the project: the PRD's name, abbreviated per rule 5 (`orderN`, `accountA`). It is the token most tempting to drop, because every sibling shares it, and it is the one that makes the unit id readable. A product tag (`BL`) is a separate token after it, taken from the shared prefix of a repo family (`billing-*`), and it earns its characters only when that family sits beside other products' repos in the same parent directory: `billing-invoice-export` there gives `IE-export BL PRD refine`, and a name that stops at `IE-export` is wrong because `IE` means nothing outside that product. When every repo in the directory belongs to one product, the product is where the chat already lives and says nothing: `ph4b1 accountA impl`, never `ph4b1 accountA <product-tag> impl`. Where no PRD directory supplies a project tag (a ticket, a GitHub issue, an ad-hoc thread) there is none: the name closes on its subject noun, as `PROJ-4271 user import impl` and `dup accounts stage2 ops` do, and a tag is never coined from a lone repo name, a company, or a team. Shorten a tag the work has when the name runs long; never drop it.
+   The tag before the activity is the project: the PRD's name, abbreviated per rule 5 (`orderN`, `accountA`). It is the token most tempting to drop, because every sibling shares it, and it is the one that makes the unit id readable. A product tag (`BL`) is a separate token after it, taken from the shared prefix of a repo family (`billing-*`), and it earns its characters only when that family sits beside other products' repos in the same parent directory: `billing-invoice-export` there gives `invoiceE BL prd refine`. When every repo in the directory belongs to one product, the product is where the chat already lives and says nothing: `ph4b1 accountA impl`, never `ph4b1 accountA <product-tag> impl`. Where no PRD directory supplies a project tag (a ticket, a GitHub issue, an ad-hoc thread) there is none: the name closes on its subject noun, as `PROJ-4271 user import impl` and `dup accounts stage2 ops` do, and a tag is never coined from a lone repo name, a company, or a team. Shorten a tag the work has when the name runs long; never drop it.
 3. **Every name ends with its activity, as one fixed token.** Whether the chat implements, refines the requirements, splits a phase, drafts a design, investigates, or reviews, the reader has to be able to tell, and the activity is the one fact the documents' identifiers do not carry. Implementation gets its token like everything else, so a name has one shape and "every implementation chat" is greppable. Use the fixed labels below; two-word labels distinguish activities that would otherwise be vague (`ref` alone reads as *reference*):
 
    | Next chat runs | Token |
    |----------------|-------|
    | `implement-from-requirements`, `implement-from-discovery` | `impl` |
-   | `autonomous-design-refinement` | `TDD refine` |
-   | `autonomous-prd-refinement` | `PRD refine` |
-   | `phase-split` | `split` |
-   | Technical Design writing (`technical-design-writing-standards`) | `design` |
    | PRD writing (`prd-writing-standards`) | `prd` |
+   | `autonomous-prd-refinement` | `prd refine` |
+   | Technical Design writing (`technical-design-writing-standards`) | `tdd` |
+   | `review-technical-design` | `tdd review` |
+   | `autonomous-design-refinement` | `tdd refine` |
+   | `phase-split` | `phase split` |
    | `stakeholder-review-package` | `stakeholder pkg` |
-   | `prd-roadmap` | `rdmap` |
+   | `prd-roadmap` | `prd rdmap` |
    | `investigate-question`, an issue or ad-hoc investigation | `invest` |
-   | `deliverable-review`, a design, code or PR review | `review` |
-   | `test-audit` | `audit` |
+   | `deliverable-review`, a code or PR review | `review` |
+   | `test-audit` | `test audit` |
    | `refactor-pass` | `refac` |
    | an ad-hoc operational thread (a stakeholder volley, an incident) | `ops` |
    | anything else | the skill's own verb stem, cut to six characters |
 
-   The token never opens the name (the tab is for finding the chat, and the unit id finds it) and is never spelled out or improvised: `ph3b2 orderN implementation` and `ph3b2 orderN build` are both wrong. A bare `refine` is wrong too: two skills refine, and the token has to say which document stage the chat is in, `PRD refine` for the PRD's review rounds before any design exists and `TDD refine` for refining the PRD, Technical Design and assumptions together once the design exists. When the name runs past the cap, pay for the token out of the middle: shorten the subject noun first, then the project tag. Never drop the unit id, the activity, or a tag the work has.
+   The token never opens the name (the tab is for finding the chat, and the unit id finds it) and is never spelled out or improvised: `ph3b2 orderN implementation` and `ph3b2 orderN build` are both wrong. A bare `refine` is wrong too: two skills refine, and the token has to say which document stage the chat is in, `prd refine` for the PRD's review rounds before any design exists and `tdd refine` for refining the PRD, Technical Design and assumptions together once the design exists. When the name runs past the cap, pay for the token out of the middle: shorten the subject noun first, then the project tag. Never drop the unit id, the activity, or a tag the work has.
 4. **Reuse the identifier the documents use, verbatim and with its casing.** `PROJ-4271`. The name must match what the user will grep for. A bare positional id from `phase-split` (`2b1`) takes the `ph` prefix so it reads as a phase: `ph2b1`.
 5. **Abbreviate the project tag, never a unit id the documents give.** Under the target the words stay whole (`account alerts`). Past it, filler goes first (`expanded`, `completion`), then the tag collapses to its distinguishing word plus the initial of the word after it: `orderN` for Order Notifications, `accountA` for Expanded Account Alerts. The phase id stays whole. A PRD standing in as the unit has no id, so rule 6 applies to it.
-6. **No dates, no articles, no punctuation that the tool might strip, and never the PRD title as written.** When the PRD itself is the unit (a refinement or a split), its subject noun abbreviated stands in: `IE-export`, not `billing-invoice-export`.
+6. **No dates, no articles, no punctuation that the tool might strip, and never the PRD title as written.** When the PRD itself is the unit (writing, reviewing, refining, splitting or packaging it), the project tag alone leads, with no phase id or subject noun: `kiln prd refine`.
 
 | Work | Name |
 |------|------|
+| The Kiln PRD itself, through its document stages | `kiln prd`, `kiln prd refine`, `kiln tdd`, `kiln tdd review`, `kiln tdd refine`, `kiln phase split`, `kiln stakeholder pkg` |
 | A PRD phased under `phase-split`'s positional ids: phase 2b1 of User Onboarding (the id already carries its parents, so no separate phase token) | `ph2b1 userO impl` |
-| Order Notifications phase 3b2, but the chat refines its PRD and design before any code | `ph3b2 orderN TDD refine` |
-| Phase 2 of the same project, being split into sub-phases (the phase is the unit, so it leads) | `ph2 orderN split` |
-| Billing product, invoice-export PRD drafted, in review rounds before its design | `IE-export BL PRD refine` |
+| Order Notifications phase 3b2, but the chat refines its PRD and design before any code | `ph3b2 orderN tdd refine` |
+| Phase 2 of the same project, being split into sub-phases (the phase is the unit, so it leads) | `ph2 orderN phase split` |
+| Billing product, invoice-export PRD drafted, in review rounds before its design | `invoiceE BL prd refine` |
 | Writing the Cloud Ingestion PRD, a planned PRD in the Acme Cloud PRD roadmap (the planned PRD's short-name is the unit; the roadmap is the project tag) | `ingestion acmeCloud prd` |
 | The only product in its directory; Account Alerts PRD, phase 4b1 | `ph4b1 accountA impl` |
 | Jira ticket PROJ-4271 in user import | `PROJ-4271 user import impl` |
@@ -144,7 +146,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
 | Ticket PROJ-4288, phone-number truncation | `PROJ-4288 phone impl` |
 | Ad-hoc thread: duplicate account cleanup, stage 2 | `dup accounts stage2 ops` |
 
-A name whose first token is `ph2` or `orderN` is wrong under rule 2 unless the phase or project really is the distinguishing token among the chats open at that moment. A name with no activity token is wrong under rule 3 whatever the chat does; nothing else in the tab says what the session is for. `IE-export PRD refine` is wrong under rule 2: the product tag is missing, and the unit abbreviation is opaque on its own. `ph4b1 accountA <product-tag> impl` is wrong under rule 2 as well: the product is the whole directory, and its characters belonged to the project name.
+A name whose first token is `ph2` is wrong under rule 2 unless the phase really is the distinguishing token among the chats open at that moment; one that opens on the project tag is wrong unless the PRD itself is the unit. A name with no activity token is wrong under rule 3 whatever the chat does; nothing else in the tab says what the session is for. `invoiceE prd refine` is wrong under rule 2 in that mixed-product directory: the product tag is missing. `ph4b1 accountA <product-tag> impl` is wrong under rule 2 as well: the product is the whole directory, and its characters belonged to the project name.
 
 ---
 
