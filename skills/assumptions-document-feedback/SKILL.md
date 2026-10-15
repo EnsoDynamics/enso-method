@@ -1,6 +1,6 @@
 ---
 name: assumptions-document-feedback
-description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, and partial answers while keeping the project moving forward.
+description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, partial answers and pushback (a doubt or question is researched and the assumption restated to meet it, never pasted in as the answer) while keeping the project moving forward.
 ---
 
 # Assumptions Document Feedback Processing
@@ -38,6 +38,7 @@ The assumptions document exists to **unblock development**, not to achieve perfe
 - **Clear answers**: Update the assumption and increase confidence
 - **Partial answers**: Incorporate what's known, **make your own assumption for the gaps** (don't leave questions for stakeholders)
 - **Corrections**: Update with the corrected information, **and assume forward on any new gaps the correction introduces**
+- **Pushback or a question**: Treat it as a clue, not an edit instruction — research it, resolve it at ≥95%, otherwise restate the assumption to address it
 - **No response on an item**: Keep the existing assumption (it was our best guess)
 
 **Never generate "follow-up questions" as a deliverable.** Follow-up questions create blocking dependencies — you're waiting on an email instead of making progress. Instead, for every gap, make your best assumption using existing context (code, docs, domain knowledge, reasoning). The user can asynchronously validate assumptions with stakeholders without being blocked.
@@ -97,7 +98,7 @@ Feedback rounds are how entries turn into walls of text. Each round bolts on a c
 An item the stakeholder already ruled on, left in the body for another pass, has to earn the second read. **Give every such entry a first line, under the heading, saying what has changed since they answered** — and carry the same tag in the heading, in the form "The heading tag vocabulary" defines in `assumptions-document-writing`, so the state is visible while scanning. **Four tags, and no fifth:**
 
 - **nothing new since** — built or queued exactly as ruled, nothing found since. A tick is all it needs.
-- **we read your words** — their answer needed an interpretation (two sentences that disagreed, a "Wrong" box ticked over a restatement of the proposal, one word taken a particular way). Name the reading and ask them to check it.
+- **we read your words** — their answer needed an interpretation (two sentences that disagreed, a "Wrong" box ticked over a restatement of the proposal, one word taken a particular way, a question or doubt read as pointing at a particular gap). Name the reading and ask them to check it.
 - **NEW SINCE YOUR ANSWER** — something was found or built afterwards. Say in the same line whether it *agrees* with their ruling, *contradicts* it, or *exposes a gap it does not cover*. This is the set that deserves their attention, and the tag is what gets it there.
 - **new question** — never put to them before, so there is nothing to re-read. Pairs with the `Added` marker rather than `Ruled`.
 
@@ -129,10 +130,13 @@ For each item in the stakeholder response, classify it:
 | Classification | Meaning | Action |
 |----------------|---------|--------|
 | **Confirmed** | Explicit "correct" or equivalent | Mark VALIDATED, move to PRD |
-| **Corrected** | Explicit "wrong, do X instead" | Update assumption with correction |
+| **Corrected** | Supplies the answer: "wrong, do X instead" | Update assumption with correction |
+| **Pushback** | Withholds the confirm without giving an answer: a doubt, concern or question | Research it; resolve at ≥95%, otherwise restate the assumption to meet it and keep pending |
 | **Partial** | Some info provided, gaps remain | Update what's known, assume the rest |
-| **Unclear** | Response is ambiguous | State your interpretation, keep as pending |
+| **Unclear** | Gives an answer that can be read more than one way | State your interpretation, keep as pending |
 | **No response** | Item wasn't addressed | Keep existing assumption |
+
+**Classify by what the words say, not by the box ticked.** Review packages offer only Confirm and Change, so every doubt comes back marked Change (`stakeholder-review-package`), and an emailed "Wrong" is often followed by a question rather than an answer. A response is **Corrected** only when it supplies the answer — what to do instead. A Change that asks, hedges or raises a concern is **Pushback**. One reply can hold both ("use ship date — not sure about returns, though"): process each part under its own class.
 
 ### 2. Process Each Classification
 
@@ -146,6 +150,17 @@ For each item in the stakeholder response, classify it:
 - Update confidence (usually increases with clear correction)
 - Add evidence for the correction
 - Keep as pending if the correction itself needs validation — and when it does, add a "why the last answer didn't close this" section so the stakeholder isn't re-reading an item they remember answering (format under "Assumption Format Reference" below)
+
+#### Pushback Items
+
+Pushback withholds the confirm without supplying the answer: a doubt ("not sure this is right"), a concern ("what about drop-ship orders?"), or a question. It is a signal, not an edit instruction. **Never paste their words in as the new assumption** — a question is not an answer, and a concern is not a correction.
+
+1. **Read it as a clue to why they couldn't confirm.** What would have to be true for them to hold back — a case the assumption misses, a risk they see, a fact they know and we don't, or a statement they read differently than we meant? Write that reading down; the rest works from it.
+2. **Research it** to the standard of Step 7: code, data, the PRD and design, transcripts and emails, and their other answers in the same batch, which often say what this one only hints at.
+3. **Research reaches ≥95%** — the answer their concern pointed to, or evidence the assumption already handles it: the item is resolved. Fold it into the requirements (Principle 4) and move it to the validated table, whose row says what answered their concern. Name it in the report, so the stakeholder sees their question was taken up, not overruled in silence.
+4. **Research stays below 95%**: restate the assumption in the best form the evidence supports, written so it answers their question or meets their concern — usually a clause or a changed example, not a longer entry (Principle 6). Set confidence honestly: a concern that exposed real doubt is cause to lower it (Principle 5). Add the "Why your [date] answer didn't close this" section quoting their words and saying how the restated assumption takes them up, and tag the heading `we read your words` (`NEW SINCE YOUR ANSWER` if the research found something that changed the answer). It stays pending and goes back to the stakeholder next round.
+
+**The same path, whoever wrote it.** A pasted stakeholder reply and the user's own typed reaction look alike, so don't try to tell them apart, and don't stop to ask the user what a pushback means before applying it. Research, restate, and report how you read each one (Output Format, item 8). If that reading is wrong, the user says so in their next message, and that is simply another round of feedback.
 
 #### Partial Items
 For incomplete answers:
@@ -242,9 +257,9 @@ For each corrected assumption, new requirement, or newly unblocked item that cha
 - [ ] Every item needing code changes is either in the requirements a build will read (the amended PRD, plus the phase document when split), or named for the user as an action item
 - [ ] No item is described as scheduled, tracked, or "will be done" unless a build will read it
 
-### 7. Research First (New Assumptions Below 95%)
+### 7. Research First (New Assumptions Below 95%, and Pushback)
 
-This step applies when Step 3 produced new assumptions below 95% confidence. **Investigate each one before finalizing it**, as `implementation-lifecycle` requires — code, data, documents, the stakeholder's own written feedback. The research decision is part of the work; don't hand it to the user.
+This step applies when Step 3 produced new assumptions below 95% confidence, and to every Pushback item (Step 2). **Investigate each one before finalizing it**, as `implementation-lifecycle` requires — code, data, documents, the stakeholder's own written feedback. The research decision is part of the work; don't hand it to the user.
 
 Then set each entry at the confidence the investigation leaves it at: at 95%+ it folds into requirements, below that it stays a pending assumption and work proceeds on it, and only when the evidence favors no answer at all does it become a Blocking Open Question. Report what moved in one line each: the assumption, its confidence before and after, and what settled it.
 
@@ -291,6 +306,25 @@ and PENDING is the safe default for unclassified accounts.
 **Confidence**: 85% | **Impact if Wrong**: 🟡 MEDIUM
 ```
 
+## Example: Processing Pushback
+
+**Original Assumption:**
+> Refunds issued more than 90 days after the order are left out of the monthly returns report.
+
+**Feedback** (review package, marked Change):
+> "What about store credit? Not sure we treat those the same."
+
+**Processing:**
+
+1. **Classification**: Pushback — marked Change, but it asks; it doesn't say what to do instead. Rewriting the assumption as "store credit is included" would invent an answer they never gave.
+2. **Read it as a clue**: they suspect store credit follows a different rule from cash refunds, and the assumption doesn't say which kind it covers.
+3. **Research**: the refunds table records the refund method, and store credit is a third of late refunds. The finance close procedure (2023) books store credit as a liability when issued, not as a refund. That points to leaving store credit out at any age — 80%, since the procedure may be out of date.
+4. **Restate**, still pending, tagged `we read your words`:
+
+> **Assumption**: **Cash and card** refunds issued more than 90 days after the order are left out of the monthly returns report. **Store credit is left out at any age** — finance books it as a liability when issued, not as a refund.
+>
+> **Why your 2026-03-12 answer didn't close this**: You asked whether store credit is treated the same ("What about store credit? Not sure we treat those the same"). We read that as store credit possibly following its own rule. The finance close procedure says it does, so the assumption now names each kind separately. Confirm that is how finance treats it today.
+
 ---
 
 ## Output Format
@@ -306,7 +340,7 @@ After processing feedback, provide:
    - What was added/updated in each document
    - Location of changes (section names or line references)
 7. **Code Changes Routed**: for each item that now needs code, where it went — the amended PRD a build will read, the phase document that will build it, or a one-line action item for the user (Step 6)
-8. **Research Done** (only if Step 7 investigated new assumptions below 95%): one line per assumption — confidence before and after, and what settled it — plus any Blocking Open Question with what would let you decide
+8. **Research Done** (only if Step 7 investigated new assumptions below 95% or Pushback items): one line per assumption — confidence before and after, and what settled it; for Pushback, also how you read their concern and whether research resolved it — plus any Blocking Open Question with what would let you decide
 
 **Propagation Checklist** (include in output):
 - [ ] PRD updated with validated decisions
