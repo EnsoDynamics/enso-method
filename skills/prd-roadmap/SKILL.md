@@ -16,7 +16,7 @@ This skill owns three things:
 
 **Terminology note:** A planned PRD is a medium body of work, and its phases (`phase-split`) are what agile teams would call stories, sized for one AI session instead of a sprint.
 
-It sits one level above `phase-split` and works the same way: `phase-split` cuts one PRD into session-sized phases and never implements; this skill cuts one idea into PRD-sized pieces and never writes a PRD. **It does not stop to ask whether to cut, or how.** It decides, declares the cut, writes the documents, and hands off. The review point is the handoff: the user reads the roadmap before pasting the prompt that writes the first PRD, and a redirect costs a few minutes of rewriting uncommitted markdown.
+It sits one level above `phase-split` and works the same way: `phase-split` cuts one PRD into session-sized phases and never implements; this skill cuts one idea into PRD-sized pieces and never writes a PRD. **It does not stop to ask whether to cut, or how.** It decides, declares the cut, writes the documents, and hands off. The review point is the handoff: the user reads the roadmap before pasting the prompt that writes the first PRD, and a redirect costs a few minutes of rewriting markdown, or one commit to revert.
 
 ---
 
@@ -120,7 +120,7 @@ Users name their inputs anything ("Product Brief", "context package", `notes.md`
 5. **Clean up the wording**: set the H1 to `# {Title} Full Brief`; remove handoff language ("context package", "questions Codex should resolve", instructions addressed to one particular agent, a purpose statement that says the document will become "a PRD and a technical design"); and note every section that orders the work or addresses "the PRD" or "the technical design" in the singular, because Step 6 retargets them.
 6. **Fix links, in both directions.** Rewrite the moved file's own relative links so they resolve from its new directory. Search the repository for the old filenames and update every inbound link. Add `docs/roadmaps/` to any index of the repository's documentation layout (a README's layout list, for example), which a filename search will not find.
 
-**Changes already staged when the skill starts.** An input often arrives in the same uncommitted change as edits made because of it: an index that now lists it, a feature list that now points at it. Those edits ride in this skill's commit, updated to the new paths, and the commit proposal names them. Changes staged for unrelated work are someone else's: leave them staged and untouched, stage only this skill's files beside them, and limit the commit hand-off to this skill's paths (`pre-commit-validation`).
+**Changes already staged when the skill starts.** An input often arrives in the same uncommitted change as edits made because of it: an index that now lists it, a feature list that now points at it. Those edits ride in this skill's commit, updated to the new paths, and the commit message names them. Changes staged for unrelated work are someone else's: leave them staged and untouched, stage only this skill's files beside them, and limit the commit to this skill's paths (`pre-commit-validation`).
 
 **When the input is an oversized draft PRD** (the size check in `prd-writing-standards` tripped mid-draft): the draft becomes the full brief. Move it out of `docs/prds/`, and remove its now-empty PRD directory, since it was never one PRD. Its acceptance criteria stay in the brief as source material for the planned PRDs.
 
@@ -235,7 +235,7 @@ After this, the brief changes only when a decision changes. If a PRD later overt
 
 State the cut in the response as a decision: a table of order, planned PRD, what reaches production, and one line on why the cut falls there. Then list the renames and removals from Step 3. Do not end the turn to ask whether the cut is acceptable.
 
-Stage the documents (brief, roadmap, PRD contracts, and the coverage matrix when there is one) and validate per `pre-commit-validation`; commit and push only under live user authorization, otherwise present the commit message for approval.
+Stage the documents (brief, roadmap, PRD contracts, and the coverage matrix when there is one), validate and commit them per `pre-commit-validation`. Committing is the default, and the user's instructions override it; pushing waits for the user ("Who Commits").
 
 Then give the copy-paste prompt for writing the first planned PRD, using `continuation-prompt`. Its chat name takes the planned PRD's short-name as the unit and the roadmap's name as the project tag, and its lineage block names the roadmap and the planned PRD:
 
@@ -247,7 +247,7 @@ In service of: Acme Cloud PRD Roadmap
   This chat: writes and refines its PRD.
 ```
 
-The prompt names `prd-writing-standards` and `autonomous-prd-refinement`, points at the planned PRD's entry in the PRD contracts, its rows in the coverage matrix when there is one, and the full brief, and says the PRD's directory. The prompt is valid once the roadmap commit lands. The chat it starts writes the PRD (and mockups, if the product needs them) and refines it with `autonomous-prd-refinement`; the user's review, the technical design (reviewed with `review-technical-design` when it makes hard-to-reverse decisions), design refinement, phase split, and build follow in the usual chain.
+The prompt names `prd-writing-standards` and `autonomous-prd-refinement`, points at the planned PRD's entry in the PRD contracts, its rows in the coverage matrix when there is one, and the full brief, and says the PRD's directory. The prompt is valid once the roadmap commit lands. The chat it starts writes the PRD (and mockups, if the product needs them) and refines it with `autonomous-prd-refinement`; the technical design and its review (`review-technical-design`), design refinement, phase split, and build follow in the usual chain, with the user's review recommended after the PRD's refinement and after the design's review.
 
 ---
 

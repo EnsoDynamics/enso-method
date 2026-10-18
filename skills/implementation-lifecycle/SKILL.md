@@ -415,7 +415,7 @@ When neither holds, stay in the shared checkout, even if parallel work seems lik
   3. If the push is rejected because another chat pushed first, repeat from step 1. Never force a push to the shared branch.
   4. Fast-forward the shared checkout so the editor shows the work: `git -C <shared checkout> merge --ff-only origin/<shared branch>`. Always attempt it; it succeeds beside another session's uncommitted changes unless they touch the same files. If git refuses, say so in the wrap-up.
 
-  When the work is not landed — the push is held for the user's word, the user said not to commit or push, the session ended Blocked, or a skill outside the implement chain has no authorization — stage or commit in the worktree accordingly, present the commit message as usual, and leave the worktree in place with its path in the wrap-up. When the user later says push, land it (steps 1–4 above) and clean up.
+  When the work is not landed — the push is held for the user's word, the user said not to commit or push, the session ended Blocked, or a skill whose default doesn't push (a requirements skill, or one that presents its commit) has no authorization to — stage or commit in the worktree accordingly, present the commit message as usual, and leave the worktree in place with its path in the wrap-up. When the user later says push, land it (steps 1–4 above) and clean up.
 - **Clean up at wrap-up**, once `git log origin/<shared branch>..HEAD` is empty and `git status` is clean. Run the cleanup from the shared checkout, not from inside the worktree: `git -C <shared checkout> worktree remove <path>`, then `git -C <shared checkout> branch -d wt/<slug>`, then delete the chat's empty folder under `.worktrees/`. `-d` refuses to delete work that has not landed; if it refuses, stop and report, and never force it. The wrap-up says whether the worktree was removed. A worktree that outlives its chat shows up in `git worktree list` and in a log with no DONE.
 
 **Parallel work still needs owners.** Worktrees stop two chats writing the same file. They do not stop two chats changing related behaviour that merges cleanly and then breaks. When one chat hands out several prompts, each prompt names the area its chat owns: files, modules, registry blocks. A chat that needs a change outside its area stops and says so.
@@ -511,8 +511,8 @@ This skill provides the **framework context**. Other skills provide the **proced
 | `investigate-question` | Deep-dive investigation of specific questions surfaced during readiness checks or implementation |
 | `assumptions-document-writing` | When writing or updating assumptions — formatting standards |
 | `prd-roadmap` | Before any PRD, when an idea is too big for one: cuts it into right-sized planned PRDs beside a full brief that stays whole |
-| `autonomous-prd-refinement` | After a PRD is drafted and before the user reviews it: review-and-fix rounds until no Medium or High finding is left |
-| `review-technical-design` | Optional, after the technical design is written and before `autonomous-design-refinement`: reviews a design that makes hard-to-reverse decisions |
+| `autonomous-prd-refinement` | After a PRD is drafted and before the user's recommended review: review-and-fix rounds until no Medium or High finding is left |
+| `review-technical-design` | After the technical design draft is committed and before `autonomous-design-refinement`: questions the design's approach, verifies its claims, revises it in place and commits the revision; skips itself for a design that follows an established pattern |
 | `autonomous-design-refinement` | Refining docs from draft to implementation-ready state |
 | `implement-from-requirements` | Default skill when starting from a fresh PRD |
 | `implement-from-discovery` | Implementing a fix or change identified during research/investigation |

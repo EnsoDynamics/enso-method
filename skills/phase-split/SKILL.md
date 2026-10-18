@@ -14,7 +14,7 @@ This skill owns three things:
 2. **The phase-split procedure** — finding seams, deciding the split, and writing the phase documents.
 3. **The phase naming and file layout** — how phases at every depth are identified and where their documents live, so that "implement phase 2a1" always points at exactly one file.
 
-It is the planning step that sits between "the requirements are ready" and "go build it." **It does not implement.** It also **does not stop to ask whether to split, or how**: it decides the cut, declares it, writes the documents, and hands off. The user can redirect after the fact — the documents are cheap to rewrite and nothing is committed yet — but a session that stops to ask "shall I split as recommended?" loses the wall-clock time the user isn't there to give back, for a question whose answer is almost always yes.
+It is the planning step that sits between "the requirements are ready" and "go build it." **It does not implement.** It also **does not stop to ask whether to split, or how**: it decides the cut, declares it, writes the documents, and hands off. The user can redirect after the fact — the documents are cheap to rewrite, and a split is one commit to revert — but a session that stops to ask "shall I split as recommended?" loses the wall-clock time the user isn't there to give back, for a question whose answer is almost always yes.
 
 ---
 
@@ -196,7 +196,7 @@ The one thing to keep avoiding is **slicing horizontally** (all-schema → all-e
 
 ### Step 3: Decide the Split and Declare It
 
-Write the split up in the response **as a decision, then proceed to Step 4 in the same turn.** Do not end the turn to ask whether to split, whether the recommended cut is acceptable, or which of several cuts the user prefers. The methodology's rule for predictable questions applies (`implementation-lifecycle`: never stop to ask when you are ≥90% confident of the answer), and "should I split as recommended?" is the canonical predictable question — the recorded answer is yes, every time, and every time the session stopped to ask it the answer arrived hours later. If two cuts are genuinely close, pick the one that flows most logically (below) and say in one line why; the user redirects after the fact if they disagree, and a redirect costs a few minutes of rewriting uncommitted markdown.
+Write the split up in the response **as a decision, then proceed to Step 4 in the same turn.** Do not end the turn to ask whether to split, whether the recommended cut is acceptable, or which of several cuts the user prefers. The methodology's rule for predictable questions applies (`implementation-lifecycle`: never stop to ask when you are ≥90% confident of the answer), and "should I split as recommended?" is the canonical predictable question — the recorded answer is yes, every time, and every time the session stopped to ask it the answer arrived hours later. If two cuts are genuinely close, pick the one that flows most logically (below) and say in one line why; the user redirects after the fact if they disagree, and a redirect costs a few minutes of rewriting markdown, or one commit to revert.
 
 The declaration is a structured write-up the user can check at a glance. For each phase include:
 
@@ -329,11 +329,11 @@ Add an `Owner` column to the `## Split into` table only when different people ru
 
 ### Step 5: Hand Off
 
-What happens after the documents are written depends on who invoked this skill. In every case, **do not implement inside this skill**, and the documents are staged and validated per `pre-commit-validation`. Invoked directly, that happens here, and they are committed or pushed only under live user authorization; when they ride an implement session's changeset, they are committed at its wrap-up under that chain's default (`pre-commit-validation`, "Who Commits").
+What happens after the documents are written depends on who invoked this skill. In every case, **do not implement inside this skill**, and the documents are staged and validated per `pre-commit-validation`. Invoked directly, that happens here, and they are committed by default, but pushed only under live user authorization ("Who Commits"); when they ride an implement session's changeset, they are committed at its wrap-up under that chain's default (`pre-commit-validation`, "Who Commits").
 
 **Called from an implement session** (`implement-from-requirements` sized the work at its Phase 2 and delegated here, or the phase being built turned out too large mid-implementation): return to that skill. Outside an authorized `phase-chain`, **it continues in the same chat with the first phase of the new plan** — phase 1 when a whole PRD was split; the first child when a phase was re-split at sizing time; mid-implementation, the child that holds the work already in progress. The context that session loaded is exactly what that phase needs, and the phase is session-sized by construction, so a fresh chat would only re-read the same documents. The new phase docs ride in that session's changeset. This skill produces no prompt in this case; the implement session's wrap-up produces the next phase's prompt via `continuation-prompt`.
 
-**Invoked directly by the user** (`/phase-split` on a PRD, or on a phase the user already knows is too large): this chat's purpose was planning, so stop after the documents are written. Tell the user the phase docs are created; commit/push when covered by live user authorization, otherwise present the message for approval; then provide a copy-paste prompt for the first leaf's chat using `continuation-prompt` (it owns the chat-name line, the lineage block with the PRD and phase by full title, the ordering, and the rule that the prompt points at the phase doc rather than restating it); the prompt is valid once that commit lands. Shape, abbreviated:
+**Invoked directly by the user** (`/phase-split` on a PRD, or on a phase the user already knows is too large): this chat's purpose was planning, so stop after the documents are written. Tell the user the phase docs are created and committed (or staged with the message, when the user said not to commit); push only under live user authorization; then provide a copy-paste prompt for the first leaf's chat using `continuation-prompt` (it owns the chat-name line, the lineage block with the PRD and phase by full title, the ordering, and the rule that the prompt points at the phase doc rather than restating it); the prompt is valid once that commit lands. Shape, abbreviated:
 
 > Phase documents created:
 > - `docs/prds/user-notifications/phase-1-event-pipeline.md`
@@ -350,7 +350,7 @@ What happens after the documents are written depends on who invoked this skill. 
 > >
 > > Use the `implement-from-requirements` skill. Implement `docs/prds/user-notifications/phase-1-event-pipeline.md`. The parent PRD is `docs/prds/user-notifications/user-notifications-prd.md` and the technical design is `docs/prds/user-notifications/technical-design.md`. Work in the shared checkout `<absolute path to the repo>`, on `develop` directly. First: read all three, then size the phase.
 >
-> Valid once the phase docs are committed (commit message above).
+> Valid now: the phase docs are committed (`a1b2c3d`).
 
 **Inside an authorized `phase-chain`**, whether this skill was invoked directly or from an implement session: return the completed planning delivery to that orchestrator; it commits, pushes, and dispatches the first leaf to a new task after its delivery gates, per that skill. The implement session does not continue with the first leaf in the same chat.
 

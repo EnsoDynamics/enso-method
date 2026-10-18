@@ -1,6 +1,6 @@
 ---
 name: autonomous-design-refinement
-description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state, run once the user has reviewed the PRD and design, before implement-from-requirements; the design-stage counterpart of autonomous-prd-refinement, which refines a draft PRD before any design exists — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
+description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state, run after review-technical-design (and the user's own read of the design, when the user wants one) and before implement-from-requirements; the design-stage counterpart of autonomous-prd-refinement, which refines a draft PRD before any design exists — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
 user-invocable: true
 ---
 
@@ -118,7 +118,7 @@ An area can be mixed; record it per component ("Salvage for the retry worker; Pr
 
 **Location:** alongside the PRD — `{feature}-design-refinement-state.md` in its directory, under `docs/prds/` or `docs/changes/`.
 
-**Lifecycle:** created in Phase 1, updated after every question, staged with the documents at each pass checkpoint, and **deleted in Phase 7** when the run completes. It is scaffolding, not a deliverable.
+**Lifecycle:** created in Phase 1, updated after every question, committed with the documents at each pass checkpoint, and **deleted in Phase 7** when the run completes. It is scaffolding, not a deliverable.
 
 **Editing rule:** update rows and counts in place. Never regenerate the whole file from memory — that is how status gets silently lost.
 
@@ -292,7 +292,7 @@ Conformance also confirms that the Technical Design's Open Questions section, an
 ### Phase 5: Checkpoint
 
 1. Update the Passes table and **Next action** in the state file.
-2. Stage the requirements documents and the state file — only those files; exploration scripts are the user's to stage — and include a proposed commit message in the checkpoint summary: `docs({feature}): design refinement pass {N} — {one-line summary}`, with a body naming what changed. **The skill does not run `git commit` unless the user explicitly says to.** The pass boundary is the user's review point; committing there is what protects the work from other sessions' git operations in the same checkout, so make the message good enough to use as-is.
+2. Commit the requirements documents and the state file — only those files; exploration scripts are the user's to stage — as `docs({feature}): design refinement pass {N} — {one-line summary}`, with a body naming what changed. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"), and then the files are staged and the message presented. Committing at the pass boundary is what protects the work from other sessions' git operations in the same checkout. It never pushes.
 3. Output the checkpoint summary:
 
 ```
@@ -302,7 +302,7 @@ Documents: PRD +{n}/-{m} ({start} → {now} words) · TD +{n}/-{m} ({now} words)
 Exploration scripts this pass: {list or none} (not staged — yours to add)
 Out of scope noticed: {count} (see state file)
 Blockers: {list or none}
-Staged for review — proposed commit message follows
+Committed: {short hash} (or: staged, message follows, when the user said not to commit)
 Next: {pass N+1 | final verification | paused: reason}
 ```
 
@@ -330,7 +330,7 @@ The ordinary count of business assumptions awaiting validation is never a reason
 3. **Final verification** — one more `implementation-readiness-check` subagent, scope-gated, against the finished documents. If it surfaces new questions below the threshold and passes remain, treat them as a new pass and go to Phase 3. If the maximum is reached with questions still below threshold, report `Maximum passes reached` and mark the documents not ready. Never label that result `Converged`.
 4. **Write the completion report** (below) from the state file, while it still exists.
 5. **Delete the state file.** The questions that mattered are in the documents; the rest is in the report.
-6. **Final staging** — stage the requirements documents and the state-file deletion, and propose `docs({feature}): design refinement complete — {passes} passes, {questions} questions` for the user to review and commit. Put the **Noticed, out of scope** lines in the message body — once the state file is gone, the commit is their only durable home. Put the conflict check's result in the body too, as one line starting `Conflict check:` (`Conflict check: 3 earlier criteria replaced, 1 raised as a question`, or `Conflict check: no earlier criteria changed`): `implement-from-requirements` reads that line to narrow its own check. Write the line only when both checks ran.
+6. **Final commit** — commit the requirements documents and the state-file deletion as `docs({feature}): design refinement complete — {passes} passes, {questions} questions`, under the same default as Phase 5. Put the **Noticed, out of scope** lines in the message body — once the state file is gone, the commit is their only durable home. Put the conflict check's result in the body too, as one line starting `Conflict check:` (`Conflict check: 3 earlier criteria replaced, 1 raised as a question`, or `Conflict check: no earlier criteria changed`): `implement-from-requirements` reads that line to narrow its own check. Write the line only when both checks ran.
 7. **Output the completion report:**
 
 ```
@@ -391,7 +391,7 @@ A failed hunk is put back as the completion commit has it; the check never rewri
 
 If the session ends mid-pass, the edits already made stay. Resume with the documents not yet done, then run the check, which compares everything with the completion commit.
 
-**Finish** by staging the documents and proposing `docs({feature}): consolidate repeats after design refinement — design {before} → {after} words`, with a body giving each document's words before and after, the number of repeats replaced, the deletions by category, any disagreements added to Open Questions, and the check's result.
+**Finish** by committing the documents, under the same default as Phase 5, as `docs({feature}): consolidate repeats after design refinement — design {before} → {after} words`, with a body giving each document's words before and after, the number of repeats replaced, the deletions by category, any disagreements added to Open Questions, and the check's result.
 
 ---
 
@@ -440,7 +440,7 @@ A script is warranted only when the question is in scope and a one-off read cann
 - Continue past the maximum number of passes
 - Pause merely because business assumptions await asynchronous validation
 - Report completion when the final verification surfaced unresolved work
-- Run `git commit` unless the user explicitly says to — stage only the requirements documents and state file, and hand the user the message
+- Commit anything but the requirements documents and state file, or push (`pre-commit-validation`, "Who Commits")
 - Embed client-specific references (credential paths, private repo names) — those belong in your house engineering standards (`docs/enso-method-setup-guide.md`, "Plugging in your house engineering standards")
 
 ---
@@ -454,7 +454,7 @@ A script is warranted only when the question is in scope and a one-off read cann
 | `assumptions-document-writing` | Applied when writing or amending any assumption, and during conformance |
 | `technical-design-writing-standards` | Applied when folding into the design, and during conformance |
 | `prd-writing-standards` | Applied when folding into the PRD, and during conformance |
-| `review-technical-design` | Optional, runs before this skill: reviews a design with hard-to-reverse decisions, so refinement starts from a reviewed design |
+| `review-technical-design` | Runs before this skill on the committed draft: questions the design's frame, which this skill never does, and commits its revision, so refinement starts from a reviewed design |
 
 ---
 
@@ -480,12 +480,12 @@ State file:   (none — fresh run)
 
 - Phase 1 finds the state file: Q11 is Investigating, **Next action** says "re-run Q11, then Q12, then conformance." Q11 is re-run — the only cost of the interruption, because Q10 had already been folded.
 - **Conformance** moves one API rate-limit detail from the assumption into the Technical Design; fixes a missing confidence line.
-- **Checkpoint**: documents and state file staged; proposed message `docs(user notifications): design refinement pass 1 — preference mapping, deactivated-account policy, 9 of 12 resolved`. The user reviews and commits.
+- **Checkpoint**: documents and state file committed as `docs(user notifications): design refinement pass 1 — preference mapping, deactivated-account policy, 9 of 12 resolved`.
 
 ### Pass 2
 
 - Discovery surfaces 6 new questions (the preference mapping added in pass 1 raised one about unknown codes) plus the 11 deferred, and Q9 rejoins them — its blocker cleared when the user granted the dev database access the pass 1 checkpoint listed. The top 12 are taken, Q9 among them. Ten resolve, including Q9, and two become assumptions.
-- Checkpoint staged and reported.
+- Checkpoint committed and reported.
 
 ### Pass 3
 
@@ -493,8 +493,8 @@ State file:   (none — fresh run)
 
 ### Completion
 
-- Final conformance clean. Final verification clean. State file deleted. Final staging. Report: 3 passes, Converged; 31 questions — 25 resolved, 6 captured as assumptions (4 awaiting validation), 0 still below threshold; ready for implementation.
+- Final conformance clean. Final verification clean. State file deleted. Final commit. Report: 3 passes, Converged; 31 questions — 25 resolved, 6 captured as assumptions (4 awaiting validation), 0 still below threshold; ready for implementation.
 
 ### Consolidation
 
-- The user commits. One writer replaces 41 repeats in the design with pointers and removes two dated correction notes; the PRD has none. The check finds every identifier present and every removed line's content where its pointer leads. Design 14,200 → 12,900 words, staged with its own proposed message.
+- On top of the completion commit, one writer replaces 41 repeats in the design with pointers and removes two dated correction notes; the PRD has none. The check finds every identifier present and every removed line's content where its pointer leads. Design 14,200 → 12,900 words, committed on its own.

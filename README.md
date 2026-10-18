@@ -16,9 +16,9 @@
 The Enso Method is a way of building production software with AI coding agents, delivered
 as free, open source agent skills for Claude Code and Codex. You describe the outcome you
 want in plain language. The method turns it into a PRD (product requirements document) and
-a technical design, which you review before the build. Then the agents build it in phases
-while your attention goes elsewhere, checking every acceptance criterion with a test that
-would fail if the behavior were wrong.
+a technical design, which agents review and fix, ready for your review before the build.
+Then the agents build it in phases while your attention goes elsewhere, checking every
+acceptance criterion with a test that would fail if the behavior were wrong.
 
 Technical questions are researched against the real code, data and APIs. Open business
 decisions are written down as assumptions, with a proposed answer, evidence and a confidence
@@ -42,8 +42,9 @@ The fix isn't a better prompt. It's doing the thinking before the build:
 
 - **Requirements lead the build.** Work starts from a PRD and a technical design, and a
   meaningful change amends them, or names what it replaces, before it is built.
-- **Review before the build.** You review the PRD and the technical design before anything
-  is built. That is where your judgment goes in; after that, the build runs without you.
+- **Review before the build.** Agents review and fix the PRD and the technical design first,
+  so your own read goes on the decisions, not the defects. That is where your judgment goes
+  in; after that, the build runs without you.
 - **Assumptions are green lights.** A business question is researched, answered with a
   proposal and a confidence level, and the build continues. Stakeholders confirm or correct
   it later.
@@ -57,8 +58,10 @@ The fix isn't a better prompt. It's doing the thinking before the build:
 
 Each step is a skill your agent runs, and each hands the next a document it can trust.
 A drafted PRD first goes through review rounds of its own, fixed between rounds, until no
-reviewer finds a problem that would change what gets built. Design refinement is a
-loop: it finds the gaps, researches each question against the real code and data, and
+reviewer finds a problem that would change what gets built. A drafted design gets a senior
+review that checks it against the real code and your house standards, fixes what it finds,
+and lists the sections worth your own reading. Design refinement is a loop: it finds the
+gaps, researches each question against the real code and data, and
 writes the answers back into the PRD and design, recording business decisions as
 assumptions for stakeholders to confirm, until nothing is left to guess. Stages 2 and 3 run
 once per phase: a phase is built, reviewed, its tests hardened, and committed, then `continuation-prompt`
@@ -72,13 +75,14 @@ flowchart TD
     direction LR
     prd["<b>PRD</b><br/>prd-writing-standards"] --> prdref["<b>PRD review rounds</b><br/>autonomous-prd-refinement"]
     prdref --> design["<b>Technical design</b><br/>technical-design-writing-standards"]
+    design --> dreview["<b>Design review</b><br/>review-technical-design"]
     subgraph refine["Refinement loop · autonomous-design-refinement"]
       direction LR
       gaps["<b>Find the gaps</b><br/>implementation-readiness-check"] --> research["<b>Research each question</b><br/>investigate-question"]
       research --> fold["<b>Fold the answers in</b><br/>PRD and design updated"]
       fold -. "repeat until no gaps are left" .-> gaps
     end
-    design --> gaps
+    dreview --> gaps
     fold --> assumptions[("<b>Assumptions register</b><br/>business decisions for<br/>stakeholders to confirm")]
   end
   subgraph build["2 · Build it in slices"]
@@ -158,9 +162,10 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
 
 1. **Write the PRD.** Run `/prd-writing-standards` and describe what you want in your own
    words. Talk it through; the messy version is better than a tidy instruction. Then run
-   `/autonomous-prd-refinement`, which reviews and fixes it in rounds, and review it yourself.
-2. **Design and refine.** Run `/technical-design-writing-standards` and review the design,
-   then `/autonomous-design-refinement` to close the gaps.
+   `/autonomous-prd-refinement`, which reviews and fixes it in rounds, ready for your review.
+2. **Design and refine.** Run `/technical-design-writing-standards`. It drafts the design and
+   has `review-technical-design` check and fix it, with a list of the sections worth your
+   reading. Then run `/autonomous-design-refinement` to close the gaps.
 3. **Build.** Run `/implement-from-requirements`. It sizes the work, splits it if it must,
    and builds, reviews and tests the first phase in the same session.
 
@@ -180,7 +185,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `prd-roadmap` — cut an idea too big for one PRD into an ordered roadmap of planned PRDs
 - `prd-writing-standards` — write a PRD, and where the documents live
 - `technical-design-writing-standards` — write or check a technical design
-- `review-technical-design` — a senior-engineer review for designs that make hard-to-reverse decisions; its triage says which sections you need to read yourself
+- `review-technical-design` — a senior review of the drafted design that checks it against the real code and your house standards, fixes what it finds, and lists the sections worth your own reading
 - `assumptions-document-writing`, `assumptions-document-feedback` — declare business assumptions and fold in stakeholder answers
 - `stakeholder-review-package` — create a single HTML review package with business highlights, every open assumption, contextual mockups and downloadable feedback
 

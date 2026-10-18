@@ -1,7 +1,8 @@
 # Enso Method Setup Guide
 
 Everything past the one-line install: plugging in your own engineering standards, the
-recommended global instructions, the optional hooks, and forking. Start with the
+recommended global instructions, instructions that restrict commits, the optional hooks, and
+forking. Start with the
 [README](../README.md) if you haven't installed the skills yet.
 
 ## Install and update
@@ -112,6 +113,19 @@ through their skills:
 
 > - CONTINUATION PROMPTS: Whenever asked for a prompt to paste into a new chat, or when a skill hands work to a fresh chat, use the `continuation-prompt` skill. If a prompt you receive opens with a short name alone on its first line (or a `Chat:` line) and you have a tool that sets the thread or session title, set it to that name before anything else; if you have no such tool, say nothing about it (where the optional title hook is installed, it has already set the title).
 > - ASSUMPTIONS DOCUMENTS: Before editing any `assumptions.md` (or a `*-assumptions.md`), load the `assumptions-document-writing` skill and read its "Editing an Existing Document" section — most edits to these files are made in passing by sessions doing something else, which is how the format drifts.
+
+## If your instructions restrict commits
+
+The skills commit their own work by default: a build commits each phase, and the
+requirements skills commit each document stage, so a run nobody watches leaves its work in
+history (`pre-commit-validation`, "Who Commits"). Your own instructions win over that
+default. A line such as "never commit unless I ask" stops every skill at a staged change with
+its commit message presented. To keep the rule for other work and let the method commit,
+carve the method out:
+
+> - GIT COMMITS: Enso Method skills commit by their own defaults, as `pre-commit-validation`'s "Who Commits" defines. For all other work, commit only when I ask.
+
+For an unattended run, the prompt that starts it can authorize commits instead.
 
 ## Optional Claude Code hooks
 

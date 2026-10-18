@@ -64,3 +64,7 @@ Every skill that ended at a commit staged its files and handed the commit to the
 - Users of the other skills report the same commit inconsistency. Extend the default to them one at a time, starting with `test-audit`, whose output is code like the implement chain's.
 - A session pushes to a branch that turned out to be shared or to release to production. Record the case here; the integration-branch list would then need a concrete signal rather than names and "the repository's instructions".
 - Held pushes pile up unreviewed in shared checkouts. The hold would then need a reminder, or the user may prefer pushing to `develop` by default.
+
+## Revised 2026-10-18: the requirements skills commit too
+
+Option 2's reason for leaving them out, that the user was about to review their documents, no longer holds: the reviews became recommended, not required, and an unattended run needs its work in history. The requirements skills now commit their documents by default and never push by default. See `review-technical-design-revises-in-place-decision-2026-10-18.md`.

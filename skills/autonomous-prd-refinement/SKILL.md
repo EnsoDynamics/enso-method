@@ -1,6 +1,6 @@
 ---
 name: autonomous-prd-refinement
-description: Review-and-fix loop that takes a drafted PRD, with its assumptions and mockups, to a state with no Medium or High finding left, run after prd-writing-standards and before the user's review and the technical design — full deliverable-review rounds until none finds a High, cheaper delta rounds over each round's fixes until none finds a Medium or High, then a final full round; mockups reviewed as design references, facts verified once, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
+description: Review-and-fix loop that takes a drafted PRD, with its assumptions and mockups, to a state with no Medium or High finding left, run after prd-writing-standards and before the user's recommended review and the technical design — full deliverable-review rounds until none finds a High, cheaper delta rounds over each round's fixes until none finds a Medium or High, then a final full round; mockups reviewed as design references, facts verified once, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
 user-invocable: true
 ---
 
@@ -36,7 +36,7 @@ Interruptions are expected: the run can take hours and outlast a session. State 
 Use this skill when:
 
 - A PRD has been drafted from source material, with its assumptions and mockups if it has them
-- No technical design exists yet; the user has not yet reviewed the PRD
+- No technical design exists yet
 - The PRD is big enough that one review round will not be the last: many criteria, several screens, or seams with other PRDs
 - Review rounds are already running on the PRD without this skill: it takes over from where they are (Phase 1, "Adopting a review already under way")
 
@@ -154,7 +154,7 @@ A PRD in a roadmap is often refined while sessions for its neighbours are writin
 - **A change another session's document needs** (a seam both sides must state the same way, a criterion of theirs that must change to fit this PRD, not one this PRD replaces) goes to that session as a message, through whatever channel the tooling offers, or as a note for the user to relay. Record it under **Hand-offs** in the state file.
 - **Agree a seam once.** When two PRDs must state a handoff the same way, settle the wording with the other session and record it under Hand-offs, so later rounds review against the agreed wording.
 - **A finding only another session can fix** (its side of a seam, a criterion of theirs that must change): the writer fixes this PRD's side, if it has one, and sends the rest as a hand-off with the proposed wording. When this PRD changed, the finding is marked `Fixed; rest handed off: {Hand-offs row}` and counts as fixed, so the change is reviewed like any other. Only when nothing in this PRD changed is it marked `Handed off: {Hand-offs row}`. Reviewers get the pending wording, so they do not raise it again each round.
-- **Staging is per file.** Stage only the run's own files. When a shared file mixes this run's lines with another session's uncommitted ones, say so in the completion report and let the user decide how it is committed.
+- **Staging is per file.** Stage only the run's own files. When a shared file mixes this run's lines with another session's uncommitted ones, leave it out of the commit, say so in the completion report, and let the user decide how it is committed.
 
 ---
 
@@ -304,7 +304,7 @@ Using the state file only:
 
 1. **Write the completion report** (below) from the state file while it still exists.
 2. **Delete the state file.** When the PRD is in a roadmap, also delete its entry's scope lines (directory, Reaches production, In and Not in this PRD, Depends on) from the PRD contracts, keeping **Shared contracts it owns** and **Questions it answers** (`prd-roadmap`, Step 5): the PRD now holds its own scope.
-3. **Stage** the run's own files and propose `docs({feature}): PRD refinement complete — {rounds} review rounds, {findings} findings fixed`. Put the **Noticed, out of scope** lines, the open hand-offs and handed-off findings, and the rejected Mediums and Highs with their reasons in the message body: once the state file is gone, the commit is their only durable home. **The skill does not run `git commit` unless the user explicitly says to.**
+3. **Commit** the run's own files as `docs({feature}): PRD refinement complete — {rounds} review rounds, {findings} findings fixed`. Put the **Noticed, out of scope** lines, the open hand-offs and handed-off findings, and the rejected Mediums and Highs with their reasons in the message body: once the state file is gone, the commit is their only durable home. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"), and then the files are staged and the message presented. It never pushes.
 4. **Output the report:**
 
 ```
@@ -320,7 +320,7 @@ Facts verified: {n}
 Hand-offs to other sessions: {list, or none}
 Out of scope, noticed and not acted on: {list, or none}
 
-Next: the user reviews the PRD, ideally with whoever owns the business decisions; then the technical design (`technical-design-writing-standards`).
+Next: the user's review of the PRD is recommended here, ideally with whoever owns the business decisions; then the technical design (`technical-design-writing-standards`).
 ```
 
 ---
@@ -350,7 +350,7 @@ Next: the user reviews the PRD, ideally with whoever owns the business decisions
 - Run two writers at once, or edit another session's lines in a shared document
 - Write to any external system, or read production beyond what `engineering-principles`, "Production Data" allows
 - Commit the state file or its facts
-- Run `git commit` unless the user explicitly says to
+- Commit files other than the run's own, or push (`pre-commit-validation`, "Who Commits")
 - Embed client-specific references (credential paths, private repo names); those belong in your house engineering standards (`docs/enso-method-setup-guide.md`, "Plugging in your house engineering standards")
 
 ---
@@ -395,4 +395,4 @@ State file:   (none, fresh run)
 
 ### Completion
 
-The report: 8 rounds (4 full, 4 delta); fixed High 2 · Medium 13 · Low 23, and 1 Low rejected; 3 screens redrawn; assumption RULE-010 added; one hand-off to the session writing the neighbouring exchanges PRD, about how both state the exchange seam. State file deleted; the PRD's files staged with the proposed commit message. The user reviews the PRD.
+The report: 8 rounds (4 full, 4 delta); fixed High 2 · Medium 13 · Low 23, and 1 Low rejected; 3 screens redrawn; assumption RULE-010 added; one hand-off to the session writing the neighbouring exchanges PRD, about how both state the exchange seam. State file deleted; the PRD's files committed. The user reads the PRD before the design starts.

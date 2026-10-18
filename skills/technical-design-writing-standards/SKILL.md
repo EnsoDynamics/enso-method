@@ -1,6 +1,6 @@
 ---
 name: technical-design-writing-standards
-description: Standards and process for writing technical design documents — architecture decisions, interfaces, data models, and integration points, including designs for changes to an existing system. Use to write a design from a PRD the user has reviewed, or to check one; autonomous-design-refinement follows the user's review of the design. Not implementation instructions.
+description: Standards and process for writing technical design documents — architecture decisions, interfaces, data models, and integration points, including designs for changes to an existing system. Use to write a design from a refined PRD, or to check one; the draft is committed and handed to review-technical-design, then autonomous-design-refinement. Not implementation instructions.
 user-invocable: true
 ---
 
@@ -41,13 +41,14 @@ A system can be mixed; say which parts are which. `autonomous-design-refinement`
 
 ### Steps
 
-1. **Read the PRD in full**, plus any PRD or design it builds on, and settle the posture above.
+1. **Read the PRD in full**, plus any PRD or design it builds on, and settle the posture above. Load `engineering-principles` and every house standard named on an `Engineering standards:` line in the project's `AGENTS.md` (or the user's global map); with none named, the conventions visible in the codebase are the house standard. The design is held to them from the first draft.
 2. **Work from the PRD outward, not from the code outward.** For each acceptance criterion, read the code and systems it touches until you know what already exists and what is missing. Stop there; a survey of the whole system is not needed.
 3. **Write the sections in the example structure below, designing only the difference**: the new or changed interfaces, data models and decisions, each decision with its rationale. For an existing system, add a short **Existing Code** section that records decisions, not a description: the posture in one line; what is reused, named in a line each; what is switched off (Salvage); and, under Preserve, behavior the design must keep that the code alone would not tell you. Don't describe how the existing code works, anywhere in the design; the implementer reads the code, and a description only goes stale. Keep the section to about a dozen lines.
 4. **Keep to the PRD.** The design never adds a requirement, and behavior the PRD doesn't ask for is out of scope. Technical choices you can make, make, and record why. A gap in the PRD goes in Open Questions; a business uncertainty also goes in the assumptions document per `assumptions-document-writing`.
 5. **Check before handing it over.** Every acceptance criterion is covered by something in the design, nothing is designed that no criterion asks for, and it can be read in one sitting.
-6. **For a design with hard-to-reverse decisions** — a new service, a schema or data model, a public interface — run `review-technical-design` next, before `autonomous-design-refinement`. It is optional; a design that follows an established pattern can skip it.
-7. **Once the user has reviewed the design** (with `review-technical-design`'s triage, when it ran), `autonomous-design-refinement` refines the PRD and design together to implementation-ready.
+6. **Commit the draft** as `docs({feature}): draft technical design`, with the assumptions document if it changed. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"). It keeps the review's changes one diff of their own.
+7. **Run `review-technical-design` in a fresh context**: a subagent, or a new chat where subagents aren't available. Its architecture pass starts from a design it sketches before reading this one, which the session that wrote the draft can't do. It revises the design in place and commits the revision, and it skips itself for a design that follows an established pattern.
+8. **Then `autonomous-design-refinement`** refines the PRD and design together to implementation-ready. Relay the review's report first: its verdict, its questions for the user and its sections worth reading. The user's own read of the design comes next when the user wants one: recommended, never required, and when to carry on follows `using-the-enso-method`, "Routing Rules".
 
 ---
 
@@ -59,7 +60,7 @@ Brief summary of what's being built and the key technical decisions. Link to the
 When the PRD comes from a PRD roadmap (`prd-roadmap`), the design also honors the full brief's settled decisions and the seams in the PRD contracts beside the roadmap (`{name}-prd-contracts.md`). It decides the shared contracts that document says this PRD owns, and extends — never redesigns — contracts an earlier PRD owns. It covers only what this PRD ships, not the whole roadmap.
 
 ### Architecture Decisions
-What choices are we making and why? Each decision should include rationale — not just "we chose X" but "we chose X because Y."
+What choices are we making and why? Each decision should include rationale — not just "we chose X" but "we chose X because Y," where Y is the requirement or constraint that decided it. The design names what it chose, never the options it beat ("Rejected Alternatives", below).
 
 - **Workload type:** Is this a REST API, queue consumer, cron job, event processor, web application?
 - **Starting point:** for new software, the seed project or existing repo whose patterns it copies — CI/CD, logging, configuration, project layout. The house engineering standards may name one; otherwise name the closest existing repo and say so. The method ships no seed projects.
@@ -148,6 +149,9 @@ This is a design document, not an implementation document. There should be no re
 
 ### Decision History
 State each decision and its rationale as it stands now. Who ruled on it and when, superseded versions, and dated correction notes belong in git history and the assumptions document, not the design. `Replaces:` and `Superseded by:` lines are pointers between documents, not history, and stay.
+
+### Rejected Alternatives
+No "alternatives considered" sections, comparison tables or options a decision beat. A later reader needs the constraint that decided the choice: it says what not to break, and when the decision can be revisited if the constraint goes away. A list of losing options adds nothing to either, it costs every later session context, and an implementer that reads one can drift toward it. The comparison a review made lives in its report and commit (`review-technical-design`).
 
 ### Unnecessary Detail
 A technical design document doesn't need to document every detail. Focus on:
