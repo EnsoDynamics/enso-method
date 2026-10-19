@@ -68,3 +68,7 @@ Every skill that ended at a commit staged its files and handed the commit to the
 ## Revised 2026-10-18: the requirements skills commit too
 
 Option 2's reason for leaving them out, that the user was about to review their documents, no longer holds: the reviews became recommended, not required, and an unattended run needs its work in history. The requirements skills now commit their documents by default and never push by default. See `review-technical-design-revises-in-place-decision-2026-10-18.md`.
+
+## Revised 2026-10-18: the test audit commits too
+
+As the Revisit list anticipated, `test-audit` now commits its tests, fixes and `test-audit.md` by default and pushes when the push lands on a feature branch, with no refactor pass. The new `delivery-audit` commits its completion phases like the requirements skills and never pushes by default. See `delivery-audit-and-prd-close-out-decision-2026-10-18.md`.

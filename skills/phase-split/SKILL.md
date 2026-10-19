@@ -211,6 +211,8 @@ The declaration is a structured write-up the user can check at a glance. For eac
 - **A compound criterion** — two outcomes that could each be verified alone, joined in one sentence ("by email and in-app") — when the right cut separates them. Split it in the PRD into two criteria that together say exactly what it said: retire its label, leaving it in the PRD as `AC-X-03 — retired, split into AC-X-09 and AC-X-10`; give the two the next free numbers (`prd-writing-standards`, "Stable Acceptance-Criterion Labels"); and update anything that cites the old label. A `Replaces:` line on the old criterion goes to whichever new one covers that part, or to both (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion"). That changes the wording, not the intent, and the PRD edit rides in the phase documents' commit.
 - **A cross-cutting criterion** — a constraint on everything the PRD builds rather than one capability ("every page requires sign-in"). The first phase that can verify it owns it; each later phase whose work it constrains also lists it as `AC-SEC-01 (also applies to this phase's work)` and proves it for what that phase adds.
 
+A completion phase added after the plan closes also lists criteria it does not own, as `AC-RET-03 (completes it; owned by phase 2)` ("Completion Phases"). That is not a third exception: the owning phase still holds each one.
+
 **Number phases in the order they will actually be executed.** The default execution model is strictly sequential: phase 1 is implemented, tested, and verified working before phase 2 begins, and so on, one phase per session, in id order (children in their parent's slot). So the numbering is not merely *a* valid ordering — it is **the** order the work will proceed in, and it must be the order a sensible engineer would naturally proceed in. Run two checks before declaring the split:
 
 1. **Dependencies point backward.** A phase may only depend on phases earlier in the sequence — if your draft has "Phases 4 and 7 must complete before Phase 3," the numbering is wrong; renumber so every dependency points backward.
@@ -394,6 +396,42 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 
 ---
 
+## Completion Phases
+
+`delivery-audit` adds completion phases once every planned phase of a PRD has closed and some criterion turns out not fully built, and `test-audit` adds one for a criterion it later finds unbuilt or broken past a small fix. They exist only once every planned phase is closed; before that, a gap goes into the next open planned phase as carried-forward work. This section owns their form; the audit decides what goes in them. A completion phase is an ordinary leaf: `implement-from-requirements` builds it, verifies it and writes its Closed line. It differs from a planned phase in four ways.
+
+- **It goes at the end, as the next top-level id.** After phases 1 to 6, the first completion phase is phase 7, the next phase 8. Nothing already in the plan changes id. The rule against appending trailing siblings is about a phase's remainder, which a completion phase is not; an unsplit PRD's first completion phase is phase 1, listing each criterion as `AC-RET-03 (completes it)`, and from then on the PRD has a plan and closes like a split one. The phase that owns each criterion keeps its Closed line, because that line records what its session built, and removing it would send the next build back into finished work.
+- **It completes criteria; it does not own them.** Each is listed as `AC-RET-03 (completes it; owned by phase 2)` under "Acceptance criteria covered". The criterion stays with its original phase, so every criterion is still in exactly one phase. The build proves the whole criterion, not only the missing part.
+- **Its top says where it came from,** so no one mistakes it for planned work: an `**Added by delivery audit:**` or `**Added by test audit:**` line above the parent pointers, and, in a plan table, the same words opening its What it does sentence.
+- **It carries the audit's findings,** one line per gap under "What the audit found missing", so the build starts from them instead of auditing again. That is the audit's record, not restated requirements.
+
+Gaps too big for one session are cut into several completion phases by the usual sizing (Step 2); usually they all fit one. A completion phase that turns out too large mid-build is re-split like any phase, and each child carries the marker line. A completion phase never holds anything but gaps: no improvement, refactor or test work. Phasing still delivers only existing scope.
+
+**Completion phase template:**
+
+```markdown
+# Phase 7: Complete multi-item returns and the refund method
+
+**Added by delivery audit:** 2026-10-18, after every planned phase closed. It builds what earlier phases left out of the criteria below.
+**Parent PRD:** docs/prds/customer-returns/customer-returns-prd.md
+**Technical design:** docs/prds/customer-returns/technical-design.md — relevant sections: "Return submission", "Confirm screen"
+
+## Summary
+Let one return cover several items, and show the refund method before the customer confirms.
+
+## Acceptance criteria covered
+AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by phase 4)
+
+## What the audit found missing
+- **AC-RET-03:** `returns/submit.py::create_return` takes one item, and the return form posts one.
+- **AC-RET-07:** the confirm screen (`web/confirm.tsx`) never shows the refund method.
+
+## Phase dependencies
+2 (return submission); 4 (the confirm screen)
+```
+
+---
+
 ## Rules and Constraints
 
 ### DO
@@ -421,7 +459,7 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 - Put an owner, a subject code, a track name, or anything but position in a phase id. Owners go in a table column; subjects go in the short-name.
 - Write a phase as a heading inside another phase's document, or write a "plan" document that holds several phases as sections — one phase, one file, always.
 - Write a split record at planning time, or report a plan as phases and sessions separately — a fresh plan is a flat list of phases, each one session; depth appears only when an already-referenced phase is re-split.
-- Create phases to house work discovered mid-implementation — discoveries are dispositioned per `implementation-lifecycle` (most dismissed, some filed), never phased. Phasing delivers existing scope; it is not a place to put new scope.
+- Create phases to house work discovered mid-implementation — discoveries are dispositioned per `implementation-lifecycle` (most dismissed, some filed), never phased. Phasing delivers existing scope; it is not a place to put new scope. A completion phase is not an exception: it holds criteria the PRD already had that a closed phase left unbuilt ("Completion Phases").
 - Order or design the split around assumed parallel execution — sequential one-phase-at-a-time is the default; parallelism is an occasional user-chosen exception, not a planning assumption.
 - Split the technical design into per-phase designs — there is one design per PRD, referenced by all phases.
 - Restate PRD acceptance criteria or technical-design content inside phase docs.
@@ -440,5 +478,6 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 | `technical-design-writing-standards` | Defines the single technical design per PRD that phase docs point into by section heading — the design is never split or duplicated per phase. |
 | `prd-roadmap` | The same job one level up: it cuts an idea too big for one PRD into right-sized planned PRDs, reusing this skill's seam principles at PRD scale. Each planned PRD, once written, comes here to be split into phases. |
 | `autonomous-design-refinement` / `implementation-readiness-check` | Should already have run against the PRD and technical design before this skill is invoked — this skill assumes the requirements are implementation-ready, it just decides whether they're too large for one session. |
+| `delivery-audit` | Checks that a finished PRD's criteria are built, and adds a completion phase in this skill's form ("Completion Phases") for each set of gaps. The one-phase-per-criterion rule is how it names the phase that owns each gap. |
 | `test-audit` | Audits a finished phase or PRD criterion by criterion: a phase document's "Acceptance criteria covered" list is the scope of a phase audit, and the one-phase-per-criterion rule is what makes a PRD audit add up. |
 | `continuation-prompt` | Produces the first leaf's copy-paste prompt when this skill was invoked directly: a chat-name line first (`ph2a1 …`), then the lineage block (PRD and phase by full title), pointers into the phase doc, valid once the phase-docs commit lands. |

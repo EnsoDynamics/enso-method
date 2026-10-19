@@ -1,6 +1,6 @@
 ---
 name: test-audit
-description: Independent audit, once a phase or a whole PRD is finished, of how well its tests prove each acceptance criterion, then fixing what it finds in the same chat. Grades every criterion's evidence Missing, Weak, Adequate or Strong by one question (would the suite notice if this broke?), breaks the code on purpose to see which tests notice, and writes the map to test-audit.md in the PRD directory. Then fills the gaps in a fixed order, missing before weak, until every criterion is at least Adequate; work that outlasts the chat continues in the next one through that file, with no phase documents. Use when a phase or PRD closes, when implement-from-requirements recommends it, or when the user asks to audit the tests of a finished phase or PRD, check them against its acceptance criteria, find untested criteria, or judge whether they are good enough. Not the end-of-session pass (test-hardening), and never for work without written acceptance criteria.
+description: Independent audit, once a phase or a whole PRD is finished, of how well its tests prove each acceptance criterion, then fixing what it finds in the same chat. Grades every criterion's evidence Missing, Weak, Adequate or Strong by one question (would the suite notice if this broke?), breaks the code on purpose to see which tests notice, and writes the map to test-audit.md in the PRD directory. Then fills the gaps in a fixed order, missing before weak, until every criterion is at least Adequate; work that outlasts the chat continues in the next one through that file, with no phase documents for test work. Use when a phase or PRD closes, after delivery-audit at the close of a split PRD, or when the user asks to audit the tests of a finished phase or PRD, check them against its acceptance criteria, find untested criteria, or judge whether they are good enough. Not the end-of-session pass (test-hardening), and never for work without written acceptance criteria.
 user-invocable: true
 ---
 
@@ -21,7 +21,7 @@ This skill reads the whole scope, its assessors take the criteria from the PRD t
 
 ## When to Use
 
-- A phase is closed, or every child of a split phase is, or a whole PRD is finished, and you want to know whether its criteria are really proven. `implement-from-requirements` recommends it when the last phase of a split PRD closes.
+- A phase is closed, or every child of a split phase is, or a whole PRD is finished, and you want to know whether its criteria are really proven. At the close of a split PRD it runs after `delivery-audit`, which checks that every criterion is built and adds completion phases for any that aren't; once nothing is left to build, `implement-from-requirements` or `delivery-audit` hands off here.
 - The user asks to audit the tests of a finished phase or PRD, to check them against its acceptance criteria, which criteria are untested, or whether the tests are good enough.
 - To continue fixing that an earlier audit left open: the continuation prompt re-runs this skill, which picks up from `test-audit.md`.
 
@@ -45,7 +45,7 @@ The user points at a document, and that document fixes the criteria. Never infer
 
 If what the user said fits more than one document, ask in one line. An unlabeled PRD (small ones may be) is cited by each criterion's bold title. **In every scope, a criterion with a `Superseded by:` line is left out,** listed as superseded with its pointer, never graded: its behavior was replaced on purpose, and grading it would ask for the old behavior back. One with `Superseded in part by:` is graded on the part still in force (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion").
 
-**Only built criteria are graded.** Pointing at a phase or an unsplit PRD says it is built. When the scope is a PRD or a split record whose phases are not all closed, criteria owned by a phase with no `**Closed:**` line are listed as Not built yet and left out.
+**Only built criteria are graded.** Pointing at a phase or an unsplit PRD says it is built. When the scope is a PRD or a split record whose phases are not all closed, criteria owned by a phase with no `**Closed:**` line are listed as Not built yet and left out. So is a criterion an open completion phase completes: its build is still to come.
 
 **A cross-cutting criterion**, one a phase document lists as also applying to its work, is graded in a phase audit for that phase's work only, and the grade is marked `this phase only`. A PRD audit always re-assesses it, across the work of the closed phases.
 
@@ -70,7 +70,7 @@ A criterion takes the grade of its least-proven required part, with one exceptio
 
 **Statuses, for rows that get no grade:**
 
-- **Not implemented:** no code does what the criterion says. First check whether the behavior was changed on purpose later, by a later-built criterion or a commit in the code's history (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one conflict check covers every such row in the audit). If a later PRD changed it, add the missing pointer pair and list the row as superseded. If the code does something else a person could have chosen, it is shipped behavior and stands (the lifecycle's shipped-behavior rule): list the row as changed outside the requirements and name it in the wrap-up for the user to record, whatever the history shows. Otherwise it is a delivery gap, not a test gap. Surface it in the wrap-up as an action item, recommending `implement-from-discovery` with the criterion as its lineage, and leave it out of remediation.
+- **Not implemented:** no code does what the criterion says. First check whether the behavior was changed on purpose later, by a later-built criterion or a commit in the code's history (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one conflict check covers every such row in the audit). If a later PRD changed it, add the missing pointer pair and list the row as superseded. If the code does something else a person could have chosen, it is shipped behavior and stands (the lifecycle's shipped-behavior rule): list the row as changed outside the requirements and name it in the wrap-up for the user to record, whatever the history shows. Otherwise it is a delivery gap, not a test gap: leave it out of remediation and handle it as Step 5's "A delivery gap" says.
 - **Person-checked:** only a person could check it, such as a stakeholder approving wording. Use it only when no test or script could check the criterion; "hard to automate" is not the bar.
 - **Not built yet:** see Scope.
 - **Superseded:** a later PRD replaced the criterion; the row shows its pointer.
@@ -119,13 +119,13 @@ A red check breaks the behavior on purpose and watches whether a test notices. A
 
 ### Step 4: Write `test-audit.md`
 
-Consolidate the sub-agents' records and the red-check results into the file (template below). Confirm every Not implemented row and every failing mapped test yourself before writing it down: the user will act on both. Then report in chat in the shape under "What the Chat Shows".
+Consolidate the sub-agents' records and the red-check results into the file (template below). Confirm every Not implemented row and every failing mapped test yourself before writing it down: the user or a build will act on them. Then report in chat in the shape under "What the Chat Shows".
 
 ### Step 5: Remediate, in the same chat
 
-If the user asked for the audit alone, stop here: stage `test-audit.md` per `pre-commit-validation`, present a `docs(scope): …` commit message with the repo named, and append DONE to this session's marker. Otherwise the report's Next line names what is being fixed first, and the work starts; "shall I fix these?" is the predictable question the 90% ask-gate exists to skip.
+If the user asked for the audit alone, stop here: commit `test-audit.md` per `pre-commit-validation` under a `docs(scope): …` message, with the repo named, and append DONE to this session's marker. Otherwise the report's Next line names what is being fixed first, and the work starts; "shall I fix these?" is the predictable question the 90% ask-gate exists to skip.
 
-**The target is every criterion in scope at Adequate or better.** Strong is optional: work it only on request, and recommend it for high-risk criteria still below it. A row this chat cannot raise leaves the target and goes under Waiting in the file, and the chat that puts it there tells the user: a blocked row, a criterion waiting on a code fix handed to the user, or one this chat could not raise for a stated reason. Never for lack of room in this chat: unfinished rows stay under To fix for the next one.
+**The target is every criterion in scope at Adequate or better.** Strong is optional: work it only on request, and recommend it for high-risk criteria still below it. A row this chat cannot raise leaves the target and goes under Waiting in the file, and the chat that puts it there tells the user: a blocked row, one this chat could not raise for a stated reason, or a row **waiting on delivery** ("A delivery gap", below). Never for lack of room in this chat: unfinished rows stay under To fix for the next one.
 
 **Tiers, in order:**
 
@@ -143,7 +143,9 @@ High-risk criteria go first within a tier, and a tier is finished before the nex
 - Is seen red before it counts, by Step 3's procedure against the behavior it proves, or is recorded `red check not possible: <why>`.
 - Follows the evidence standard and environment rules (`engineering-principles`; `test-hardening`, "Environment Rules for Real-Resource Tests"): real resources at the boundary, writes only to non-production systems, test data tagged, fixtures checked in.
 
-**When a new test finds the criterion broken,** and the code consistently does something else instead, first check whether the behavior was changed on purpose later, by a later-built criterion or a commit in the code's history (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one conflict check covers every such row in the run). If a later PRD changed it, add the missing pointer pair and list the row as superseded; otherwise the shipped behavior stands, and the row is listed as changed outside the requirements and named in the wrap-up. Either way the new test is dropped; an audit never reverts shipped behavior on its own. Otherwise the test is right and the code is wrong; never weaken the test. The work may already be in production, so if the break costs money, data or production correctness now, stop: "Critical finding, stopping to surface." Otherwise fix the code when the fix is small and plainly within the criterion. When it is bigger than the test work left, the row goes under Waiting and the fix goes to the user as an action item, recommending `implement-from-discovery`.
+**When a new test finds the criterion broken,** and the code consistently does something else instead, first check whether the behavior was changed on purpose later, by a later-built criterion or a commit in the code's history (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one conflict check covers every such row in the run). If a later PRD changed it, add the missing pointer pair and list the row as superseded; otherwise the shipped behavior stands, and the row is listed as changed outside the requirements and named in the wrap-up. Either way the new test is dropped; an audit never reverts shipped behavior on its own. Otherwise the test is right and the code is wrong; never weaken the test. The work may already be in production, so if the break costs money, data or production correctness now, stop: "Critical finding, stopping to surface." Otherwise fix the code when the fix is small and plainly within the criterion. When it is bigger than the test work left, it is a delivery gap.
+
+**A delivery gap,** a criterion Not implemented or broken in a way bigger than the test work left, is build work, not test work. Once every planned phase of the PRD is closed, write a completion phase for it in `phase-split`'s form ("Completion Phases"), marked `**Added by test audit:**`; gaps that share code go in one phase, and its "What the audit found missing" line names what is missing and, for a broken criterion, the test that failed and its failure. While planned phases are still open (a phase audit mid-PRD), add the gap instead to the next open planned phase as a `## Carried forward from Phase N` section (`implementation-lifecycle`). Either way the row goes under Waiting as **waiting on delivery**, naming that phase. Revert the failing test rather than commit it or leave it in the checkout; the build proves the criterion.
 
 **A question only a stakeholder can answer** (what the required value is, when the requirements don't say) goes to the assumptions document through `assumptions-document-writing`, never into `test-audit.md` (`implementation-lifecycle`, "A Decision Needs an Assumption Entry, Always").
 
@@ -152,10 +154,14 @@ High-risk criteria go first within a tier, and a tier is finished before the nex
 ### Step 6: Re-grade, record, hand off
 
 1. **Re-grade with fresh eyes.** Send the criteria this chat touched to one sub-agent under the Assessment Checklist, as in Step 2; the grades come from it, not from the chat that wrote the tests. This replaces a separate `test-hardening` pass.
-2. **Update `test-audit.md`:** the table, To fix, Waiting and the Status line, which reads `Done <date>` once nothing is left to fix.
+2. **Update `test-audit.md`:** the table, To fix, Waiting and the Status line. It reads `Done <date>` only when nothing is left to fix and no row waits on delivery; a blocked row can still be waiting. While rows wait on delivery it names them, as in `Waiting on delivery: AC-RET-08 (phase 8)`.
 3. **Run the full suite**, naming the command: green apart from pre-existing failures, which are named.
-4. **Stage and validate** per `pre-commit-validation`: the tests, any code fixes, and `test-audit.md`. Present the commit message, `test(scope): …` or `fix(scope): …` when it fixed code, with the repo named; the user commits.
-5. **Hand off or close.** If the target isn't met, write the next chat's prompt with `continuation-prompt` before presenting the commit, so its edits to `test-audit.md` ride in it; the file is the governing document and its To fix list is the chain. Line 3 of the lineage reads `This chat: continues its test audit, fixing AC-…`, and the first action is to re-run this skill on the same scope. If the target is met there is no prompt: say so, and recommend Strong in one line for any high-risk criterion still below it.
+4. **Commit** per `pre-commit-validation`: the tests, any code fixes, any completion phase or carried-forward section and plan-table row Step 5 wrote, and `test-audit.md`, under `test(scope): …`, or `fix(scope): …` when it fixed code, with the repo named. Committed by default, and pushed when the push lands on a feature branch ("Who Commits").
+5. **Hand off or close.** Write the next chat's prompt with `continuation-prompt` before the commit, so its edits to `test-audit.md` ride in it; the file is the governing document. Which prompt, taking the first case that applies:
+   - **A completion phase this audit added is open:** `implement-from-requirements` on it, with that phase's lineage (`This chat: implements it.`). Building comes before proving, whatever is left to fix; when the last open leaf closes, the build hands off by its own wrap-up rule (`implement-from-requirements`, Phase 8), which brings this audit back.
+   - **Rows are left to fix:** this skill on the same scope. Line 3 of the lineage reads `This chat: continues its test audit, fixing AC-…`, and the first action is to re-run this skill.
+   - **The only rows waiting on delivery were carried into an open planned phase:** no prompt. The build's next phase delivers them, and the PRD's close re-audits them; say so.
+   - **The Status line reads Done.** When the audit covered the whole PRD, every phase is closed and a whole-PRD delivery audit has run, the PRD's track is complete: say so, with no prompt, and for a PRD on a PRD roadmap name its next planned PRD in one line (`continuation-prompt`, "A PRD roadmap is not a track"). When every phase is closed but no whole-PRD delivery audit has run, the prompt is `delivery-audit` on the whole PRD. Otherwise the audit of its scope is done, with no prompt. Either way, recommend Strong in one line for any high-risk criterion still below it.
 6. **Append DONE** to this session's marker, naming the terminal state.
 
 The wrap-up takes the shape under "What the Chat Shows". Its headline names the audit, so the user doesn't re-run it, and a critical finding comes before everything else.
@@ -169,7 +175,7 @@ One per PRD directory, written by this skill and updated in place by every later
 ```markdown
 # Test audit: Customer Returns
 
-**Status:** 2 to fix (AC-RET-03, AC-RET-02); 1 waiting (AC-RET-04)
+**Status:** 2 to fix (AC-RET-03, AC-RET-02); 1 waiting (AC-RET-04, blocked)
 **Last audit:** 2026-10-04, whole PRD, at `a1b2c3d`
 **PRD:** [customer-returns-prd.md](./customer-returns-prd.md)
 
@@ -207,7 +213,7 @@ One per PRD directory, written by this skill and updated in place by every later
 
 The file holds the full map; the chat shows only what needs attention. No legend, no list of what passed, no account of how the audit ran.
 
-**After the audit (Step 4):** a headline saying how many criteria have test gaps; a table of just those criteria, in the order they will be fixed, each with what's wrong in one line (past about fifteen rows, the high-risk ones and "and N more in the file"); the user's actions, from Waiting and Not implemented rows; then what happens next and the file's path. With no gaps, the headline and the path are the whole report.
+**After the audit (Step 4):** a headline saying how many criteria have test gaps; a table of just those criteria, in the order they will be fixed, each with what's wrong in one line (past about fifteen rows, the high-risk ones and "and N more in the file"); the user's actions, from blocked Waiting rows, and the phase each delivery gap went to; then what happens next and the file's path. With no gaps, the headline and the path are the whole report.
 
 ```markdown
 **Test audit, Customer Returns (whole PRD): 2 of 6 criteria have test gaps.** 3 are Adequate or better; 1 is blocked.
@@ -222,7 +228,7 @@ The file holds the full map; the chat shows only what needs attention. No legend
 **Next:** writing a test for AC-RET-03. Full map: `docs/prds/customer-returns/test-audit.md`
 ```
 
-**At the wrap-up (Step 6):** a headline with the gaps fixed out of the gaps found; what is still open and where it goes; how the result was checked; the user's actions and any Strong recommendation; then the commit message and, when gaps remain, the next chat's prompt.
+**At the wrap-up (Step 6):** a headline with the gaps fixed out of the gaps found; what is still open and where it goes; how the result was checked; the user's actions and any Strong recommendation; then the commit and, when gaps remain or rows wait on delivery, the next chat's prompt.
 
 ```markdown
 **Test audit, Customer Returns (whole PRD): 2 of 2 gaps fixed.** Every criterion is now Adequate or better except AC-RET-04 (blocked). Re-graded by a fresh reviewer; full suite green (`pytest`).
@@ -269,7 +275,7 @@ Report one record per criterion with these fields. Observations outside the crit
 - Grade Strong without red checks on every required part
 - Red-check a test that reaches production, or break a guard on whether, where or how much the code writes or sends
 - Overwrite a file someone else edited during a red check, or leave a check unrestored
-- Plan remediation in phase documents, a PRD amendment or a change directory (a missing `Superseded by:` pointer pair the conflict check finds is not remediation)
+- Plan remediation in phase documents, a PRD amendment or a change directory (a missing `Superseded by:` pointer pair the conflict check finds is not remediation, and a delivery gap's completion phase is build work, not test remediation)
 - Write a test that traces to no criterion in scope, or fix pre-existing failures unrelated to the criteria
 - Weaken a test to make it pass against code that breaks the criterion
 - Work the Strong tier unasked
@@ -281,11 +287,11 @@ Report one record per criterion with these fields. Observations outside the crit
 | Skill | Relationship |
 |-------|-------------|
 | `test-hardening` | The per-session pass this skill checks after the fact. Same grades, same scope boundary, same evidence rules: it hardens one session's work, and this skill grades and repairs the finished whole. |
-| `implement-from-requirements` | Recommends this skill when the last phase of a split PRD closes. Its per-phase test hardening does not replace it. |
+| `implement-from-requirements` | Hands off to this skill when the last completion phase of a split PRD closes. Its per-phase test hardening does not replace it. |
+| `delivery-audit` | Runs before this skill at the close of a split PRD, and hands off to it when it finds no gaps. Same statuses and conflict rules; a delivery gap this skill finds later becomes its own completion phase, in the same form. |
 | `phase-split` | A phase document's "Acceptance criteria covered" list is the scope of a phase audit, and its rule that every criterion lands in exactly one phase is what makes a PRD audit add up. |
 | `implementation-lifecycle` | Remediation runs under its session discipline; the audit steps are the review mode it describes. It names `test-audit.md` as this skill's own record, never a destination for discovered work. |
 | `engineering-principles` | The testing evidence standard the grades encode. |
 | `deliverable-review` | Runs on any implementation change remediation makes, before the re-grade. |
-| `continuation-prompt` | Writes the next chat's prompt when remediation outlasts a chat, with `test-audit.md` as the governing document and its To fix list as the chain. |
+| `continuation-prompt` | Writes the next chat's prompt when remediation outlasts a chat or a completion phase this audit added needs building, with `test-audit.md` as the governing document. |
 | `pre-commit-validation` | The commit boundary for remediation's tests, fixes and the audit file. |
-| `implement-from-discovery` | Where a Not implemented criterion, or a broken one whose fix is bigger than the test work left, goes. |

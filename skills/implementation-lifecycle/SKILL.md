@@ -29,6 +29,8 @@ Paths above show `docs/prds/`; a `docs/changes/` directory is identical.
 
 **Upstream of the PRD, when an idea was too big for one:** a full brief and a PRD roadmap in `docs/roadmaps/{name}/` (`prd-roadmap` owns them). The full brief holds decisions that govern every PRD cut from it; the roadmap orders the planned PRDs. They are inputs to requirements work, not entities an implement session maintains. The one exception is the roadmap's Status column, which moves when a PRD is written and when its work reaches production.
 
+**At the end of a split PRD, completion phases:** phase documents `delivery-audit` or `test-audit` adds after every planned phase has closed, when a criterion turns out not fully built, marked `**Added by delivery audit:**` or `**Added by test audit:**` at the top. `phase-split` owns their form ("Completion Phases"). They carry criteria the PRD already had, never discovered work, and are never a destination for filed work.
+
 **Beside them, once a test audit has run:** `test-audit.md` in the PRD's directory, the map of each criterion's test evidence. `test-audit` owns it, and only a `test-audit` session writes it; it is never a destination for discovered work.
 
 **PRD and Technical Design are the source of truth.** Code implements what they say. If code and docs disagree, figure out which is right — fix the wrong one. Never implement something different from what the docs say without updating the docs first — and that includes ad hoc fixes to work delivered long ago: amending the PRD that owns the behavior is always allowed and is the cheapest thing a session can do. A change directory (`prd-writing-standards`, storage convention) is for work the user chooses to write up on its own, never a way around an amendment. When a later PRD or change directory changes behavior an earlier one defined, the later one owns it and the earlier one is not rewritten (see "When Later Work Changes Earlier Requirements" below).
@@ -175,7 +177,7 @@ It runs at these points, and each skill carries its own step:
 | `autonomous-design-refinement`, pass 1 | The whole PRD, with findings resolved as questions in the run; at completion, again for criteria the run added or changed after pass 1 |
 | `implementation-readiness-check`, when run on its own | The whole PRD |
 | `implement-from-requirements`, after sizing and before building | The criteria this session builds, narrowed by the last recorded check; with none, the whole PRD, recorded for later phases |
-| `implement-from-discovery`, `test-audit`, and anywhere else code is about to change to match a criterion | Amending: the criterion, both ways. Matching code to a criterion it consistently contradicts: only whether a later-built criterion changed it; the shipped-behavior rule covers the rest. Skipped when a check in this session already covered it |
+| `implement-from-discovery`, `delivery-audit`, `test-audit`, and anywhere else code is about to change to match a criterion | Amending: the criterion, both ways. Matching code to a criterion it consistently contradicts: only whether a later-built criterion changed it; the shipped-behavior rule covers the rest. Skipped when a check in this session already covered it |
 
 **The test tripwire catches what the check missed.** Before changing the expected result of an existing test the session did not write, or deleting one, check that something accounts for the change: a criterion or Technical Design decision the session builds, amends or enforces requires the new expectation, or, where no criterion speaks to the behavior, the defect the fix serves (its ticket, incident or report) does. A test that a criterion's own change forces to change is accounted for. If nothing accounts for it, the session is changing behavior nobody declared: resolve it by the Doc Divergence rule (`implement-from-requirements`), which ends either in a criterion that accounts for it (an amendment, or a `Replaces:` line and its back-pointer) or in putting the behavior back. Renaming or restructuring a test without changing what it expects does not trip it.
 
@@ -481,7 +483,7 @@ successor dispatch and distinguishes a delivered phase from a completed chain.
 
 ### Completed — Remainder Filed Into Future Phases
 
-The current phase (or task) is done, and follow-up work discovered along the way — the survivors of the Materiality Gate, not every observation — is filed into the future phase docs where it naturally belongs. This is the preferred home for gate-surviving discovered work whenever a split exists — those docs get loaded automatically when `implement-from-requirements` builds the phase, so nothing is tossed into the void.
+The current phase (or task) is done, and follow-up work discovered along the way — the survivors of the Materiality Gate, not every observation — is filed into the future phase docs where it naturally belongs, never a completion phase (`phase-split`, "Completion Phases"), which holds only the gaps its audit found. This is the preferred home for gate-surviving discovered work whenever a split exists — those docs get loaded automatically when `implement-from-requirements` builds the phase, so nothing is tossed into the void.
 
 ### Blocked — Surfaced to the User
 

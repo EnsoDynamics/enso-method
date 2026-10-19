@@ -22,9 +22,10 @@ Read the repo before choosing. Everything for one piece of work lives in `docs/p
 | A reviewed technical design | `autonomous-design-refinement`, after the user's read of it when the user wants one. A `{name}-design-refinement-state.md` in the directory means a run is in progress: resume it |
 | Refined requirements | `implement-from-requirements` |
 | Phase documents | `implement-from-requirements` for the first leaf phase, in plan-table order, without a `**Closed:**` line |
-| Every phase closed | Recommend `test-audit` in a fresh chat |
+| Every phase closed, no whole-PRD delivery audit yet (no `delivery audit complete (whole PRD)` commit) | `delivery-audit` on the whole PRD, in a fresh chat. The completion phases either audit adds, marked `**Added by delivery audit:**` or `**Added by test audit:**` at the top, are phase documents like any other: the row above builds them |
+| Every phase closed after a whole-PRD delivery audit | `test-audit` on the whole PRD, in a fresh chat; it continues an existing `test-audit.md` and re-checks only what changed since its last audit. The PRD is complete when that run ends with `Done`. Never declare it complete from the file alone: a completion phase built since the last audit changes what it must check |
 
-Four stages leave no file: a finished PRD refinement (its `PRD refinement complete` commit, or `PRD refinement stopped` when the user ended it with findings open, which its body lists; a small PRD's one `deliverable-review` round commits under the same subject), the design review (its `technical design review` commit, which it makes even when it changed nothing or skipped itself), a finished design refinement (its `design refinement complete` commit, or `requirements refinement complete` from before the skill was renamed) and a build that was not split (its feature commit). Read them from `git log -- <directory>`. The PRD refinement and the design review commit empty when they changed nothing (`pre-commit-validation`, "Who Commits"), and a path-limited log leaves empty commits out. So also list the subjects since the directory's first commit, `git log --format=%s $(git log --reverse --format=%H -- <directory> | head -1)..HEAD`, and look for the stage's subject with the same scope as that commit. Ask the user when neither says. The user's reviews are never a stage to detect: they are recommended, not required.
+Five stages leave no file: a finished PRD refinement (its `PRD refinement complete` commit, or `PRD refinement stopped` when the user ended it with findings open, which its body lists; a small PRD's one `deliverable-review` round commits under the same subject), the design review (its `technical design review` commit, which it makes even when it changed nothing or skipped itself), a finished design refinement (its `design refinement complete` commit, or `requirements refinement complete` from before the skill was renamed), a delivery audit that found no gaps (its `delivery audit complete (whole PRD)` commit) and a build that was not split (its feature commit). Read them from `git log -- <directory>`. The PRD refinement, the design review and the delivery audit commit empty when they changed nothing (`pre-commit-validation`, "Who Commits"), and a path-limited log leaves empty commits out. So also list the subjects since the directory's first commit, `git log --format=%s $(git log --reverse --format=%H -- <directory> | head -1)..HEAD`, and look for the stage's subject with the same scope as that commit. Ask the user when neither says. The user's reviews are never a stage to detect: they are recommended, not required.
 
 ## The Order
 
@@ -42,7 +43,14 @@ Four stages leave no file: a finished PRD refinement (its `PRD refinement comple
 - `implement-from-requirements`: sizes the work, splits it with `phase-split` when it is too big for one session, and builds the first phase. Run `phase-split` on its own only to plan the phases without building.
 - `continuation-prompt`: hands each next phase to a fresh session. In Codex, `phase-chain` runs an authorized sequence of phases on its own.
 
-**3. Prove it works.** Inside every build, without being asked: `deliverable-review`, then `test-hardening`, then `pre-commit-validation`. Then the build commits, runs `refactor-pass`, and pushes a feature branch (a push to `develop` or `main` waits for the user's word), unless the user has said otherwise; when the last phase of a PRD closes, `test-audit` is recommended for a fresh chat.
+**3. Prove it works.** Inside every build, without being asked: `deliverable-review`, then `test-hardening`, then `pre-commit-validation`. Then the build commits, runs `refactor-pass`, and pushes a feature branch (a push to `develop` or `main` waits for the user's word), unless the user has said otherwise.
+
+**4. Close out the PRD.** When the last phase of a split PRD closes, its build hands off to two audits, each in a fresh chat, before the PRD is done:
+
+- `delivery-audit`: is every acceptance criterion built? Gaps become completion phases at the end of the plan, marked at the top as added by the audit, and `implement-from-requirements` builds them like any other phase.
+- `test-audit`: once nothing is left to build, do the tests prove every criterion? It fills the gaps, missing tests first, and its `test-audit.md` carries the work across chats until its Status line says `Done`.
+
+Either audit can also be pointed at a single closed phase when the user asks.
 
 ## Along the Way
 
@@ -55,6 +63,6 @@ Four stages leave no file: a finished PRD refinement (its `PRD refinement comple
 ## Routing Rules
 
 - **The two reviews are recommended, not required.** The refined PRD and the reviewed technical design are where human judgment goes in best. At each, say it is a good point for the user's review and what to read, then carry on when the user says to, or straight away when the user, or the prompt that started the run, asked to go through without stopping. Nothing refuses to proceed because a review didn't happen: like an assumption, an unreviewed document is a green light, and the user's corrections are folded in whenever they arrive. Beyond these, the user is not asked about requirements again; they start each next phase and send assumptions to stakeholders.
-- **The requirements skills and the builds commit their own work** unless the user says not to (`pre-commit-validation`, "Who Commits"). The requirements skills never push by default; builds push when the push lands on a feature branch.
+- **The requirements skills, the builds and the audits commit their own work** unless the user says not to (`pre-commit-validation`, "Who Commits"). The requirements skills and the delivery audit never push by default; builds and the test audit push when the push lands on a feature branch.
 - **Requirements come before the build.** A request to build something new with no PRD starts at `prd-writing-standards`, or `prd-roadmap` when it is bigger than one PRD.
 - **Start at the stage the work has reached.** Existing documents are not rewritten to restart the sequence.

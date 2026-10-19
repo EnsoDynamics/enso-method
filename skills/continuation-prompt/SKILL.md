@@ -19,7 +19,7 @@ Three problems it exists to fix:
 ## When to Use
 
 - The user asks for a prompt to paste into a **new** chat, in any wording that means starting a fresh session.
-- A skill hands work to a fresh chat: `phase-split` after writing phase docs when the user invoked it directly (called from an implement session it produces no prompt — that session builds the first leaf, and its wrap-up produces the next one), `implement-from-requirements` at wrap-up when a next phase exists, `prd-roadmap` for the first planned PRD of the roadmap it just wrote, `test-audit` when its remediation outlasts the chat.
+- A skill hands work to a fresh chat: `phase-split` after writing phase docs when the user invoked it directly (called from an implement session it produces no prompt — that session builds the first leaf, and its wrap-up produces the next one), `implement-from-requirements` at wrap-up when a next phase or the PRD's closing audit exists, `prd-roadmap` for the first planned PRD of the roadmap it just wrote, `delivery-audit` to the build of its first completion phase or to the test audit, `test-audit` when its remediation outlasts the chat or a completion phase it added needs building.
 - A prompt already given was wrong (bad name, too long, stale) and the user wants it regenerated. Re-run the whole skill; if only the name was wrong, only the name changes.
 - A skill or the user invokes it at the **end of a track** — the unit just finished has no successor in its own chain. That is a legitimate invocation, and its correct output is a statement that the track is complete and **no prompt**. See the gate below.
 
@@ -33,7 +33,7 @@ A **context package** is a message from this chat to another chat that is *alrea
 
 ## Before Step 1: Confirm a Next Unit Exists in This Track, and Name What It Serves
 
-This skill continues a track. It does not choose one. Before drafting anything, answer one question from the governing document: **is there a next unit of work in the chain the finished unit belongs to?** The chain is the one that document defines — the next phase or sub-phase of the same PRD, change, or phase plan that is not yet closed, in the order the document states. A test audit's governing document is its `test-audit.md` and its chain is that file's To fix list (`test-audit`): a next unit exists while its Status line still lists criteria to fix.
+This skill continues a track. It does not choose one. Before drafting anything, answer one question from the governing document: **is there a next unit of work in the chain the finished unit belongs to?** The chain is the one that document defines — the next phase or sub-phase of the same PRD, change, or phase plan that is not yet closed, in the order the document states. A test audit's governing document is its `test-audit.md` and its chain is that file's To fix list (`test-audit`): a next unit exists until its Status line says `Done`: first any open completion phase the audit added, built by `implement-from-requirements`, then the audit again for what is left to fix. A row carried into an open planned phase is the build's work, not a unit of this chain.
 
 - **If there is, continue.** That unit is the prompt's subject and every step below applies to it.
 - **If there is not — the unit just finished was the last in its track — produce no prompt.** Say the track is complete, name what closed it (date and commit hashes), and stop. That is this skill's correct output at the end of a track, not a failure to run it.
@@ -42,7 +42,9 @@ What the second case forbids, and why. When a track ends, the next thing to work
 
 The one exception is an explicit ask. If the user names what to continue with — a different track, a change directory, a ticket — that is a request, not an inference, and the skill runs normally for it. What it never does is supply the choice itself.
 
-**A PRD roadmap is not a track.** When the last phase of a PRD that came from a PRD roadmap (`prd-roadmap`) closes, the roadmap's next planned PRD is not the next unit of that track. Moving on to it is a decision the user makes after the finished PRD reaches production, and the roadmap may be reordered by then. Say the PRD is complete, name the roadmap's next planned PRD in one line, and write no prompt unless asked.
+**A split PRD's track ends at its test audit, not its last phase.** After the last planned leaf closes, the chain goes on: `delivery-audit` on the whole PRD, then any completion phases it adds, in plan order, then `test-audit` and its To fix list. The track is complete when a whole-PRD test audit, run with every phase closed after the whole-PRD delivery audit, ends with `Done`, which it says only when nothing is left to fix and nothing waits on delivery. Completion phases either audit adds are units of the same track. The two audits are part of the PRD that was already being built, so prompting for them is continuing the track, not choosing a new one.
+
+**A PRD roadmap is not a track.** When the track of a PRD that came from a PRD roadmap (`prd-roadmap`) ends, at its test audit, the roadmap's next planned PRD is not the next unit of that track. Moving on to it is a decision the user makes after the finished PRD reaches production, and the roadmap may be reordered by then. Say the PRD is complete, name the roadmap's next planned PRD in one line, and write no prompt unless asked.
 
 If a calling skill invokes it and the answer to the question above is no, the caller's premise was wrong, and the right output is still no prompt.
 
@@ -51,8 +53,8 @@ If a calling skill invokes it and the answer to the question above is no, the ca
 The second question, asked of the unit the prompt is for: **what does it serve, and can I say so without inventing anything?** Fill the lineage block from Step 3 now, from the documents, before drafting anything else. The block has three lines and every line is checkable:
 
 1. The PRD, by the full title in its H1 (`Order Notifications`), never the directory slug or the chat-name abbreviation.
-2. The phase, by its id **and** the full title from the phase doc's H1 (`Phase 2a1 — Delivery receipts from the SMS provider`). For a leaf below a split parent, the leaf's own title; a positional id already carries the ancestry. An unsplit PRD has no phase: line 2 reads `whole PRD, not split`. A test audit of a whole split PRD reads `whole PRD, all phases`.
-3. What this chat does for them, in one line: `implements it`, or `fixes <the thing> that blocks AC-DLV-04 of it`. A fix names the acceptance criterion it unblocks — the label, from the phase doc's "Acceptance criteria covered" — not a symptom. Chats that do not build use their activity's verb: `refines its PRD` (PRD refinement), `refines its PRD and design` (design refinement), `splits it into phases`, `drafts its technical design`, `investigates <x> for it`, `reviews it`.
+2. The phase, by its id **and** the full title from the phase doc's H1 (`Phase 2a1 — Delivery receipts from the SMS provider`). For a leaf below a split parent, the leaf's own title; a positional id already carries the ancestry. An unsplit PRD has no phase: line 2 reads `whole PRD, not split`. A test audit or delivery audit of a whole split PRD reads `whole PRD, all phases`.
+3. What this chat does for them, in one line: `implements it`, or `fixes <the thing> that blocks AC-DLV-04 of it`. A fix names the acceptance criterion it unblocks — the label, from the phase doc's "Acceptance criteria covered" — not a symptom. Chats that do not build use their activity's verb: `refines its PRD` (PRD refinement), `refines its PRD and design` (design refinement), `splits it into phases`, `drafts its technical design`, `investigates <x> for it`, `reviews it`, `audits whether it is built` (delivery audit), `audits its tests` (test audit).
 
 The shapes that legitimately have no PRD phase are listed in `implementation-lifecycle` ("Every Session Names What It Serves"): ticket-tracked work, a declared ops thread with a session file, a component defect reported from outside, requirements work on the PRD itself, methodology work. Each puts its own lineage on line 1 in place of the PRD, and `no phase — <shape>` on line 2; Step 3 item 2 shows the rendered block. One variant: writing a planned PRD from a PRD roadmap, where the PRD does not exist yet, puts the roadmap's full title on line 1 and the planned PRD on line 2 — `In service of: Acme Cloud PRD Roadmap` / `Cloud Ingestion — planned PRD, first in the roadmap` / `This chat: writes and refines its PRD.`
 
@@ -122,6 +124,7 @@ The name is the first line of the prompt and the argument to the tool's rename c
    | `prd-roadmap` | `prd rdmap` |
    | `investigate-question`, an issue or ad-hoc investigation | `invest` |
    | `deliverable-review`, a code or PR review | `review` |
+   | `delivery-audit` | `delivery audit` |
    | `test-audit` | `test audit` |
    | `refactor-pass` | `refac` |
    | an ad-hoc operational thread (a stakeholder volley, an incident) | `ops` |
@@ -130,10 +133,11 @@ The name is the first line of the prompt and the argument to the tool's rename c
    The token never opens the name (the tab is for finding the chat, and the unit id finds it) and is never spelled out or improvised: `ph3b2 orderN implementation` and `ph3b2 orderN build` are both wrong. A bare `refine` is wrong too: two skills refine, and the token has to say which document stage the chat is in, `prd refine` for the PRD's review rounds before any design exists and `tdd refine` for refining the PRD, Technical Design and assumptions together once the design exists. When the name runs past the cap, pay for the token out of the middle: shorten the subject noun first, then the project tag. Never drop the unit id, the activity, or a tag the work has.
 4. **Reuse the identifier the documents use, verbatim and with its casing.** `PROJ-4271`. The name must match what the user will grep for. A bare positional id from `phase-split` (`2b1`) takes the `ph` prefix so it reads as a phase: `ph2b1`.
 5. **Abbreviate the project tag, never a unit id the documents give.** Under the target the words stay whole (`account alerts`). Past it, filler goes first (`expanded`, `completion`), then the tag collapses to its distinguishing word plus the initial of the word after it: `orderN` for Order Notifications, `accountA` for Expanded Account Alerts. The phase id stays whole. A PRD standing in as the unit has no id, so rule 6 applies to it.
-6. **No dates, no articles, no punctuation that the tool might strip, and never the PRD title as written.** When the PRD itself is the unit (writing, reviewing, refining, splitting or packaging it), the project tag alone leads, with no phase id or subject noun: `kiln prd refine`.
+6. **No dates, no articles, no punctuation that the tool might strip, and never the PRD title as written.** When the PRD itself is the unit (writing, reviewing, refining, splitting, packaging or auditing it), the project tag alone leads, with no phase id or subject noun: `kiln prd refine`.
 
 | Work | Name |
 |------|------|
+| The Kiln PRD's closing audits (the PRD is the unit) | `kiln delivery audit`, `kiln test audit` |
 | The Kiln PRD itself, through its document stages | `kiln prd`, `kiln prd refine`, `kiln tdd`, `kiln tdd review`, `kiln tdd refine`, `kiln phase split`, `kiln stakeholder pkg` |
 | A PRD phased under `phase-split`'s positional ids: phase 2b1 of User Onboarding (the id already carries its parents, so no separate phase token) | `ph2b1 userO impl` |
 | Order Notifications phase 3b2, but the chat refines its PRD and design before any code | `ph3b2 orderN tdd refine` |

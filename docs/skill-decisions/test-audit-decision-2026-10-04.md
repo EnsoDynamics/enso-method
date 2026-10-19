@@ -58,3 +58,7 @@ Phase documents already listed their criteria by label, and a re-split put each 
 - Fixing regularly takes three or more chats per PRD. The batching rule would then need concrete anchors, like `phase-split`'s calibration.
 - A project has a mutation-testing tool. Red checks could run through it.
 - `test-hardening` adopts red checks for the tests it adds. Its grade note and the "credible" wording would then change.
+
+## Revised 2026-10-18: the PRD close-out
+
+A split PRD now closes with `delivery-audit`, then `test-audit`, each handed off in a fresh chat rather than recommended. A Not implemented criterion, or a broken one past a small fix, no longer goes to `implement-from-discovery`: the test audit writes a completion phase for it (`phase-split`, "Completion Phases"). The test audit also commits by default. See `delivery-audit-and-prd-close-out-decision-2026-10-18.md`.

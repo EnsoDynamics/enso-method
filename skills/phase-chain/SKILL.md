@@ -240,11 +240,17 @@ observed status. Do not claim the entire chain is done at this boundary.
 
 ## Stop truthfully
 
+- **The closing audits are not chain units.** When the last leaf of a split PRD
+  closes, the PRD's closing audit follows in a fresh chat, as
+  `implement-from-requirements` hands off. The chain presents that prompt and stops;
+  it never dispatches an audit as a phase.
 - **Chain complete:** verify every unit within the kickoff scope is complete and
   all required end-of-chain PR/merge/deployment/verification steps are finished.
   Check governing docs for remaining acceptance criteria and pending human actions.
   Report completion with delivery evidence; create no successor. Do not claim the
-  larger PRD complete when the user authorized only a subset.
+  larger PRD complete when the user authorized only a subset. When the scope is a
+  whole split PRD, hold the end-of-chain merge and deployment until its closing
+  audits are done, and report the phases delivered, never the PRD complete.
 - **Blocked:** keep working on permitted, useful checks/fixes first. Stop when a
   material issue cannot be resolved within scope, a required approval is absent,
   an explicit stop-to-replan condition fires, ownership is ambiguous, or an

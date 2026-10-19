@@ -61,3 +61,7 @@ The user wants to run everything before implementation unattended, from an outsi
 - A design visibly flip-flops between two runs of the review. Record the case; the "a swap back needs a defect in the swap" rule failed.
 - Designs keep regrowing "alternatives considered" sections through refinement or by hand. Conformance in `autonomous-design-refinement` would then need a row for them.
 - Unattended runs stall on a pause that only a person can answer more than occasionally. That pause needs a state an orchestrator can read, or a default.
+
+## Revised 2026-10-18: the test audit commits too
+
+Later the same day `test-audit` joined the implement chain's default: it commits its work and pushes when the push lands on a feature branch. See `delivery-audit-and-prd-close-out-decision-2026-10-18.md`.

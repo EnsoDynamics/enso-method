@@ -65,8 +65,11 @@ gaps, researches each question against the real code and data, and
 writes the answers back into the PRD and design, recording business decisions as
 assumptions for stakeholders to confirm, until nothing is left to guess. Stages 2 and 3 run
 once per phase: a phase is built, reviewed, its tests hardened, and committed, then `continuation-prompt`
-hands the next one to a fresh session. An idea too big for one PRD first goes through
-`prd-roadmap`.
+hands the next one to a fresh session. When the last phase closes, stage 4 checks the whole
+PRD: `delivery-audit` confirms every acceptance criterion was actually built and adds
+completion phases for anything missing, which are built like any other phase, then
+`test-audit` confirms the tests prove each criterion and fills the gaps. An idea too big for
+one PRD first goes through `prd-roadmap`.
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 280}}}%%
@@ -95,7 +98,11 @@ flowchart TD
     direction LR
     dr["<b>Fresh-eyes review</b><br/>deliverable-review"] --> th["<b>Test hardening</b><br/>test-hardening"] --> pc["<b>Commit</b><br/>pre-commit-validation"]
   end
-  decide --> build --> prove
+  subgraph close["4 · Close out the PRD, after the last phase"]
+    direction LR
+    da["<b>Is every criterion built?</b><br/>delivery-audit<br/>gaps become completion phases"] --> ta["<b>Is every criterion proven?</b><br/>test-audit"]
+  end
+  decide --> build --> prove --> close
   classDef doc fill:#fbf1ea,stroke:#b63e28,color:#16140f
   class assumptions doc
 ```
@@ -167,7 +174,11 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
    has `review-technical-design` check and fix it, with a list of the sections worth your
    reading. Then run `/autonomous-design-refinement` to close the gaps.
 3. **Build.** Run `/implement-from-requirements`. It sizes the work, splits it if it must,
-   and builds, reviews and tests the first phase in the same session.
+   and builds, reviews and tests the first phase in the same session. Each phase ends with
+   the prompt for the next one's fresh session.
+4. **Close it out.** When the last phase closes, its prompt starts `/delivery-audit`, which
+   checks every acceptance criterion was built and adds completion phases for any gaps. Once
+   those are built, `/test-audit` checks the tests prove every criterion and fills the gaps.
 
 Before your first real project, plug in your team's engineering standards and add two
 recommended lines to your global instructions: see the [setup guide](docs/enso-method-setup-guide.md).
@@ -205,7 +216,8 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 
 **Quality and principles**
 - `deliverable-review`, `test-hardening`, `refactor-pass` — the post-build quality chain
-- `test-audit` — once a phase or PRD is finished: grade every acceptance criterion's test evidence, then fill the gaps, missing first
+- `delivery-audit` — once every phase of a PRD is closed: check each acceptance criterion is actually built, and add marked completion phases for the gaps
+- `test-audit` — once nothing is left to build (or on any finished phase): grade every acceptance criterion's test evidence, then fill the gaps, missing first
 - `pre-commit-validation` — commit-boundary checks for a checkout several sessions share
 - `engineering-principles` — the principles the method depends on: no silent fallbacks, the testing evidence standard, production data, judgment calls
 - `wall-clock-awareness` — cut waiting time in tests, builds and CI
