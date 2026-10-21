@@ -138,6 +138,8 @@ For each item in the stakeholder response, classify it:
 
 **Classify by what the words say, not by the box ticked.** Review packages offer only Confirm and Change, so every doubt comes back marked Change (`stakeholder-review-package`), and an emailed "Wrong" is often followed by a question rather than an answer. A response is **Corrected** only when it supplies the answer — what to do instead. A Change that asks, hedges or raises a concern is **Pushback**. One reply can hold both ("use ship date — not sure about returns, though"): process each part under its own class.
 
+**Feedback on acceptance criteria or mockups is classified the same way.** A review package exports it separately from the assumption answers, labelled with its section (`stakeholder-review-package`). It answers no assumption, so there is nothing to mark validated. A stated change is a correction to the requirement itself and goes straight into the PRD and its mockups through Step 5. A doubt or question is researched like Pushback, against the criterion or screen it names; if research stays below 95%, open a new assumption (Step 3), or bring back the original ID when the criterion came from a ruling the stakeholder gave (`assumptions-document-writing`, "When an answered item may sit in the body at all"), stating the answer the criterion now rests on, with a "Why your [date] answer didn't close this" section quoting their words, so it goes back to them next round.
+
 ### 2. Process Each Classification
 
 #### Confirmed Items
@@ -213,14 +215,15 @@ Apply all updates to the assumptions document:
 
 ### 5. Propagate to Implementation Documents (CRITICAL)
 
-**This step is essential and must not be skipped.** Validated and corrected assumptions must be reflected in the actual implementation documents—otherwise the assumptions document becomes a dead end.
+**This step is essential and must not be skipped.** Every decision this skill settles or changes must be reflected in the actual implementation documents—otherwise the assumptions document becomes a dead end.
 
-For each **validated** or **corrected** item:
+For each decision this skill settles or changes, at any confidence: a validated or corrected item, a resolved Pushback, a stated change to a criterion or mockup, and an assumption added or restated with a different answer (below 95% the PRD still states the answer it rests on, citing the entry's ID, per `prd-writing-standards`). A reopened stakeholder ruling is the exception: the PRD, its mockups and the Technical Design keep the stakeholder's decision until the stakeholder revises it (Principle 5).
 
-1. **Identify affected documents**: Which documents reference this assumption?
+1. **Identify affected documents**: Which documents reference this decision?
    - PRD: Business decisions and acceptance criteria
    - Technical Design: Implementation details, field mappings, business rules
    - Field Mapping docs: If the correction changes data sources or logic
+   - Mockups: If the decision changes what a screen shows
 
 2. **Update the PRD**:
    - Fold the decision into the requirement it settles (an acceptance criterion, Summary or Business Context), stated as the requirement itself. If that criterion carries a `Superseded by:` line covering what the ruling settles, a later-built PRD changed that behavior on purpose: do not fold, and name the conflict between the ruling and the later PRD in the report, for the user to settle with the stakeholder. If it is only partly superseded and the ruling concerns the part still in force, fold into it as usual (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion")
@@ -235,12 +238,16 @@ For each **validated** or **corrected** item:
 4. **Update Field Mapping documents** (if applicable):
    - Update SQL queries, field sources, or business logic
 
+5. **Redraw affected mockups** (if the PRD has them):
+   - Redraw every mockup state the decision changes, in the same change as the PRD edit (`prd-writing-standards`, "Mockups Show What the Criteria Require")
+
 **Why this matters**: The assumptions document is a working document that eventually gets emptied. If you only update assumptions without propagating to PRD/Tech Design, the validated decisions are lost when the assumption is removed. The PRD and Technical Design are the permanent records.
 
 **Checklist for propagation**:
 - [ ] PRD updated with validated decisions
 - [ ] Technical Design updated with any implementation changes
 - [ ] Field mapping docs updated if data sources/logic changed
+- [ ] Mockups redrawn wherever the decision changed what a screen shows
 - [ ] All documents have consistent information (no contradictions)
 
 ### 6. Route the Code Changes (For Items That Now Need Implementation)
@@ -336,7 +343,7 @@ After processing feedback, provide:
 3. **Items Updated**: List assumptions that were modified with what changed
 4. **New Assumptions Made**: Any assumptions created to fill gaps from partial/unclear feedback (with confidence levels). These are NOT questions — they are implementable decisions.
 5. **Updated Assumptions Document**: The revised assumptions document
-6. **Propagation Summary**: List of changes made to PRD, Technical Design, and other implementation documents
+6. **Propagation Summary**: List of changes made to PRD, Technical Design, mockups and other implementation documents
    - What was added/updated in each document
    - Location of changes (section names or line references)
 7. **Code Changes Routed**: for each item that now needs code, where it went — the amended PRD a build will read, the phase document that will build it, or a one-line action item for the user (Step 6)
@@ -346,6 +353,7 @@ After processing feedback, provide:
 - [ ] PRD updated with validated decisions
 - [ ] Technical Design updated with implementation details
 - [ ] Field mapping docs updated (if applicable)
+- [ ] Mockups redrawn wherever a decision changed what a screen shows
 - [ ] All documents now consistent
 - [ ] Code changes routed per Step 6 (amended PRD, phase document, or action item for the user)
 - [ ] All gaps filled with assumptions (no follow-up questions)

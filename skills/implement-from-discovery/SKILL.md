@@ -89,7 +89,7 @@ Three cases:
 | Case | Meaning | Action |
 |------|---------|--------|
 | **Docs right, code wrong** | The PRD/TD describes the intended behavior; the code doesn't do it; the discovery is a gap-closing fix | Implement the fix. This is the most common case. When the code does something else instead, rather than failing, apply the check below first. |
-| **Code right, docs wrong** | The code is correct but the PRD/TD has drifted out of date | Update the docs first, then the code is already correct. |
+| **Code right, docs wrong** | The code is correct but the PRD/TD has drifted out of date | Update the docs first, including any mockup that shows the old behavior, then the code is already correct. |
 | **Docs silent, new behavior** | The PRD/TD doesn't address this case at all; the discovery is proposing new behavior | Apply the technical-vs-business gate (Phase 3). New behavior often needs an assumption. |
 
 If the change *contradicts* the PRD/TD's stated intent (not just fills a gap), resolve it as a Doc Divergence (the rule is in `implement-from-requirements`; the philosophy in `implementation-lifecycle`) — a decide-and-proceed, not a session stop: below 95% business confidence, an assumption entry and the build continues on it (it stops only when no answer can be put forward); where a stakeholder had personally ruled, it is a reopening at any confidence. Don't silently implement something the docs explicitly say shouldn't happen.

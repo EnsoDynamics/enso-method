@@ -272,6 +272,8 @@ Do not batch steps 3–4 for later. The pass's value is only as safe as the last
 - **Blocked:** record what is needed. If three or more questions share one blocker, pause and report rather than continuing degraded.
 - **Reframed:** the investigation showed the question was wrong. Mark the original Dropped (reason: reframed) and add the reframed question as a new Pending row noting its origin; it competes for a slot in the next pass on its own merits.
 
+Whenever a fold changes what the PRD says a screen shows, at any confidence, the writer redraws every mockup state it changes in the same fold (`prd-writing-standards`, "Mockups Show What the Criteria Require").
+
 ### Phase 4: Conformance (once per pass)
 
 After the pass's questions are landed, launch one subagent to read all requirements documents and check placement and standards. It fixes what it finds and returns a short list.
@@ -292,7 +294,7 @@ Conformance also confirms that the Technical Design's Open Questions section, an
 ### Phase 5: Checkpoint
 
 1. Update the Passes table and **Next action** in the state file.
-2. Commit the requirements documents and the state file — only those files; exploration scripts are the user's to stage — as `docs({feature}): design refinement pass {N} — {one-line summary}`, with a body naming what changed. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"), and then the files are staged and the message presented. Committing at the pass boundary is what protects the work from other sessions' git operations in the same checkout. It never pushes.
+2. Commit the requirements documents (including any mockups a fold redrew) and the state file — only those files; exploration scripts are the user's to stage — as `docs({feature}): design refinement pass {N} — {one-line summary}`, with a body naming what changed. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"), and then the files are staged and the message presented. Committing at the pass boundary is what protects the work from other sessions' git operations in the same checkout. It never pushes.
 3. Output the checkpoint summary:
 
 ```
@@ -344,6 +346,7 @@ Document updates:
 - PRD: {significant changes}
 - Technical Design: {significant changes}
 - Assumptions: {n} entries added or amended
+- Mockups: {screens redrawn, or none}
 
 Exploration scripts: {list, or none}
 Out of scope, noticed and not acted on: {list from the state file}

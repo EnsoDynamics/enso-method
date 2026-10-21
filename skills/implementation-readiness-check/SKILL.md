@@ -257,7 +257,7 @@ The point is: **you are not the one deciding to update documents or start implem
 
 ### If Asked to Update Requirements Documents
 
-When the human asks you to fold decisions into the docs, **update ALL affected documents** — not just the one they mention. A decision might affect the PRD's acceptance criteria AND the technical design's implementation approach AND the assumptions document. Trace each confirmed answer to every document it touches and update them all.
+When the human asks you to fold decisions into the docs, **update ALL affected documents** — not just the one they mention. A decision might affect the PRD's acceptance criteria AND the mockups that show them AND the technical design's implementation approach AND the assumptions document. Trace each confirmed answer to every document it touches and update them all.
 
 For example, if the human says "fold those into the technical design" but a confirmed answer also changes an acceptance criterion in the PRD, update both. The human is telling you to record decisions, not limiting you to a single file. The only exception is if they explicitly say to update one document but not another.
 
