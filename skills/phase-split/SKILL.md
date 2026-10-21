@@ -333,7 +333,7 @@ Add an `Owner` column to the `## Split into` table only when different people ru
 
 What happens after the documents are written depends on who invoked this skill. In every case, **do not implement inside this skill**, and the documents are staged and validated per `pre-commit-validation`. Invoked directly, that happens here, and they are committed by default, but pushed only under live user authorization ("Who Commits"); when they ride an implement session's changeset, they are committed at its wrap-up under that chain's default (`pre-commit-validation`, "Who Commits").
 
-**Called from an implement session** (`implement-from-requirements` sized the work at its Phase 2 and delegated here, or the phase being built turned out too large mid-implementation): return to that skill. Outside an authorized `phase-chain`, **it continues in the same chat with the first phase of the new plan** — phase 1 when a whole PRD was split; the first child when a phase was re-split at sizing time; mid-implementation, the child that holds the work already in progress. The context that session loaded is exactly what that phase needs, and the phase is session-sized by construction, so a fresh chat would only re-read the same documents. The new phase docs ride in that session's changeset. This skill produces no prompt in this case; the implement session's wrap-up produces the next phase's prompt via `continuation-prompt`.
+**Called from an implement session** (`implement-from-requirements` sized the work at its Phase 2 and delegated here, or the phase being built turned out too large mid-implementation): return to that skill. **It continues in the same chat with the first phase of the new plan** — phase 1 when a whole PRD was split; the first child when a phase was re-split at sizing time; mid-implementation, the child that holds the work already in progress. The context that session loaded is exactly what that phase needs, and the phase is session-sized by construction, so a fresh chat would only re-read the same documents. The new phase docs ride in that session's changeset. This skill produces no prompt in this case; the implement session's wrap-up produces the next phase's prompt via `continuation-prompt`.
 
 **Invoked directly by the user** (`/phase-split` on a PRD, or on a phase the user already knows is too large): this chat's purpose was planning, so stop after the documents are written. Tell the user the phase docs are created and committed (or staged with the message, when the user said not to commit); push only under live user authorization; then provide a copy-paste prompt for the first leaf's chat using `continuation-prompt` (it owns the chat-name line, the lineage block with the PRD and phase by full title, the ordering, and the rule that the prompt points at the phase doc rather than restating it); the prompt is valid once that commit lands. Shape, abbreviated:
 
@@ -353,8 +353,6 @@ What happens after the documents are written depends on who invoked this skill. 
 > > Use the `implement-from-requirements` skill. Implement `docs/prds/user-notifications/phase-1-event-pipeline.md`. The parent PRD is `docs/prds/user-notifications/user-notifications-prd.md` and the technical design is `docs/prds/user-notifications/technical-design.md`. Work in the shared checkout `<absolute path to the repo>`, on `develop` directly. First: read all three, then size the phase.
 >
 > Valid now: the phase docs are committed (`a1b2c3d`).
-
-**Inside an authorized `phase-chain`**, whether this skill was invoked directly or from an implement session: return the completed planning delivery to that orchestrator; it commits, pushes, and dispatches the first leaf to a new task after its delivery gates, per that skill. The implement session does not continue with the first leaf in the same chat.
 
 ---
 
@@ -449,7 +447,7 @@ AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by ph
 - When splitting a phase already in the plan, convert its document into a split record and move its carried-forward items and work state into the children that will build them.
 - Keep phase docs as thin scope overlays on the parent PRD and the single technical design **at creation** — later growth from work routed in by other phases is legitimate.
 - Write each phase Summary — and any plan table's "What it does" column — in plain English a reader outside the project can follow, without claiming more or less than the phase's acceptance criteria.
-- Hand off per Step 5: back to the implement session when called from one (outside a `phase-chain` it continues with the first leaf in the same chat); stop with a prompt for the first leaf when invoked directly; inside an authorized `phase-chain`, return the planning delivery to the orchestrator, which dispatches the first leaf to a new task.
+- Hand off per Step 5: back to the implement session when called from one (it continues with the first leaf in the same chat); stop with a prompt for the first leaf when invoked directly.
 
 ### DO NOT
 
@@ -472,8 +470,7 @@ AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by ph
 | Skill | How This Skill Relates |
 |-------|-------------------------|
 | `implementation-lifecycle` | The methodology umbrella. Phase documents are one of its four entities: born here as thin overlays, they become the preferred landing place for follow-up work discovered in other phases. Its "never stop to ask a predictable question" rule is why Step 3 declares instead of asking. |
-| `implement-from-requirements` | The downstream consumer. Its Phase 2 sizing gate hands work here when it's too large (including a phase at any depth that turned out bigger than assumed); once the docs exist it continues with the first leaf in the same chat (inside an authorized `phase-chain`, the orchestrator dispatches it to a new task), and later leaves get one fresh chat each. It is always pointed at a leaf. |
-| `phase-chain` | The Codex orchestrator. When a chain is active, a split, whether invoked directly or from an implement session, is a planning delivery it commits and hands to the first leaf's successor in a new task. |
+| `implement-from-requirements` | The downstream consumer. Its Phase 2 sizing gate hands work here when it's too large (including a phase at any depth that turned out bigger than assumed); once the docs exist it continues with the first leaf in the same chat, and later leaves get one fresh chat each. It is always pointed at a leaf. |
 | `prd-writing-standards` | Owns the `docs/prds/` and `docs/changes/` directory convention that phase docs live in, the `AC-<AREA>-<NN>` labels phase docs reference, and the plain-English readability standard that phase Summaries and plan tables follow. |
 | `technical-design-writing-standards` | Defines the single technical design per PRD that phase docs point into by section heading — the design is never split or duplicated per phase. |
 | `prd-roadmap` | The same job one level up: it cuts an idea too big for one PRD into right-sized planned PRDs, reusing this skill's seam principles at PRD scale. Each planned PRD, once written, comes here to be split into phases. |

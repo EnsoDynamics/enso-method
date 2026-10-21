@@ -217,7 +217,6 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `implement-from-discovery` — implement a fix found mid-work or raised in a bug report
 - `phase-split` — split a too-large PRD into session-sized, shippable phases
 - `continuation-prompt` — the copy-paste prompt that starts the next chat
-- `phase-chain` — Codex only: run an authorized sequence of phases, one fresh task each
 
 **Quality and principles**
 - `deliverable-review`, `test-hardening`, `refactor-pass` — the post-build quality chain

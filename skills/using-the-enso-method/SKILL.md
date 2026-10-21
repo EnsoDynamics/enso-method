@@ -41,7 +41,7 @@ Five stages leave no file: a finished PRD refinement (its `PRD refinement comple
 **2. Build it in phases**
 
 - `implement-from-requirements`: sizes the work, splits it with `phase-split` when it is too big for one session, and builds the first phase. Run `phase-split` on its own only to plan the phases without building.
-- `continuation-prompt`: hands each next phase to a fresh session. In Codex, `phase-chain` runs an authorized sequence of phases on its own.
+- `continuation-prompt`: hands each next phase to a fresh session.
 
 **3. Prove it works.** Inside every build, without being asked: `deliverable-review`, then `test-hardening`, then `pre-commit-validation`. Then the build commits, runs `refactor-pass`, and pushes a feature branch (a push to `develop` or `main` waits for the user's word), unless the user has said otherwise.
 

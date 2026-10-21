@@ -401,7 +401,7 @@ serves:     Phase 2a — Email digest scheduler, of User Notifications
 1. The prompt that started the chat says `Parallel: yes`.
 2. Another agent session is live in a repo this chat will edit. That means an `.agent-sessions/` log in the shared checkout (Session Markers, above) with a START line, no DONE line, and a last line written within the past 12 hours. An older log without a DONE is an abandoned session, not a live one.
 
-When neither holds, stay in the shared checkout, even if parallel work seems likely and even if the checkout has uncommitted changes you did not make (leave those alone and stage only your own files). A chat that isolates by default leaves directories behind for the user to find and delete. A chat that starts a few minutes after this one sees this chat's log and isolates itself, so this chat does not have to anticipate it. When any signal holds, every repo the chat will edit goes into the worktree folder, not only the repo that tripped it, so sibling repos stay siblings. Inside an authorized `phase-chain`, that skill's checkout rule governs instead: no worktree, and another live writer is a blocker.
+When neither holds, stay in the shared checkout, even if parallel work seems likely and even if the checkout has uncommitted changes you did not make (leave those alone and stage only your own files). A chat that isolates by default leaves directories behind for the user to find and delete. A chat that starts a few minutes after this one sees this chat's log and isolates itself, so this chat does not have to anticipate it. When any signal holds, every repo the chat will edit goes into the worktree folder, not only the repo that tripped it, so sibling repos stay siblings.
 
 **Never a clone** unless the user asks for one. A worktree does everything a clone would for this purpose, shares the repository's history and fetches, and `git worktree list` finds it again.
 
@@ -478,8 +478,6 @@ The feature/gap is implemented, tested, and ready to commit. Documents are consi
 the implement chain's default covers it (`pre-commit-validation`, "Who Commits").
 Complete the commit, the refactor pass, the push when it is covered, and any required project delivery
 tail first.
-For an authorized sequence across fresh Codex tasks, use `phase-chain`: it owns
-successor dispatch and distinguishes a delivered phase from a completed chain.
 
 ### Completed — Remainder Filed Into Future Phases
 
