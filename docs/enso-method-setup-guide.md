@@ -42,6 +42,31 @@ npx skills update -g                           # later, to update
 `-g` installs for your user rather than for one project. In a tool that has the plugin, use
 the plugin rather than the skills CLI, or every skill loads twice.
 
+### Switch from the skills CLI to the plugin
+
+Before October 2026 the skills CLI was the only install, so an older machine has plain copies
+and no plugin marketplace: `claude plugin marketplace update enso-method` fails with
+`Marketplace 'enso-method' not found`. Remove the copies (this names only the Enso Method's
+skills, including ones since renamed, and leaves your other skills alone), then install the
+plugin:
+
+```bash
+npx skills remove -g -y assumptions-document-feedback assumptions-document-writing \
+  autonomous-design-refinement autonomous-prd-refinement autonomous-requirements-refinement \
+  continuation-prompt deliverable-review delivery-audit engineering-principles \
+  implement-from-discovery implement-from-requirements implementation-lifecycle \
+  implementation-readiness-check investigate-question phase-chain phase-split prd-roadmap \
+  prd-writing-standards pre-commit-validation refactor-pass review-technical-design \
+  stakeholder-review-package technical-design-writing-standards test-audit test-hardening \
+  using-the-enso-method wall-clock-awareness
+
+claude plugin marketplace add EnsoDynamics/enso-method
+claude plugin install enso-method@enso-method
+```
+
+Then install for Codex too, if you use it (see above). If you linked the skills from a clone
+with your own script instead, remove those links the same way your script made them.
+
 ### Work from a clone
 
 If you'd rather keep the skills in a clone of the repository, so `git pull` updates them and

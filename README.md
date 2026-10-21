@@ -159,6 +159,11 @@ codex plugin marketplace upgrade enso-method
 npx skills update -g
 ```
 
+If Claude Code says `Marketplace 'enso-method' not found`, the plugin isn't installed on that
+machine yet: run the install commands above. If you installed with the skills CLI before the
+plugin existed, [remove those copies first](docs/enso-method-setup-guide.md#switch-from-the-skills-cli-to-the-plugin),
+or every skill loads twice.
+
 In Claude Code and Codex the skills install as a plugin, which names each one
 `enso-method:<skill>` so none can clash with a same-named skill from somewhere else. New to
 plugins? See how they work in [Claude Code](https://code.claude.com/docs/en/plugins/install)
