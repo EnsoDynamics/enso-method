@@ -240,6 +240,7 @@ A phase doc is a **scope-setting overlay** on the parent PRD and the single tech
 Each phase doc should contain:
 
 - **Pointer to parent documents** — explicit paths to the PRD and the technical design. If helpful, name the specific technical-design section headings this phase implements (don't copy them). A child phase also names its parent phase doc.
+- **Repositories it changes** — when the technical design puts any of this phase's work outside the PRD's own repository, a `**Repositories:**` line beside the pointers names every repository the phase changes, separated by commas: `**Repositories:** returns-api, storefront`. Each is named by the folder name of its checkout, which sits beside the PRD's repository; when the design names a repository some other way, check the folder beside the PRD's repository rather than guessing. The PRD's repository is listed only when the phase changes code in it. A phase that changes only the PRD's repository gets no line, so a single-repository PRD's phase docs never carry one. Tools that run a phase across several repositories read this line to set each one up, so it names only the repositories the design puts this phase's work in. A split record keeps its line; each child gets its own line for its own work, because tools don't pass a parent's line to its children.
 - **Summary** — 1-2 sentences on what this phase delivers, **in plain English**. Write it for a smart reader who wasn't part of the project: no undefined project shorthand, actors and direction named ("the correction package we hand to Vendor X," not "Correction Handoff"), and nothing claimed beyond what the phase's acceptance criteria actually require. This is the same standard as `prd-writing-standards` → "Plain English for Readers Outside the Project"; the Summary is a gloss on the criteria, so check it against them and confirm it neither overclaims nor underclaims.
 - **Acceptance criteria covered** — list which criteria from the parent PRD are in scope, **by label** (e.g., "AC-REV-01, AC-REV-02, AC-GRP-07"). **Don't re-state the full criterion text** — the implementing AI reads the full PRD before building, and duplication invites drift. The implementer's stale-phase-doc check catches drift between these references and the current PRD.
 - **Out of scope for this phase** — what's deferred to later phases.
@@ -254,6 +255,7 @@ Each phase doc should contain:
 **Parent PRD:** [path to {prd-name}-prd.md]
 **Technical design:** [path to technical-design.md] — relevant sections: [heading(s)]
 **Parent phase:** [path to phase-2-{short-name}.md] — omit unless this phase is a child of a split record
+**Repositories:** [folder names, comma-separated] — omit when this phase changes only the PRD's repository
 
 ## Summary
 [1-2 sentences on what this phase delivers — plain English, no undefined project shorthand.]
@@ -292,7 +294,7 @@ Email and in-app delivery (Phase 2); user notification preferences (Phase 3).
 None.
 ```
 
-(The example omits "Phase-specific notes" because there's nothing phase-specific to add — that's the norm, not an oversight.)
+(The example omits "Phase-specific notes" because there's nothing phase-specific to add — that's the norm, not an oversight. It has no `**Repositories:**` line because all its work is in the PRD's repository; the completion phase template below shows one.)
 
 **Split-record template** — what a phase's own document becomes when the phase is split (see "What happens to a phase's document when the phase is split"):
 
@@ -301,6 +303,7 @@ None.
 
 **Parent PRD:** [path]
 **Technical design:** [path] — relevant sections: [heading(s)]
+**Repositories:** [unchanged — omit if it had none; each child names its own]
 
 ## Summary
 [Unchanged from before the split.]
@@ -413,6 +416,7 @@ Gaps too big for one session are cut into several completion phases by the usual
 **Added by delivery audit:** 2026-10-18, after every planned phase closed. It builds what earlier phases left out of the criteria below.
 **Parent PRD:** docs/prds/customer-returns/customer-returns-prd.md
 **Technical design:** docs/prds/customer-returns/technical-design.md — relevant sections: "Return submission", "Confirm screen"
+**Repositories:** returns-api, storefront
 
 ## Summary
 Let one return cover several items, and show the refund method before the customer confirms.
@@ -421,8 +425,8 @@ Let one return cover several items, and show the refund method before the custom
 AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by phase 4)
 
 ## What the audit found missing
-- **AC-RET-03:** `returns/submit.py::create_return` takes one item, and the return form posts one.
-- **AC-RET-07:** the confirm screen (`web/confirm.tsx`) never shows the refund method.
+- **AC-RET-03:** `returns/submit.py::create_return` in returns-api takes one item, and the return form posts one.
+- **AC-RET-07:** the confirm screen (`web/confirm.tsx` in storefront) never shows the refund method.
 
 ## Phase dependencies
 2 (return submission); 4 (the confirm screen)
