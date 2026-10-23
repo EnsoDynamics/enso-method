@@ -154,11 +154,11 @@ def render(data, root, images_dir):
             importance = f'<span class="attention">{esc(item["attention"])}</span>' if item.get('attention') else ''
             proposal = ''.join(f'<p>{esc(p)}</p>' for p in item['proposal'])
             options = ''.join(f'<label><input type="radio" name="{ident}" value="{value}"><span>{label}</span></label>' for value, label in [('confirm', 'Confirm'), ('change', 'Change')])
-            confidence = f'<p class="confidence">Source confidence: {esc(item["confidence"])}</p>' if item.get('confidence') else ''
+            confidence = f'<span class="confidence">Confidence: {esc(item["confidence"])}</span>' if item.get('confidence') else ''
             cards.append(f'''<article class="decision" id="{ident}" data-section="{sid}">
-<div class="decision-top"><span class="decision-id">{ident}</span>{importance}<span class="answer-status">Unanswered</span><button type="button" class="clear-answer text-button" aria-label="Clear response to {ident}" hidden>Clear</button></div>
+<div class="decision-top"><span class="decision-id">{ident}</span>{confidence}{importance}<span class="answer-status">Unanswered</span><button type="button" class="clear-answer text-button" aria-label="Clear response to {ident}" hidden>Clear</button></div>
 <h3>{esc(item['title'])}</h3><div class="proposal">{proposal}</div>
-<details class="evidence"><summary>Why this is proposed</summary><p>{esc(item['evidence'])}</p>{confidence}{refs_markup(item['refs'], sources)}</details>
+<details class="evidence"><summary>Why this is proposed</summary><p>{esc(item['evidence'])}</p>{refs_markup(item['refs'], sources)}</details>
 <fieldset><legend>Your response to {ident}</legend><div class="choices">{options}</div></fieldset>
 <label class="comment-label" for="comment-{ident}">Correction or comment <span>(optional for confirmation)</span></label>
 <textarea id="comment-{ident}" rows="2" placeholder="Describe the change, or what you’re unsure about."></textarea>
