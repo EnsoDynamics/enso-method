@@ -56,20 +56,14 @@ The fix isn't a better prompt. It's doing the thinking before the build:
 
 ## How it works
 
-Each step is a skill your agent runs, and each hands the next a document it can trust.
-A drafted PRD first goes through review rounds of its own, fixed between rounds, until no
-reviewer finds a problem that would change what gets built. A drafted design gets a senior
-review that checks it against the real code and your house standards, fixes what it finds,
-and lists the sections worth your own reading. Design refinement is a loop: it finds the
-gaps, researches each question against the real code and data, and
-writes the answers back into the PRD and design, recording business decisions as
-assumptions for stakeholders to confirm, until nothing is left to guess. Stages 2 and 3 run
-once per phase: a phase is built, reviewed, its tests hardened, and committed, then `continuation-prompt`
-hands the next one to a fresh session. When the last phase closes, stage 4 checks the whole
-PRD: `delivery-audit` confirms every acceptance criterion was actually built and adds
-completion phases for anything missing, which are built like any other phase, then
-`test-audit` confirms the tests prove each criterion and fills the gaps. An idea too big for
-one PRD first goes through `prd-roadmap`.
+Agents review and refine the requirements and design, researching open questions before
+the build. Business proposals are gathered into a review package stakeholders can read
+and respond to on their own schedule.
+
+Large builds are divided into shippable pieces, with each session carrying forward the
+same requirements and decisions. Agents build, review and test each piece, then check the
+finished software against the whole PRD. The documents stay current, so future changes
+start from what was intended.
 
 ```mermaid
 %%{init: {"flowchart": {"wrappingWidth": 280}}}%%
@@ -87,10 +81,11 @@ flowchart TD
     end
     dreview --> gaps
     fold --> assumptions[("<b>Assumptions register</b><br/>business decisions for<br/>stakeholders to confirm")]
+    fold -- "ready and consolidated" --> package["<b>Stakeholder review package</b><br/>stakeholder-review-package<br/>unless declined"]
   end
   subgraph build["2 · Build it in slices"]
     direction LR
-    split["<b>Phases</b><br/>phase-split"] --> impl["<b>Build a phase</b><br/>implement-from-requirements"]
+    split["<b>Plan phases</b><br/>phase-split<br/>keep whole if one session"] --> impl["<b>Build a phase</b><br/>implement-from-requirements"]
     impl --> next["<b>Next phase, fresh session</b><br/>continuation-prompt"]
     next --> impl
   end
@@ -102,7 +97,8 @@ flowchart TD
     direction LR
     da["<b>Is every criterion built?</b><br/>delivery-audit<br/>gaps become completion phases"] --> ta["<b>Is every criterion proven?</b><br/>test-audit"]
   end
-  decide --> build --> prove --> close
+  package --> split
+  build --> prove --> close
   classDef doc fill:#fbf1ea,stroke:#b63e28,color:#16140f
   class assumptions doc
 ```
@@ -219,7 +215,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `implementation-lifecycle` — the umbrella: the assumptions philosophy, confidence thresholds and the No Loose Ends session discipline. Reload it to get a drifting session back on track
 - `implement-from-requirements` — the default build from PRD and technical design
 - `implement-from-discovery` — implement a fix found mid-work or raised in a bug report
-- `phase-split` — split a too-large PRD into session-sized, shippable phases
+- `phase-split` — size the work before implementation; split it into session-sized, shippable phases only when needed
 - `continuation-prompt` — the copy-paste prompt that starts the next chat
 
 **Quality and principles**
