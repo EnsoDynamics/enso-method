@@ -178,10 +178,12 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
 2. **Design and refine.** Run `/technical-design-writing-standards`. It drafts the design and
    has `review-technical-design` check and fix it, with a list of the sections worth your
    reading. Then run `/autonomous-design-refinement` to close the gaps.
-3. **Build.** Run `/implement-from-requirements`. It sizes the work, splits it if it must,
-   and builds, reviews and tests the first phase in the same session. Each phase ends with
-   the prompt for the next one's fresh session.
-4. **Close it out.** When the last phase closes, its prompt starts `/delivery-audit`, which
+3. **Plan the phases.** Run `/phase-split`. It sizes the work, writes phase documents when
+   needed, and hands off without building. Work that fits one session stays whole.
+4. **Build.** Run `/implement-from-requirements` on the first planned phase, or the unsplit
+   PRD. It builds, reviews and tests the work, retaining its sizing check as a safeguard.
+   Each phase ends with the prompt for the next one's fresh session.
+5. **Close it out.** When the last phase closes, its prompt starts `/delivery-audit`, which
    checks every acceptance criterion was built and adds completion phases for any gaps. Once
    those are built, `/test-audit` checks the tests prove every criterion and fills the gaps.
 

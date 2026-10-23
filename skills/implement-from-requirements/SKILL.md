@@ -10,6 +10,8 @@ The default skill for taking implementation-ready requirements and producing wor
 
 This skill assumes the requirements have already been refined (typically via `autonomous-design-refinement`, or `implementation-readiness-check` for a human checkpoint). Its job is to load full context, decide whether the work fits in one AI session, phase it if not, then implement, test, and verify the deliverable.
 
+The normal handoff runs `phase-split` before this skill, producing a phase plan or an explicit decision that no split is needed. Callers may also invoke this skill without having done that planning. Always run the sizing gate below before building: it handles both omitted phase planning and work that outgrows an existing plan, invoking `phase-split` when needed.
+
 This skill is one procedural arm of the `implementation-lifecycle` framework — **read that skill first if it isn't already loaded.** It's the umbrella for the whole methodology: the four entities (PRD, Technical Design, Assumptions, and Phase Documents when split), the confidence thresholds, and the session discipline (disposition of loose ends, the ask-gate, no hollow promises, the continuation test) that this entire session runs under. A user pointing you at a requirements doc should never need to name another skill — loading this one pulls the whole methodology with it.
 
 ---

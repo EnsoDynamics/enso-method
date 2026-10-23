@@ -1,6 +1,6 @@
 ---
 name: autonomous-design-refinement
-description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state, run after review-technical-design (and the user's own read of the design, when the user wants one) and before implement-from-requirements; the design-stage counterpart of autonomous-prd-refinement, which refines a draft PRD before any design exists — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
+description: Multi-pass workflow that refines PRD, Technical Design, and Assumptions documents to implementation-ready state, run after review-technical-design (and the user's own read of the design, when the user wants one) and before phase-split; the design-stage counterpart of autonomous-prd-refinement, which refines a draft PRD before any design exists — small ranked batches, each answer folded into the documents as soon as it is known, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
 user-invocable: true
 ---
 
@@ -363,7 +363,7 @@ Next: consolidation (Phase 8), once this commit lands
 Recommended next steps:
 1. Review assumptions awaiting business validation
 2. Address blockers or final-verification items
-3. Start the build with `implement-from-requirements`, which sizes the work and splits it with `phase-split` if needed
+3. After consolidation, run `phase-split` to size and plan the work without implementing; it hands off to `implement-from-requirements` once the planning decision is made
 ```
 
 ### Phase 8: Consolidation (the run's last step, after the completion commit)

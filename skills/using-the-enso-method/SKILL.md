@@ -20,7 +20,8 @@ Read the repo before choosing. Everything for one piece of work lives in `docs/p
 | A refined PRD, no technical design | `technical-design-writing-standards`, after the user's review when the user wants one. A small change that follows an established pattern and adds no new interfaces can skip the design and go to `implement-from-requirements`, which proceeds without one |
 | A drafted technical design with no review commit after it, and no design refinement under way or finished | `review-technical-design`, in a fresh context |
 | A reviewed technical design | `autonomous-design-refinement`, after the user's read of it when the user wants one. A `{name}-design-refinement-state.md` in the directory means a run is in progress: resume it |
-| Refined requirements | `implement-from-requirements` |
+| Refined requirements, not yet sized for phase planning | `phase-split` to decide whether phases are needed and plan them before implementation |
+| Phase planning confirmed the work fits one session | `implement-from-requirements` on the unsplit PRD |
 | Phase documents | `implement-from-requirements` for the first leaf phase, in plan-table order, without a `**Closed:**` line |
 | Every phase closed, no whole-PRD delivery audit yet (no `delivery audit complete (whole PRD)` commit) | `delivery-audit` on the whole PRD, in a fresh chat. The completion phases either audit adds, marked `**Added by delivery audit:**` or `**Added by test audit:**` at the top, are phase documents like any other: the row above builds them |
 | Every phase closed after a whole-PRD delivery audit | `test-audit` on the whole PRD, in a fresh chat; it continues an existing `test-audit.md` and re-checks only what changed since its last audit. The PRD is complete when that run ends with `Done`. Never declare it complete from the file alone: a completion phase built since the last audit changes what it must check |
@@ -38,9 +39,10 @@ Five stages leave no file: a finished PRD refinement (its `PRD refinement comple
 - `review-technical-design`: started by the drafting skill in a fresh context. It questions the design's approach, checks its claims against the real code and the house standards, revises it in place and commits the revision; it skips itself for a design that follows an established pattern. **Second recommended review point:** the user reads the sections the review lists as worth reading.
 - `autonomous-design-refinement`: closes the gaps in both documents without the user. Technical questions are researched; open business decisions become assumptions, and the build proceeds on them. `implementation-readiness-check` is the alternative when the user wants to confirm each open question themselves; only the user can start it.
 
-**2. Build it in phases**
+**2. Plan the phases, then build**
 
-- `implement-from-requirements`: sizes the work, splits it with `phase-split` when it is too big for one session, and builds the first phase. Run `phase-split` on its own only to plan the phases without building.
+- `phase-split`: the normal next step after requirements refinement. Size the work, write phase documents only when needed, and hand off without implementing.
+- `implement-from-requirements`: builds the first planned phase, or the whole PRD when phase planning found it fits one session. Its sizing and automatic split remain a safeguard for a direct implementation request or work that outgrows its plan.
 - `continuation-prompt`: hands each next phase to a fresh session.
 
 **3. Prove it works.** Inside every build, without being asked: `deliverable-review`, then `test-hardening`, then `pre-commit-validation`. Then the build commits, runs `refactor-pass`, and pushes a feature branch (a push to `develop` or `main` waits for the user's word), unless the user has said otherwise.

@@ -22,7 +22,7 @@ It is the planning step that sits between "the requirements are ready" and "go b
 
 Use this skill when:
 
-- You already know a PRD is **too large to implement in a single AI session** and you want to break it into phases before building anything.
+- Requirements are refined and you want to decide whether the PRD needs phases, and plan them before building anything.
 - `implement-from-requirements` sized the work, found it too large, and sent you here.
 - You want to re-evaluate or revise an existing phase split.
 - **A phase at any depth turned out bigger than the split above it assumed** — discovered at sizing time or mid-implementation — and its remaining work needs to be cut into child phases.
@@ -30,7 +30,6 @@ Use this skill when:
 **Do NOT use this skill when:**
 
 - The PRD or technical design haven't been written or refined yet — do that first (`prd-writing-standards`, `technical-design-writing-standards`, then `autonomous-design-refinement`, or `implementation-readiness-check` for an explicit human checkpoint).
-- The work comfortably fits in one AI session — skip phasing entirely and go straight to `implement-from-requirements`. Don't manufacture phases for work that doesn't need them.
 - The work is a single bounded fix with no requirements directory behind it — `implement-from-discovery` builds that without phases.
 - The source is bigger than one PRD — a brief or idea that would run to dozens of phases before anything reaches production. Cut it into planned PRDs with `prd-roadmap` first; this skill then splits each PRD once it is written.
 
@@ -141,7 +140,7 @@ Walk through the implementation mentally. How many distinct capabilities does it
 
 **The decision:**
 
-- **Fits in one session** → you don't need this skill. Hand back to `implement-from-requirements` and build it directly.
+- **Fits in one session** → report that no phases are needed. When invoked directly, stop with a `continuation-prompt` for `implement-from-requirements` on the unsplit PRD; do not start building. When called from an implement session, return that decision to the caller.
 - **Too large** → continue to Step 2.
 
 If you're genuinely unsure, keep it whole. Every phase carries a fixed cost (see Session Capacity Calibration), and work that does turn out too large is split mid-implementation in the same chat, keeping what is already built.
