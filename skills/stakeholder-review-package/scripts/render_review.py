@@ -61,7 +61,8 @@ def validate(data, root):
         if urlsplit(source['url']).scheme != 'https' or not urlsplit(source['url']).netloc:
             raise ValueError('Sources need HTTPS URLs')
         (root / path).read_bytes()
-    register = (root / sources[data['assumptions_source']]['path']).read_text()
+    assumptions_source = data['assumptions_source']
+    register = '' if assumptions_source is None else (root / sources[assumptions_source]['path']).read_text()
     active = re.split(r'^##\s+Validated Assumptions\s*$', register, flags=re.M | re.I)[0]
     if re.search(r'^#{2,6}\s+Blocking\s*:', active, re.M | re.I):
         raise ValueError('Unanswered blocking question: resolve it in the assumptions source before creating a Confirm/Change review; do not invent a proposal or omit it')
@@ -72,6 +73,8 @@ def validate(data, root):
         expected = data['open_assumption_ids']
     elif not expected:
         raise ValueError('No open IDs parsed; check register format and supply an explicit inventory')
+    if assumptions_source is None and expected:
+        raise ValueError('A review without an assumptions source requires an explicit empty inventory')
     actual, section_ids, screen_ids = [], [], []
     for section in data['sections']:
         sid = section['id']

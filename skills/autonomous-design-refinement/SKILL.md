@@ -363,12 +363,12 @@ Next: consolidation (Phase 8), once this commit lands
 Recommended next steps:
 1. Review assumptions awaiting business validation
 2. Address blockers or final-verification items
-3. After consolidation, run `phase-split` to size and plan the work without implementing; it hands off to `implement-from-requirements` once the planning decision is made
+3. When requirements are ready, after consolidation prepare `stakeholder-review-package` unless declined, then run `phase-split` to size and plan the work without implementing
 ```
 
-### Phase 8: Consolidation (the run's last step, after the completion commit)
+### Phase 8: Consolidation (the last refinement step, after the completion commit)
 
-Refinement folds each answer where it is needed, so after several passes the same rule is often stated in several places. This pass removes those repeats. It is the last thing the run does, it runs once, and it runs whatever the final status.
+Refinement folds each answer where it is needed, so after several passes the same rule is often stated in several places. This pass removes those repeats. It is the last refinement pass, it runs once, and it runs whatever the final status.
 
 **It starts from a commit.** The completion commit is its baseline, so the pass's whole effect is one diff the user can review and one revert. A session that may not commit stops after Phase 7 and runs this phase as soon as the user's commit lands. Never run it on uncommitted refinement work.
 
@@ -395,6 +395,8 @@ A failed hunk is put back as the completion commit has it; the check never rewri
 If the session ends mid-pass, the edits already made stay. Resume with the documents not yet done, then run the check, which compares everything with the completion commit.
 
 **Finish** by committing the documents, under the same default as Phase 5, as `docs({feature}): consolidate repeats after design refinement — design {before} → {after} words`, with a body giving each document's words before and after, the number of repeats replaced, the deletions by category, any disagreements added to Open Questions, and the check's result.
+
+When the requirements are ready, invoke `stakeholder-review-package` after the consolidation commit to create or refresh the HTML from the final sources, unless the user declined it. Do not wait to be asked; sharing and stakeholder feedback remain optional, and the package skill's existing delivery rules apply. Then hand off to `phase-split`.
 
 ---
 
@@ -425,7 +427,7 @@ A script is warranted only when the question is in scope and a one-off read cann
 - Document evidence and sources for findings
 - Stop cleanly on a session-limit warning with the state file updated
 - Delete the state file at completion
-- End with the consolidation pass, on top of the completion commit (Phase 8)
+- Finish refinement with the consolidation pass, on top of the completion commit (Phase 8), then prepare the stakeholder package when ready before handing off to phase planning
 
 ### DO NOT
 

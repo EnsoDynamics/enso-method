@@ -177,7 +177,9 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
    `/autonomous-prd-refinement`, which reviews and fixes it in rounds, ready for your review.
 2. **Design and refine.** Run `/technical-design-writing-standards`. It drafts the design and
    has `review-technical-design` check and fix it, with a list of the sections worth your
-   reading. Then run `/autonomous-design-refinement` to close the gaps.
+   reading. Then run `/autonomous-design-refinement` to close the gaps. When requirements
+   are ready and consolidation is complete, it prepares the stakeholder review package
+   automatically unless you decline it; sharing and stakeholder feedback remain optional.
 3. **Plan the phases.** Run `/phase-split`. It sizes the work, writes phase documents when
    needed, and hands off without building. Work that fits one session stays whole.
 4. **Build.** Run `/implement-from-requirements` on the first planned phase, or the unsplit

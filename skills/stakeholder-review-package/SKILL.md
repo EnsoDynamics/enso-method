@@ -15,6 +15,8 @@ Select requirements by business consequence: changed procedures, permissions, mo
 
 **Every open assumption gets exactly one answerable place in the HTML.** Include provisional answers and reopened decisions still needing attention. Exclude settled entries unless explicitly reopened in the register. Keep original IDs. Inventory the IDs before writing and reconcile them after generation; the supplied renderer checks registers with ID-bearing Markdown headings and a `Validated Assumptions` section. For other formats, produce and check an explicit inventory rather than claiming that parser covers them.
 
+If no assumptions register exists, confirm the PRD has no open assumptions and use `assumptions_source: null`, `open_assumption_ids: []` and an `inventory_note` explaining the absence. Do not invent assumptions or create an empty register just for the renderer. If a register exists, include it; a missing named source is an error. Recheck for a register when refreshing or preparing to share.
+
 A genuine **Blocking Open Question** has no proposed answer to confirm. Surface it directly and resolve it through `assumptions-document-writing` before producing a complete Confirm/Change review. Never invent an ID or proposal to fit the form, or silently leave the question out. The renderer rejects the method’s `### Blocking: ...` entries even with an explicit inventory.
 
 ## Organize around the work

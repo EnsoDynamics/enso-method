@@ -43,7 +43,7 @@ The PRD and technical design are the source of truth. Code implements what they 
 
 Your review of the PRD and the technical design before the build is where a person's judgment goes in. Agents review and fix each one first: review rounds on the PRD, then a senior review that checks the drafted design against the real code and the house standards, revises it, and lists the sections worth a person's reading. Your review is recommended at both points, never a gate: like an assumption, an unreviewed document is a green light, and your corrections are folded in when they arrive. Nobody waits on a stakeholder's review to start either: assumptions keep the work moving.
 
-For business stakeholders, `stakeholder-review-package` can turn selected PRD requirements, every open assumption and contextual mockups into a single HTML review with downloadable feedback. This optional review package is a dated view of the source documents; implementation still uses the full PRD and technical design.
+When requirements are ready after design refinement and consolidation, `stakeholder-review-package` prepares selected PRD requirements, every open assumption and contextual mockups as a single HTML review with downloadable feedback, unless the user declines it. Sharing and stakeholder feedback remain optional. The package is a dated view of the source documents; implementation still uses the full PRD and technical design.
 
 These documents colocate inside `docs/prds/{prd-name}/` (a program) or `docs/changes/{name}/` (a bounded delivery — a ticket, a bug, a small enhancement — identical layout) so everything tied to a piece of work lives in one place. See `prd-writing-standards` for the full directory structure.
 

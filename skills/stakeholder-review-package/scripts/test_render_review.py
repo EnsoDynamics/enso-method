@@ -44,6 +44,38 @@ class ReviewTests(unittest.TestCase):
         (self.root / 'class-bookings-assumptions.md').write_text('# Open questions\n- Should cancellations be free?\n')
         with self.assertRaises(ValueError): validate(self.data, self.root)
 
+    def test_no_register_review_builds_and_checks_with_explicit_empty_inventory(self):
+        (self.root / 'class-bookings-assumptions.md').unlink()
+        self.data['assumptions_source'] = None
+        del self.data['sources']['assumptions']
+        self.data.update(open_assumption_ids=[], inventory_note='No assumptions register exists; the PRD contains no open assumptions.')
+        self.data['sections'][0]['decisions'] = []
+        self.data['sections'][0]['rules'] = [{'text':'Show class availability.', 'refs':[{'source':'prd','label':'AC-BOOK-01'}]}]
+        self.input.write_text(json.dumps(self.data))
+        output = self.root / 'class-bookings-stakeholder-review.html'
+        command = [sys.executable, str(Path(__file__).with_name('render_review.py')),
+                   '--repo-root', str(self.root), '--input', str(self.input), '--output', str(output)]
+        built = subprocess.run(command, text=True, capture_output=True)
+        self.assertEqual(built.returncode, 0, built.stderr)
+        self.assertIn('Show class availability.', output.read_text())
+        self.assertNotIn('class="decision"', output.read_text())
+        self.assertIsNone(load_authoring(output)['assumptions_source'])
+        self.input.unlink()
+        command[command.index('--input') + 1] = str(output)
+        checked = subprocess.run(command + ['--check'], text=True, capture_output=True)
+        self.assertEqual(checked.returncode, 0, checked.stderr)
+        # Explicit absence must not hide decisions, an unchecked inventory, or a missing named file.
+        for mode in ('nonempty', 'omitted', 'missing-note', 'missing-file'):
+            data = copy.deepcopy(self.data)
+            if mode == 'nonempty': data['open_assumption_ids'] = ['RULE-001']
+            if mode == 'omitted': del data['open_assumption_ids']
+            if mode == 'missing-note': del data['inventory_note']
+            if mode == 'missing-file':
+                data['assumptions_source'] = 'assumptions'
+                data['sources']['assumptions'] = {'path':'class-bookings-assumptions.md', 'url':'https://example.org/assumptions', 'label':'Assumptions'}
+            with self.subTest(mode=mode), self.assertRaises((ValueError, FileNotFoundError)):
+                validate(data, self.root)
+
     def test_unanswered_blocker_cannot_be_omitted_from_review(self):
         register = self.root / 'class-bookings-assumptions.md'
         register.write_text('## Blocking Open Questions\n### Blocking: Who may cancel a booking?\nNo option is favored.\n' + register.read_text())

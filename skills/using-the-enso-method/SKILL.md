@@ -20,7 +20,8 @@ Read the repo before choosing. Everything for one piece of work lives in `docs/p
 | A refined PRD, no technical design | `technical-design-writing-standards`, after the user's review when the user wants one. A small change that follows an established pattern and adds no new interfaces can skip the design and go to `implement-from-requirements`, which proceeds without one |
 | A drafted technical design with no review commit after it, and no design refinement under way or finished | `review-technical-design`, in a fresh context |
 | A reviewed technical design | `autonomous-design-refinement`, after the user's read of it when the user wants one. A `{name}-design-refinement-state.md` in the directory means a run is in progress: resume it |
-| Refined requirements, not yet sized for phase planning | `phase-split` to decide whether phases are needed and plan them before implementation |
+| Refined requirements, stakeholder package missing or stale and not declined | `stakeholder-review-package` to create or refresh the HTML automatically before phase planning |
+| Refined requirements, stakeholder package current or declined, not yet sized for phase planning | `phase-split` to decide whether phases are needed and plan them before implementation |
 | Phase planning confirmed the work fits one session | `implement-from-requirements` on the unsplit PRD |
 | Phase documents | `implement-from-requirements` for the first leaf phase, in plan-table order, without a `**Closed:**` line |
 | Every phase closed, no whole-PRD delivery audit yet (no `delivery audit complete (whole PRD)` commit) | `delivery-audit` on the whole PRD, in a fresh chat. The completion phases either audit adds, marked `**Added by delivery audit:**` or `**Added by test audit:**` at the top, are phase documents like any other: the row above builds them |
@@ -38,10 +39,11 @@ Five stages leave no file: a finished PRD refinement (its `PRD refinement comple
 - `technical-design-writing-standards`: the technical design, saying how, committed as a draft.
 - `review-technical-design`: started by the drafting skill in a fresh context. It questions the design's approach, checks its claims against the real code and the house standards, revises it in place and commits the revision; it skips itself for a design that follows an established pattern. **Second recommended review point:** the user reads the sections the review lists as worth reading.
 - `autonomous-design-refinement`: closes the gaps in both documents without the user. Technical questions are researched; open business decisions become assumptions, and the build proceeds on them. `implementation-readiness-check` is the alternative when the user wants to confirm each open question themselves; only the user can start it.
+- `stakeholder-review-package`: when requirements are ready, automatically create or refresh the HTML after design refinement and consolidation, unless the user declines it. Do not wait to be asked; sharing and stakeholder feedback remain optional.
 
 **2. Plan the phases, then build**
 
-- `phase-split`: the normal next step after requirements refinement. Size the work, write phase documents only when needed, and hand off without implementing.
+- `phase-split`: follows stakeholder-package preparation or the user's opt-out. Size the work, write phase documents only when needed, and hand off without implementing.
 - `implement-from-requirements`: builds the first planned phase, or the whole PRD when phase planning found it fits one session. Its sizing and automatic split remain a safeguard for a direct implementation request or work that outgrows its plan.
 - `continuation-prompt`: hands each next phase to a fresh session.
 
@@ -56,7 +58,7 @@ Either audit can also be pointed at a single closed phase when the user asks.
 
 ## Along the Way
 
-- When preparing material for business stakeholders, `stakeholder-review-package` can package selected PRD requirements, every open assumption and contextual mockups into one HTML review. It is an optional review aid, not another implementation document or approval gate. The user sends it; assumption answers come back through `assumptions-document-feedback`, and requirements or mockup corrections go through `prd-writing-standards`. Stakeholders respond on their own schedule; nothing waits on them.
+- The automatically prepared stakeholder package combines selected PRD requirements, every open assumption and contextual mockups into one HTML review. Its use and sharing remain optional; it is not another implementation document or approval gate. The user sends it; assumption answers come back through `assumptions-document-feedback`, and requirements or mockup corrections go through `prd-writing-standards`. Stakeholders respond on their own schedule; nothing waits on them.
 - A change to behavior an existing PRD already owns: amend that PRD and its design first (`prd-writing-standards`, "Document Storage Convention"), then build. A separate `docs/changes/` directory is the user's call; never create one unasked.
 - A fix already identified, mid-work or from a bug report, that fits one session: `implement-from-discovery`. With only a symptom, `investigate-question` first. Anything bigger goes back to the user to open a PRD or change directory.
 - One question to research to an answer with a confidence level: `investigate-question`.
