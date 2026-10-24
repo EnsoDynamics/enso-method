@@ -33,11 +33,11 @@ Use this skill when:
 
 ## Core Idea
 
-The framework's substance is the same as everywhere else: read the affected component's docs, verify alignment, apply the technical-vs-business gate, implement, test, commit. What this skill adds is the *trigger shape* — the source of the requirement is research findings sitting in the conversation, not a document authored upstream.
+The framework's substance is the same as everywhere else: read the affected component's docs, verify alignment, apply the technical-vs-business gate, record any changed intent, implement, test, commit. What this skill adds is the *trigger shape* — the source of the requirement is research findings sitting in the conversation, not a document authored upstream.
 
 That changes a few things in practice:
 
-- **There's no "PRD to implement against"** — the PRD that's relevant is the one for the *component you're modifying*, not for the change itself. The discovery is a delta against an existing component's intended behavior.
+- **There's usually no separate PRD for the change** — the PRD that's relevant is the one for the *component you're modifying*. Confirm its current owning criteria already express the intended behavior, or amend them before implementing. The discovery is a delta against an existing component's intended behavior.
 - **The commit message has to carry the discovery → fix linkage** — the conversation is ephemeral, but the commit message is the durable record of what was found and what was done.
 - **The technical-vs-business gate is the most load-bearing step** — because there's no PRD authoring step where the question would have surfaced, this skill is where you decide whether the change is something you can just make or something that needs an assumption + stakeholder validation.
 
@@ -90,7 +90,7 @@ Three cases:
 |------|---------|--------|
 | **Docs right, code wrong** | The PRD/TD describes the intended behavior; the code doesn't do it; the discovery is a gap-closing fix | Implement the fix. This is the most common case. When the code does something else instead, rather than failing, apply the check below first. |
 | **Code right, docs wrong** | The code is correct but the PRD/TD has drifted out of date | Update the docs first, including any mockup that shows the old behavior, then the code is already correct. |
-| **Docs silent, new behavior** | The PRD/TD doesn't address this case at all; the discovery is proposing new behavior | Apply the technical-vs-business gate (Phase 3). New behavior often needs an assumption. |
+| **Docs silent, new behavior** | The PRD/TD doesn't address this case at all; the discovery is proposing new behavior | Apply the technical-vs-business gate (Phase 3), then write the intended behavior before implementing (Phase 4). New behavior often needs an assumption. |
 
 If the change *contradicts* the PRD/TD's stated intent (not just fills a gap), resolve it as a Doc Divergence (the rule is in `implement-from-requirements`; the philosophy in `implementation-lifecycle`) — a decide-and-proceed, not a session stop: below 95% business confidence, an assumption entry and the build continues on it (it stops only when no answer can be put forward); where a stakeholder had personally ruled, it is a reopening at any confidence. Don't silently implement something the docs explicitly say shouldn't happen.
 
@@ -122,6 +122,12 @@ The most common mistake is over-classifying things as business — writing assum
 The reverse mistake is also real: classifying a business decision as technical and just changing it. That erodes the validation process. When in doubt, err toward business.
 
 ### Phase 4: Implement
+
+**Before changing code, record the intended change.** Name the governing criteria and confirm they already express the intended outcome, or amend them first after Phase 2's conflict check and Phase 3's decision. A bug that violates an existing requirement needs no manufactured requirement edit. For new or changed behavior, write testable acceptance criteria in the current owning PRD and update affected technical design sections and mockups. Purely technical changes update the design where needed, without inventing business requirements. An unconfirmed business choice remains an assumption; the criterion references that assumption rather than presenting it as settled.
+
+**Keep the amendment local and readable.** Rewrite the affected rule as a coherent statement of intended behavior, following `prd-writing-standards`, "Keep Criteria Readable as Cases Are Added"; don't append a trail of exceptions or an amendment log. Git preserves the earlier wording. If the change needs substantial restructuring, spans several owners, or needs its own explanation as a distinct capability, recommend a separate change PRD under "When to Use" above. Do not create one unasked. A separate PRD preserves the earlier criterion and uses the existing `Replaces:` / `Superseded by:` rules; an in-place amendment does not supersede itself.
+
+**Recorded intent is not proof of current behavior.** Someone may have changed the code outside the method. Investigate disagreements using Phase 2's shipped-behavior rule; neither the code nor an old criterion wins automatically. Amend only what this fix deliberately changes, without reconciling every historical PRD or claiming the rest matches the code. When Phase 1 found no owning documents, retain its explicit degraded-alignment path rather than fabricate a PRD or silently claim this step passed. The document edits precede code edits, but can land together in the same commit; no separate approval round is added.
 
 Build the fix following the codebase's existing patterns, the `engineering-principles` skill, and the house engineering standards named on an `Engineering standards:` line in the project's AGENTS.md/CLAUDE.md, if any (those own stack, style, structure and configuration).
 
@@ -162,7 +168,7 @@ After deliverable review completes — including any fixes it produced — **aut
 
 At this or any other terminal state, append the session marker's DONE line (`implementation-lifecycle`, "Session Markers").
 
-1. **Capture the discovery → fix linkage in the COMMIT MESSAGE.** There is no PRD recording why this change exists, so the commit message is the only place that reasoning survives: what was discovered, what was fixed, and why. **This is not licence for a summary in the wrap-up** — say there whether the fix landed, in a sentence or two, and let the commit message and the diff carry the detail (see the continuation test later in this list).
+1. **Capture the discovery → fix linkage in the COMMIT MESSAGE:** what was discovered, what was fixed, and why. The governing documents record intended behavior; the commit explains the change and does not substitute for the pre-code amendment in Phase 4. **This is not licence for a summary in the wrap-up** — say there whether the fix landed, in a sentence or two, and let the commit message and the diff carry the detail (see the continuation test later in this list).
 2. **Stage and validate per `pre-commit-validation`.** First write anything step 5 files into a governing document, so it is in the staged set. Load that skill at the commit boundary — build the expected changeset, leave other sessions' staged files staged, stage only your specific files (never `git add .` or `git add -A`), and run its checks (secrets scan, diff sanity).
 3. **Commit, run `refactor-pass`, then push a feature branch** — the default for finished work unless the user's instructions say otherwise (`pre-commit-validation`, "Who Commits"). Commit the fix with a message following the project's commit conventions (`type(scope): description`), announced with the repo name. Then run `refactor-pass` in this chat without asking; for the typically small changesets this skill ships its usual outcome is a one-line "no refactor warranted", and when it tidies it makes its own `refactor(scope):` commit. Then push when `pre-commit-validation`'s default push or the user's authorization covers it: a feature branch is pushed by default, never forced; without authorization, a push that would land on `develop`, `main` or another integration branch is held — stop after the commits and tell the user in one line to say push when ready. The wrap-up shows each commit's message with the repo name and the validation summary. A session ending Blocked stages its work and presents the commit instead. When the user has said not to commit — in this chat, in the prompt that started it, or in their instructions file — stop at the staged changeset with the message presented, and recommend `refactor-pass` for after the commit lands rather than running it. When the user has said not to push, stop after the commits.
 
