@@ -61,3 +61,7 @@ When the last phase of a split PRD closed, the method ended with a one-line reco
 - Completion phases regularly carry gaps small enough that a build session is mostly overhead. A same-chat fix for gaps under a threshold would then pay for itself.
 - Test audits keep adding completion phases for criteria the delivery audit read as implemented. Reading isn't catching partial builds, and the delivery audit should run the mapped tests too.
 - Per-phase audits become routine for large PRDs. The close-out could then shrink to a delta check across phases.
+
+## Update, 2026-10-25
+
+The historical-audit-exists routing rule above is replaced: after completion phases from either audit, or direct implementation fixes during a test audit, run a fresh whole-PRD delivery audit before returning to the test audit. Repeat repairs and delivery audits until clean. A clean audit remains current only while the governing requirements and implementation are unchanged; test-only and audit-record-only edits retain it. This closes the gap where the first audit's existence let later repairs bypass delivery verification.

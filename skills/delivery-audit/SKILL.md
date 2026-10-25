@@ -14,7 +14,9 @@ Every phase already ran `deliverable-review`. That is not enough on its own:
 - **A phase's Closed line is written by the session that built it.** Its own wrap-up decided the criteria were met.
 - **Gaps are usually partial, not total.** The logic exists but nothing calls it; the main path works and the error case the criterion names doesn't; one of two channels is wired. A missing feature is easy to notice, a half-wired one is not.
 
-The order at the end of a split PRD is fixed: this audit, then `implement-from-requirements` on any completion phases it added, then `test-audit`. Building comes before proving, so the test audit never grades tests for behavior that isn't there yet.
+At the end of a split PRD, this audit hands off to `test-audit` only when it finds no gaps. When either audit adds completion phases, `implement-from-requirements` builds them, then a fresh whole-PRD delivery audit checks the repairs. Repeat until no gaps remain. Building comes before proving, so the test audit never grades tests for behavior that isn't there yet.
+
+**A current clean delivery audit** found no gaps in the whole PRD and still covers the governing requirements and implementation as they stand. Read its outcome and compare relevant changes since its commit; the existence of a `delivery audit complete (whole PRD)` commit alone is not enough. Requirements or implementation changes, including small fixes made during a test audit, require a fresh delivery audit followed by test-audit's affected-row reassessment. Test-only and audit-record-only edits do not invalidate a clean delivery audit.
 
 ---
 
@@ -164,7 +166,7 @@ Report one record per criterion with these fields. Do not judge tests, style or 
 
 | Skill | Relationship |
 |-------|-------------|
-| `implement-from-requirements` | Hands off here when the last planned phase of a split PRD closes, and builds the completion phases this skill adds. When it closes the last of those, it hands off to `test-audit`. |
+| `implement-from-requirements` | Hands off here when the last planned or completion phase of a split PRD closes, and builds the completion phases either audit adds. Repairs return here until the whole-PRD delivery audit finds no gaps. |
 | `phase-split` | Owns the form of a completion phase ("Completion Phases"): its id, file name, marker line and template. Its rule that every criterion lands in exactly one phase is what lets this audit name the phase that owns each gap. |
 | `test-audit` | Runs after this skill. Same scope rules and the same rules for superseded and changed criteria; it grades whether the tests prove each criterion, and writes a completion phase of its own, in the same form, for a delivery gap it finds later. |
 | `deliverable-review` | The per-session check this skill repeats across the finished whole. |

@@ -182,8 +182,9 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
    PRD. It builds, reviews and tests the work, retaining its sizing check as a safeguard.
    Each phase ends with the prompt for the next one's fresh session.
 5. **Close it out.** When the last phase closes, its prompt starts `/delivery-audit`, which
-   checks every acceptance criterion was built and adds completion phases for any gaps. Once
-   those are built, `/test-audit` checks the tests prove every criterion and fills the gaps.
+   checks every acceptance criterion was built and adds completion phases for any gaps. Build
+   those and repeat the delivery audit until clean; then `/test-audit` checks the tests prove
+   every criterion and fills the gaps. Implementation fixes return through delivery audit.
 
 Before your first real project, plug in your team's engineering standards and add two
 recommended lines to your global instructions: see the [setup guide](docs/enso-method-setup-guide.md).
