@@ -55,10 +55,10 @@ npx skills remove -g -y assumptions-document-feedback assumptions-document-writi
   autonomous-design-refinement autonomous-prd-refinement autonomous-requirements-refinement \
   continuation-prompt deliverable-review delivery-audit engineering-principles \
   implement-from-discovery implement-from-requirements implementation-lifecycle \
-  implementation-readiness-check investigate-question phase-chain phase-split prd-roadmap \
-  prd-writing-standards pre-commit-validation refactor-pass review-technical-design \
-  stakeholder-review-package technical-design-writing-standards test-audit test-hardening \
-  using-the-enso-method wall-clock-awareness
+  implementation-readiness-check initiative-breakdown investigate-question phase-chain \
+  phase-split prd-roadmap prd-writing-standards pre-commit-validation refactor-pass \
+  review-technical-design stakeholder-review-package technical-design-writing-standards \
+  test-audit test-hardening using-the-enso-method wall-clock-awareness
 
 claude plugin marketplace add EnsoDynamics/enso-method
 claude plugin install enso-method@enso-method

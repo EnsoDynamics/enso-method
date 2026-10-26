@@ -31,7 +31,7 @@ Use this skill when:
 
 - The PRD or technical design haven't been written or refined yet — do that first (`prd-writing-standards`, `technical-design-writing-standards`, then `autonomous-design-refinement`, or `implementation-readiness-check` for an explicit human checkpoint).
 - The work is a single bounded fix with no requirements directory behind it — `implement-from-discovery` builds that without phases.
-- The source is bigger than one PRD — a brief or idea that would run to dozens of phases before anything reaches production. Cut it into planned PRDs with `prd-roadmap` first; this skill then splits each PRD once it is written.
+- The source is bigger than one PRD — a brief or idea that would run to dozens of phases before anything reaches production. Cut it into planned PRDs with `initiative-breakdown` first; this skill then splits each PRD once it is written.
 
 ---
 
@@ -179,7 +179,7 @@ Do not split for safety margin. An extra phase is not free — it costs a full s
 
 - A typical PRD splits into **2-4 phases**. A large one can honestly need more, but past about six, look for neighbors that together still fit one session and merge them before declaring.
 - The red flag is **phases thinner than session capacity requires** — slivers that would each finish with most of a session's capacity unused. Merge them. Don't compress honestly session-sized phases to hit an aesthetic count either.
-- A stubbornly enormous count *can* mean the PRD is oversized, but reopening a stakeholder-settled PRD is a rare last resort, not the default. When the phase count runs well past the band in `prd-roadmap`'s "PRD Size Calibration", say so in one line of the declaration, with a recommendation to re-cut the PRD into several with `prd-roadmap` — then finish the split anyway. Whether to reopen the PRD is the user's decision, not a reason to stop.
+- A stubbornly enormous count *can* mean the PRD is oversized, but reopening a stakeholder-settled PRD is a rare last resort, not the default. When the phase count runs well past the band in `initiative-breakdown`'s "PRD Size Calibration", say so in one line of the declaration, with a recommendation to re-cut the PRD into several with `initiative-breakdown` — then finish the split anyway. Whether to reopen the PRD is the user's decision, not a reason to stop.
 
 **When a clean split is hard — do your best before pushing back.** Phasing happens *after* the PRD has usually been hammered out with stakeholders, so reworking it is expensive and frequently off the table. Your job is to **make the split work**, not to bounce it back. If no cut gives every phase standalone end-user value, fall back in this order:
 
@@ -476,7 +476,7 @@ AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by ph
 | `implement-from-requirements` | The downstream consumer. Its Phase 2 sizing gate hands work here when it's too large (including a phase at any depth that turned out bigger than assumed); once the docs exist it continues with the first leaf in the same chat, and later leaves get one fresh chat each. It is always pointed at a leaf. |
 | `prd-writing-standards` | Owns the `docs/prds/` and `docs/changes/` directory convention that phase docs live in, the `AC-<AREA>-<NN>` labels phase docs reference, and the plain-English readability standard that phase Summaries and plan tables follow. |
 | `technical-design-writing-standards` | Defines the single technical design per PRD that phase docs point into by section heading — the design is never split or duplicated per phase. |
-| `prd-roadmap` | The same job one level up: it cuts an idea too big for one PRD into right-sized planned PRDs, reusing this skill's seam principles at PRD scale. Each planned PRD, once written, comes here to be split into phases. |
+| `initiative-breakdown` | The same job one level up: it cuts an idea too big for one PRD into right-sized planned PRDs, reusing this skill's seam principles at PRD scale. Each planned PRD, once written, comes here to be split into phases. |
 | `autonomous-design-refinement` / `implementation-readiness-check` | Should already have run against the PRD and technical design before this skill is invoked — this skill assumes the requirements are implementation-ready, it just decides whether they're too large for one session. |
 | `delivery-audit` | Checks that a finished PRD's criteria are built, and adds a completion phase in this skill's form ("Completion Phases") for each set of gaps. The one-phase-per-criterion rule is how it names the phase that owns each gap. |
 | `test-audit` | Audits a finished phase or PRD criterion by criterion: a phase document's "Acceptance criteria covered" list is the scope of a phase audit, and the one-phase-per-criterion rule is what makes a PRD audit add up. |

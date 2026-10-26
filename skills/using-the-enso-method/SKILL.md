@@ -10,12 +10,12 @@ The Enso Method builds software from requirements through a fixed order of docum
 
 ## Find Where the Work Stands
 
-Read the repo before choosing. Everything for one piece of work lives in `docs/prds/{name}/`, or `docs/changes/{name}/` for a bounded change, or wherever the repo already keeps its documents; an idea cut into several PRDs also has `docs/roadmaps/{name}/`. When several rows match, the furthest stage reached (the lowest row) wins.
+Read the repo before choosing. Everything for one piece of work lives in `docs/prds/{name}/`, or `docs/changes/{name}/` for a bounded change, or wherever the repo already keeps its documents; an idea cut into several PRDs also has `docs/initiatives/{name}/` (`docs/roadmaps/{name}/` in older repos). When several rows match, the furthest stage reached (the lowest row) wins.
 
 | What exists | Next skill |
 |---|---|
-| An idea, notes or a brief, no PRD | `prd-roadmap` if it is bigger than one PRD, otherwise `prd-writing-standards` |
-| A new PRD roadmap | `prd-writing-standards` for its first planned PRD. Later ones start only when the user chooses, usually after the previous PRD reaches production |
+| An idea, notes or a brief, no PRD | `initiative-breakdown` if it is bigger than one PRD, otherwise `prd-writing-standards` |
+| A new initiative | `prd-writing-standards` for its first planned PRD. The others are written when the user chooses, one at a time or alongside each other, and each is built once the PRDs on its **Depends on:** line are done |
 | A drafted PRD, not yet refined | `autonomous-prd-refinement`; one `deliverable-review` round is enough for a small PRD. A `{name}-prd-refinement-state.md` in the directory means a run is in progress: resume it |
 | A refined PRD, no technical design | `technical-design-writing-standards`, after the user's review when the user wants one. A small change that follows an established pattern and adds no new interfaces can skip the design and go to `implement-from-requirements`, which proceeds without one |
 | A drafted technical design with no review commit after it, and no design refinement under way or finished | `review-technical-design`, in a fresh context |
@@ -33,7 +33,7 @@ Five stages leave no file: a finished PRD refinement (its `PRD refinement comple
 
 **1. Decide what to build**
 
-- `prd-roadmap`: only when the idea is bigger than one PRD. A PRD is a medium body of work, about the size of an agile epic. Decide which applies with the PRD-sized test in `prd-roadmap` (Step 2) rather than asking the user. Each planned PRD then goes through this whole sequence.
+- `initiative-breakdown`: only when the idea is bigger than one PRD. A PRD is a medium body of work, about the size of an agile epic; an idea bigger than that is an initiative. Decide which applies with the PRD-sized test in `initiative-breakdown` (Step 2) rather than asking the user. Each planned PRD then goes through this whole sequence.
 - `prd-writing-standards`: the PRD, saying what is built and why.
 - `autonomous-prd-refinement`: reviews and fixes the drafted PRD, its assumptions and mockups in rounds until no Medium or High finding is left. **First recommended review point:** the user reads it, ideally with whoever owns the business decisions, before the design starts.
 - `technical-design-writing-standards`: the technical design, saying how, committed as a draft.
@@ -68,5 +68,5 @@ Either audit can also be pointed at a single closed phase when the user asks.
 
 - **The two reviews are recommended, not required.** The refined PRD and the reviewed technical design are where human judgment goes in best. At each, say it is a good point for the user's review and what to read, then carry on when the user says to, or straight away when the user, or the prompt that started the run, asked to go through without stopping. Nothing refuses to proceed because a review didn't happen: like an assumption, an unreviewed document is a green light, and the user's corrections are folded in whenever they arrive. Beyond these, the user is not asked about requirements again; they start each next phase and send assumptions to stakeholders.
 - **The requirements skills, the builds and the audits commit their own work** unless the user says not to (`pre-commit-validation`, "Who Commits"). The requirements skills and the delivery audit never push by default; builds and the test audit push when the push lands on a feature branch.
-- **Requirements come before the build.** A request to build something new with no PRD starts at `prd-writing-standards`, or `prd-roadmap` when it is bigger than one PRD.
+- **Requirements come before the build.** A request to build something new with no PRD starts at `prd-writing-standards`, or `initiative-breakdown` when it is bigger than one PRD.
 - **Start at the stage the work has reached.** Existing documents are not rewritten to restart the sequence.

@@ -199,7 +199,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `using-the-enso-method` — the map: which skill runs at each stage, in what order, and where you review. Ask your agent to "use the Enso Method" and it loads this
 
 **Requirements and design**
-- `prd-roadmap` — cut an idea too big for one PRD into an ordered roadmap of planned PRDs
+- `initiative-breakdown` — cut an initiative, an idea too big for one PRD, into right-sized planned PRDs that each reach production
 - `prd-writing-standards` — write a PRD, and where the documents live
 - `technical-design-writing-standards` — write or check a technical design
 - `review-technical-design` — a senior review of the drafted design that checks it against the real code and your house standards, fixes what it finds, and lists the sections worth your own reading

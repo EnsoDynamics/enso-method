@@ -27,7 +27,7 @@ Every implementation area has up to four documents. They form a system. **All of
 
 Paths above show `docs/prds/`; a `docs/changes/` directory is identical.
 
-**Upstream of the PRD, when an idea was too big for one:** a full brief and a PRD roadmap in `docs/roadmaps/{name}/` (`prd-roadmap` owns them). The full brief holds decisions that govern every PRD cut from it; the roadmap orders the planned PRDs. They are inputs to requirements work, not entities an implement session maintains. The one exception is the roadmap's Status column, which moves when a PRD is written and when its work reaches production.
+**Upstream of the PRD, when an idea was too big for one:** an initiative brief and its PRD list in `docs/initiatives/{name}/` (`initiative-breakdown` owns them). The initiative brief holds decisions that govern every PRD cut from it; the PRD list orders the planned PRDs. They are inputs to requirements work, not entities an implement session maintains. The one exception is the PRD list's Status column, which moves when a PRD is written and when its work reaches production.
 
 **At the end of a split PRD, completion phases:** phase documents `delivery-audit` or `test-audit` adds after every planned phase has closed, when a criterion turns out not fully built, marked `**Added by delivery audit:**` or `**Added by test audit:**` at the top. `phase-split` owns their form ("Completion Phases"). They carry criteria the PRD already had, never discovered work, and are never a destination for filed work.
 
@@ -362,7 +362,7 @@ Every implementation session exists in service of one named unit of work, and it
 - **Ticket-tracked work** — a ticket or issue somebody raised, in whatever tracker it lives in: a Jira ticket (`PROJ-4271`), a GitHub issue. Lineage is the id and what it reports. The id counts because someone other than this session decided the work matters. Filing a ticket is bookkeeping, not a disposition (the disposition table above), and citing an id this session just minted as the lineage for a chat it writes itself is the orphan chain wearing an id: a minted id makes work findable, not needed.
 - **A declared ops or incident thread** with a session notes file in the repo recording its state. Lineage is the thread and the incident.
 - **A component defect reported from outside**, no PRD in flight — the `implement-from-discovery` case. Lineage is the component's own PRD plus who reported it or what broke.
-- **Requirements work** — refining, splitting, designing, writing the PRD. In service of the PRD itself; there is no phase yet. When the PRD is not written yet and comes from a PRD roadmap (`prd-roadmap`), the lineage is the roadmap and the planned PRD by name.
+- **Requirements work** — refining, splitting, designing, writing the PRD. In service of the PRD itself; there is no phase yet. When the PRD is not written yet and comes from an initiative (`initiative-breakdown`), the lineage is the initiative and the planned PRD by name.
 - **Methodology work** on the skills or instructions themselves.
 
 The red flag is the one shape not on that list: a code-change chat whose only lineage is *another chat*. It names a symptom, and no acceptance criterion, no ticket id, no incident, no session file. That chat is the chain, and the honest block for it reads "no lineage found" — which is the block's whole value: an orphan reads as an orphan, so the user can decide whether it should exist at all, instead of discovering the chain from the inside a day later.
@@ -510,7 +510,7 @@ This skill provides the **framework context**. Other skills provide the **proced
 | `implementation-readiness-check` | Pre-implementation gate — only when user explicitly requests a review checkpoint |
 | `investigate-question` | Deep-dive investigation of specific questions surfaced during readiness checks or implementation |
 | `assumptions-document-writing` | When writing or updating assumptions — formatting standards |
-| `prd-roadmap` | Before any PRD, when an idea is too big for one: cuts it into right-sized planned PRDs beside a full brief that stays whole |
+| `initiative-breakdown` | Before any PRD, when an idea is too big for one: cuts it into right-sized planned PRDs beside an initiative brief that stays whole |
 | `autonomous-prd-refinement` | After a PRD is drafted and before the user's recommended review: review-and-fix rounds until no Medium or High finding is left |
 | `review-technical-design` | After the technical design draft is committed and before `autonomous-design-refinement`: questions the design's approach, verifies its claims, revises it in place and commits the revision; skips itself for a design that follows an established pattern |
 | `autonomous-design-refinement` | Refining docs from draft to implementation-ready state |

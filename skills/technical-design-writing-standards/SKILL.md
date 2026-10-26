@@ -41,7 +41,7 @@ A system can be mixed; say which parts are which. `autonomous-design-refinement`
 
 ### Steps
 
-1. **Read the PRD in full**, plus any PRD or design it builds on, and settle the posture above. In a roadmap, the designs it builds on are those of the PRDs on its **Depends on** line, and their contracts are settled once each design has finished `autonomous-design-refinement`. When one of them has no design yet, or its refinement hasn't finished, say so in one line before drafting and recommend designing that PRD first, then carry on unless the user says to wait. When the draft goes ahead, put what this design assumes about that PRD's contracts in Open Questions, so it is checked once that design settles. Load `engineering-principles` and every house standard named on an `Engineering standards:` line in the project's `AGENTS.md` (or the user's global map); with none named, the conventions visible in the codebase are the house standard. The design is held to them from the first draft.
+1. **Read the PRD in full**, plus any PRD or design it builds on, and settle the posture above. In an initiative, the designs it builds on are those of the PRDs on its **Depends on** line, and their contracts are settled once each design has finished `autonomous-design-refinement`. When one of them has no design yet, or its refinement hasn't finished, say so in one line before drafting and recommend designing that PRD first, then carry on unless the user says to wait. When the draft goes ahead, put what this design assumes about that PRD's contracts in Open Questions, so it is checked once that design settles. Load `engineering-principles` and every house standard named on an `Engineering standards:` line in the project's `AGENTS.md` (or the user's global map); with none named, the conventions visible in the codebase are the house standard. The design is held to them from the first draft.
 2. **Work from the PRD outward, not from the code outward.** For each acceptance criterion, read the code and systems it touches until you know what already exists and what is missing. Stop there; a survey of the whole system is not needed.
 3. **Write the sections in the example structure below, designing only the difference**: the new or changed interfaces, data models and decisions, each decision with its rationale. For an existing system, add a short **Existing Code** section that records decisions, not a description: the posture in one line; what is reused, named in a line each; what is switched off (Salvage); and, under Preserve, behavior the design must keep that the code alone would not tell you. Don't describe how the existing code works, anywhere in the design; the implementer reads the code, and a description only goes stale. Keep the section to about a dozen lines.
 4. **Keep to the PRD.** The design never adds a requirement, and behavior the PRD doesn't ask for is out of scope. Technical choices you can make, make, and record why. A gap in the PRD goes in Open Questions; a business uncertainty also goes in the assumptions document per `assumptions-document-writing`.
@@ -57,7 +57,7 @@ A system can be mixed; say which parts are which. `autonomous-design-refinement`
 ### Overview
 Brief summary of what's being built and the key technical decisions. Link to the parent PRD.
 
-When the PRD comes from a PRD roadmap (`prd-roadmap`), the design also honors the full brief's settled decisions and the seams in the PRD contracts beside the roadmap (`{name}-prd-contracts.md`). It decides the shared contracts that document says this PRD owns, and extends — never redesigns — contracts an earlier PRD owns. It covers only what this PRD ships, not the whole roadmap.
+When the PRD comes from an initiative (`initiative-breakdown`), the design also honors the initiative brief's settled decisions and the seams in the PRD contracts beside the PRD list (`{name}-prd-contracts.md`). It decides the shared contracts that document says this PRD owns, and extends — never redesigns — contracts an earlier PRD owns. It covers only what this PRD ships, not the whole initiative.
 
 ### Architecture Decisions
 What choices are we making and why? Each decision should include rationale — not just "we chose X" but "we chose X because Y," where Y is the requirement or constraint that decided it. The design names what it chose, never the options it beat ("Rejected Alternatives", below).
@@ -242,8 +242,8 @@ docs/prds/{prd-name}/          ← or docs/changes/{prd-name}/ — a bounded del
 
 Use the simple filename `technical-design.md`. There's no need to repeat the PRD name — the directory already provides that context.
 
-A PRD has exactly one technical design (`phase-split`, `prd-roadmap`). A PRD spanning several services covers each in its own section; work that genuinely needs separate designs is more than one PRD (`prd-roadmap`).
+A PRD has exactly one technical design (`phase-split`, `initiative-breakdown`). A PRD spanning several services covers each in its own section; work that genuinely needs separate designs is more than one PRD (`initiative-breakdown`).
 
-### Cross-Repo Initiatives
+### Cross-Repo Work
 
 If the feature spans multiple repositories, designate one repo as the home for the PRD directory (typically the one that owns the primary interface or orchestration) and put the technical design alongside the PRD there.
