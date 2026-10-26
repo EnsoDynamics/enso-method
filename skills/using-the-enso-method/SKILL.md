@@ -17,7 +17,7 @@ Read the repo before choosing. Everything for one piece of work lives in `docs/p
 | An idea, notes or a brief, no PRD | `initiative-breakdown` if it is bigger than one PRD, otherwise `prd-writing-standards` |
 | A new initiative | `prd-writing-standards` for its first planned PRD. The others are written when the user chooses, one at a time or alongside each other, and each is built once the PRDs on its **Depends on:** line are done |
 | A drafted PRD, not yet refined | `autonomous-prd-refinement`; one `deliverable-review` round is enough for a small PRD. A `{name}-prd-refinement-state.md` in the directory means a run is in progress: resume it |
-| A refined PRD, no technical design | `technical-design-writing-standards`, after the user's review when the user wants one. A small change that follows an established pattern and adds no new interfaces can skip the design and go to `implement-from-requirements`, which proceeds without one |
+| A refined PRD, no technical design | `technical-design-writing-standards`, after the user's review when the user wants one. A small change that follows an established pattern and adds no new interfaces can skip the design and go to `implement-from-requirements`, which proceeds without one. A stakeholder package made from the refined PRD does not move the work past this row |
 | A drafted technical design with no review commit after it, and no design refinement under way or finished | `review-technical-design`, in a fresh context |
 | A reviewed technical design | `autonomous-design-refinement`, after the user's read of it when the user wants one. A `{name}-design-refinement-state.md` in the directory means a run is in progress: resume it |
 | Refined requirements, stakeholder package missing or stale and not declined | `stakeholder-review-package` to create or refresh the HTML automatically before phase planning |
@@ -33,9 +33,11 @@ Five stages leave no file: a finished PRD refinement (its `PRD refinement comple
 
 **1. Decide what to build**
 
+The method starts from the user's own material, however rough: notes, emails, meeting transcripts, earlier chat sessions where decisions were made, and mockups or a prototype for anything with a screen. All of it is input to the PRD. Gather everything directly relevant before writing it, and ask once where else decisions live.
+
 - `initiative-breakdown`: only when the idea is bigger than one PRD. A PRD is a medium body of work, about the size of an agile epic; an idea bigger than that is an initiative. Decide which applies with the PRD-sized test in `initiative-breakdown` (Step 2) rather than asking the user. Each planned PRD then goes through this whole sequence.
 - `prd-writing-standards`: the PRD, saying what is built and why.
-- `autonomous-prd-refinement`: reviews and fixes the drafted PRD, its assumptions and mockups in rounds until no Medium or High finding is left. **First recommended review point:** the user reads it, ideally with whoever owns the business decisions, before the design starts.
+- `autonomous-prd-refinement`: reviews and fixes the drafted PRD, its assumptions and mockups in rounds until no Medium or High finding is left. **First recommended review point:** the user reads it, ideally with whoever owns the business decisions, before the design starts. For that read, `stakeholder-review-package` can be made now from the refined PRD, when the user asks or says they will not take the work through the design themselves. A business owner can review it and hand the directory to whoever builds it; the package is refreshed after design refinement as usual and then shows only what is still open, including anything the design raised.
 - `technical-design-writing-standards`: the technical design, saying how, committed as a draft.
 - `review-technical-design`: started by the drafting skill in a fresh context. It questions the design's approach, checks its claims against the real code and the house standards, revises it in place and commits the revision; it skips itself for a design that follows an established pattern. **Second recommended review point:** the user reads the sections the review lists as worth reading.
 - `autonomous-design-refinement`: closes the gaps in both documents without the user. Technical questions are researched; open business decisions become assumptions, and the build proceeds on them. `implementation-readiness-check` is the alternative when the user wants to confirm each open question themselves; only the user can start it.
@@ -56,10 +58,18 @@ Five stages leave no file: a finished PRD refinement (its `PRD refinement comple
 
 Either audit can also be pointed at a single closed phase when the user asks.
 
+## When to Start a New Chat
+
+A stage that starts in a new chat works from the documents rather than a long conversation about them, and brings fresh eyes. The model cannot clear its own context, so the session says when to start over. At each of these points, end with a `continuation-prompt` for the next stage and tell the user plainly that the next step is a new chat, unless the user asked to carry on in this one:
+
+- **Always:** between the requirements and the technical design (after `autonomous-prd-refinement`, which is also the first review point), before the build, and when the user turns to a different piece of work. Each later phase and each audit already gets its own chat.
+- **Recommended:** after drafting the PRD and before its refinement, and between each design stage. These refinements review in fresh subagents, so a break skipped here costs little.
+
+An orchestrator that opens sessions itself uses the same points: one session per stage, never one long session for the whole sequence.
+
 ## Along the Way
 
 - The automatically prepared stakeholder package combines selected PRD requirements, every open assumption and contextual mockups into one HTML review. Its use and sharing remain optional; it is not another implementation document or approval gate. The user sends it; assumption answers come back through `assumptions-document-feedback`, and requirements or mockup corrections go through `prd-writing-standards`. Stakeholders respond on their own schedule; nothing waits on them.
-- A change to behavior an existing PRD already owns: amend that PRD and its design first (`prd-writing-standards`, "Document Storage Convention"), then build. A separate `docs/changes/` directory is the user's call; never create one unasked.
 - A fix already identified, mid-work or from a bug report, that fits one session: `implement-from-discovery`. With only a symptom, `investigate-question` first. Anything bigger goes back to the user to open a PRD or change directory.
 - One question to research to an answer with a confidence level: `investigate-question`.
 - A session drifting from the method: reload `implementation-lifecycle`.
@@ -68,5 +78,6 @@ Either audit can also be pointed at a single closed phase when the user asks.
 
 - **The two reviews are recommended, not required.** The refined PRD and the reviewed technical design are where human judgment goes in best. At each, say it is a good point for the user's review and what to read, then carry on when the user says to, or straight away when the user, or the prompt that started the run, asked to go through without stopping. Nothing refuses to proceed because a review didn't happen: like an assumption, an unreviewed document is a green light, and the user's corrections are folded in whenever they arrive. Beyond these, the user is not asked about requirements again; they start each next phase and send assumptions to stakeholders.
 - **The requirements skills, the builds and the audits commit their own work** unless the user says not to (`pre-commit-validation`, "Who Commits"). The requirements skills and the delivery audit never push by default; builds and the test audit push when the push lands on a feature branch.
-- **Requirements come before the build.** A request to build something new with no PRD starts at `prd-writing-standards`, or `initiative-breakdown` when it is bigger than one PRD.
+- **Requirements come before the build.** A request to build something new with no PRD starts at `prd-writing-standards`, or `initiative-breakdown` when it is bigger than one PRD. When the user asks to skip or reorder a stage (build before the PRD is refined, build one piece first, a process of their own layered on the method), say once which stage is skipped and what it risks, then do what the user decides.
+- **Feedback goes into the requirements before the code.** Reactions to working software ("this is wrong", "can you change X"), meeting notes and review comments change intended behavior, even when they read like a quick tweak. Don't edit the code from the chat. When the code does not do what the PRD says, that is a bug for `implement-from-discovery`. When the PRD itself asked for the wrong thing, amend that PRD and its design first (`prd-writing-standards`, "Document Storage Convention"), with answers to open assumptions going through `assumptions-document-feedback`; commit, then build the difference with `implement-from-requirements` in a new chat. While that PRD's build is still under way, record the change in its documents and let the build finish rather than changing code beside it. When the user asks for the direct edit, say this in a sentence; if they still want it, it is their call. A separate `docs/changes/` directory is the user's call; never create one unasked.
 - **Start at the stage the work has reached.** Existing documents are not rewritten to restart the sequence.

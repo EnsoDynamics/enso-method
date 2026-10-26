@@ -320,8 +320,10 @@ Facts verified: {n}
 Hand-offs to other sessions: {list, or none}
 Out of scope, noticed and not acted on: {list, or none}
 
-Next: the user's review of the PRD is recommended here, ideally with whoever owns the business decisions; then the technical design (`technical-design-writing-standards`).
+Next: the user's review of the PRD is recommended here, ideally with whoever owns the business decisions (`stakeholder-review-package` can make it a readable review now, on request); then the technical design (`technical-design-writing-standards`) in a new chat.
 ```
+
+After the report, give the `continuation-prompt` for the technical design, unless the user asked to carry on in this chat.
 
 ---
 

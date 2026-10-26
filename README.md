@@ -166,11 +166,14 @@ plugins? See how they work in [Claude Code](https://code.claude.com/docs/en/plug
 and [Codex](https://learn.chatgpt.com/docs/plugins). To work from a clone of the repo, see the
 [setup guide](docs/enso-method-setup-guide.md#install-and-update). Then, in your
 agent (in Codex, pick skills from the `$` menu or type the full name, such as
-`$enso-method:prd-writing-standards`):
+`$enso-method:prd-writing-standards`). Start each step below in a new chat:
 
 1. **Write the PRD.** Run `/prd-writing-standards` and describe what you want in your own
-   words. Talk it through; the messy version is better than a tidy instruction. Then run
-   `/autonomous-prd-refinement`, which reviews and fixes it in rounds, ready for your review.
+   words, pointing it at your notes, transcripts, mockups or prototype. Talk it through; the
+   messy version is better than a tidy instruction. Then run `/autonomous-prd-refinement`,
+   which reviews and fixes it in rounds, ready for your review. If you own the business
+   decisions but won't take the design further yourself, run `/stakeholder-review-package`
+   now, answer it, and hand the folder to whoever builds it.
 2. **Design and refine.** Run `/technical-design-writing-standards`. It drafts the design and
    has `review-technical-design` check and fix it, with a list of the sections worth your
    reading. Then run `/autonomous-design-refinement` to close the gaps. When requirements
