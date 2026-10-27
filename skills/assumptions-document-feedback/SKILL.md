@@ -193,7 +193,7 @@ Confirmations and items with no response change nothing and need no sorting. One
 **The follow-on.** Every new ask that is not minor and has no other home goes to one follow-on PRD:
 
 - **One open follow-on per PRD.** A follow-on is found by its `**Follow-on to:**` line naming the PRD it follows: under its PRD's H1 once written, in its PRD contracts entry or scope file before that. If this PRD already has a follow-on whose build has not started (the same test as above), the asks join it, as amendments to its PRD once that is written. Otherwise create one. One round never creates more than one follow-on for a PRD.
-- **Keep the stakeholder's words.** Save the reply exactly as received in this PRD's directory as `{prd-dir}-stakeholder-feedback-YYYY-MM-DD.txt`, unless the repository already keeps it. The follow-on's scope points at it, so the session that writes the follow-on works from the stakeholder's words, not a paraphrase.
+- **Keep the stakeholder's words.** Whenever a reply carries attachments or feeds a follow-on, including a reply whose changes all stay in this PRD, save it exactly as received, with any mockups or files attached to it, in `source-material/{source}-feedback-YYYY-MM-DD/`, where `{source}` names who sent it (the stakeholder or their team), unless the repository already keeps it. Like any handoff material, it is never edited and never sits inside a PRD's directory (`prd-writing-standards`, "Mockups Show What the Criteria Require"). The follow-on's scope points at it, so the session that writes the follow-on works from the stakeholder's words and pictures, not a paraphrase.
 - **In an initiative:** add the follow-on as a row in the PRD list and an entry in the PRD contracts, in the formats `initiative-breakdown` defines (Step 5), with status `planned`. Give it a title that says what it delivers, and put it right after this PRD in the order, ahead of any planned PRD whose criteria it changes (the conflict check in `implementation-lifecycle` finds those). Its **Depends on:** and **Follow-on to:** lines name this PRD. Its **In this PRD:** line names each ask in a few words and points at the saved feedback. A **Changes:** line names each criterion of this or another PRD that it changes, by label, so its PRD can carry the `Replaces:` lines.
 - **Outside an initiative:** create a change directory, `docs/changes/{name}/`, holding one file, `{name}-follow-on-scope.md`, with the same lines as a PRD contracts entry. The chat that writes the PRD deletes that file in the commit that writes the PRD.
 - **Not written here.** Writing the follow-on's PRD, with its mockups and assumptions, is a session of its own. This chat ends with the prompt for it (Step 8).
@@ -301,8 +301,8 @@ For each decision this skill settles or changes, at any confidence: a validated 
 4. **Update Field Mapping documents** (if applicable):
    - Update SQL queries, field sources, or business logic
 
-5. **Redraw affected mockups** (if the PRD has them):
-   - Redraw every mockup state the decision changes, in the same change as the PRD edit (`prd-writing-standards`, "Mockups Show What the Criteria Require")
+5. **Draw or redraw affected mockups:**
+   - Draw or redraw every mockup state the decision changes, in the same change as the PRD edit, even when the PRD had no mockups before. Start from any mockup the stakeholder supplied, after saving the original under `source-material/` (Step 1a, "Keep the stakeholder's words"), otherwise from the latest drawing of the screen or the screen as built (`prd-writing-standards`, "Mockups Show What the Criteria Require"). A decision that changes no screen needs none
 
 **Why this matters**: The assumptions document is a working document that eventually gets emptied. If you only update assumptions without propagating to PRD/Tech Design, the validated decisions are lost when the assumption is removed. The PRD and Technical Design are the permanent records.
 
@@ -310,7 +310,7 @@ For each decision this skill settles or changes, at any confidence: a validated 
 - [ ] PRD updated with validated decisions
 - [ ] Technical Design updated with any implementation changes
 - [ ] Field mapping docs updated if data sources/logic changed
-- [ ] Mockups redrawn wherever the decision changed what a screen shows
+- [ ] Mockups drawn or redrawn wherever the decision changed what a screen shows
 - [ ] All documents have consistent information (no contradictions)
 
 ### 6. Give the Work a Place in the Plan
@@ -334,6 +334,8 @@ This step applies when Step 3 produced new assumptions below 95% confidence, and
 Then set each entry at the confidence the investigation leaves it at: at 95%+ it folds into requirements, below that it stays a pending assumption and work proceeds on it, and only when the evidence favors no answer at all does it become a Blocking Open Question. Report what moved in one line each: the assumption, its confidence before and after, and what settled it.
 
 ### 8. Hand Off
+
+When this round drew or redrew a mockup for a change kept in this PRD, refresh its stakeholder review package first, or create one if none exists, unless the user declined it (`stakeholder-review-package`), so the stakeholder sees how their feedback will look. Nothing waits on their reply.
 
 End with a prompt for each new chat this round needs, written with `continuation-prompt` and shown in full in the report, so the user knows exactly what to start:
 
@@ -420,7 +422,7 @@ and PENDING is the safe default for unclassified accounts.
 3. **Exchanges:** a new ask that reverses an explicit exclusion, so it goes to the follow-on. The refund-only flow is built, and shipping it leaves nothing for exchanges to clean up, so it ships as built.
 4. **Daily export:** an outcome the PRD never set out to deliver. The initiative's planned Returns Reporting PRD covers exports for staff, so the ask goes into that entry's scope, not the follow-on.
 
-**Result:** one follow-on, *Customer Exchanges*, added after Customer Returns in the initiative's order. Its **Changes:** line names AC-RET-05, and the stakeholder's reply is saved beside the PRD. The report gives one prompt, to write Customer Exchanges. Phases 5 and 6 still finish Customer Returns on the scope it started with.
+**Result:** one follow-on, *Customer Exchanges*, added after Customer Returns in the initiative's order. Its **Changes:** line names AC-RET-05, and the stakeholder's reply is saved under `source-material/`. The confirm screen's mockup is redrawn with the fee, and the review package is refreshed. The report gives one prompt, to write Customer Exchanges. Phases 5 and 6 still finish Customer Returns on the scope it started with.
 
 ---
 
@@ -445,7 +447,7 @@ After processing feedback, provide:
 - [ ] PRD updated with validated decisions
 - [ ] Technical Design updated with implementation details
 - [ ] Field mapping docs updated (if applicable)
-- [ ] Mockups redrawn wherever a decision changed what a screen shows
+- [ ] Mockups drawn or redrawn wherever a decision changed what a screen shows, and the review package refreshed (Step 8)
 - [ ] All documents now consistent
 - [ ] Every change sorted as a fix or a new ask, and every new ask in exactly one place: this PRD, another PRD, or the follow-on (Step 1a)
 - [ ] Code changes routed per Step 6 (amended PRD, carried-forward section, or feedback phase)
