@@ -244,7 +244,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 **Implementation**
 - `implementation-lifecycle` — the umbrella: the assumptions philosophy, confidence thresholds and the No Loose Ends session discipline. Reload it to get a drifting session back on track
 - `implement-from-requirements` — the default build from PRD and technical design
-- `implement-from-discovery` — implement a fix found mid-work or raised in a bug report
+- `implement-from-discovery` — implement a fix or change found mid-work or raised in a bug report, writing it into the requirements first
 - `phase-split` — size the work before implementation; split it into session-sized, shippable phases only when needed
 - `continuation-prompt` — the copy-paste prompt that starts the next chat
 

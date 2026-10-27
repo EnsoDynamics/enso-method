@@ -151,7 +151,7 @@ This skill is self-contained — the signals and guardrails above are the comple
 | Skill | Relationship |
 |-------|-------------|
 | `implement-from-requirements` | Runs this skill at wrap-up, in the same chat, after the feature commit and before any push. |
-| `implement-from-discovery` | Same, for discovery-triggered work — the anchor is the stated intent of the fix rather than PRD acceptance criteria. |
+| `implement-from-discovery` | Same, for discovery-triggered work — the anchor is the criteria its Phase 4 wrote or confirmed, or the stated intent of the fix when it wrote none. |
 | `test-hardening` | The preceding step, and the precondition: it certifies the safety net this pass depends on. Standalone invocations with a weak or red suite get routed there first. |
 | `deliverable-review` | Two steps earlier in the chain. It verifies the deliverable matches intent; this pass never revisits that question. |
 | `prd-writing-standards` | Where an over-the-gate refactor lives if the user wants it done (Step 5): a change directory, created on the user's say-so, whose technical design is the brief a fresh standalone invocation executes. |

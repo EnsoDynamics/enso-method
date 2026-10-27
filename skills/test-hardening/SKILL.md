@@ -215,7 +215,7 @@ This skill is self-contained — the testing philosophy and scope boundary above
 | Skill | Relationship |
 |-------|-------------|
 | `implement-from-requirements` | Auto-runs this skill after deliverable review completes — the third step of its chain. Its test phase builds the initial portfolio; this skill hardens it with fresh eyes. |
-| `implement-from-discovery` | Same chain, discovery-triggered work — auto-runs this skill after its deliverable review; the baseline is the stated intent of the fix rather than PRD acceptance criteria. |
+| `implement-from-discovery` | Same chain, discovery-triggered work — auto-runs this skill after its deliverable review; the baseline is the criteria its Phase 4 wrote or confirmed, or the stated intent of the fix when it wrote none. |
 | `test-audit` | The independent check once a phase or PRD is finished: it grades every criterion's evidence on the same four grades, across all the sessions that built it, and fills the gaps. This skill hardens one session's work; that one audits the finished whole. |
 | `deliverable-review` | The preceding step. It verifies the deliverable matches intent; this skill verifies the tests prove the requirements. Run it first — its fixes change code that tests must cover. |
 | `engineering-principles` | The testing evidence standard this skill enforces. This skill's rules are a self-contained restatement, deliberately aligned; test tooling and framework conventions come from the house engineering standards the project names, if any. |
