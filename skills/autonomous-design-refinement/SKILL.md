@@ -229,6 +229,8 @@ If a session-limit or context warning appears: finish the in-flight question, up
 
 ### Phase 1: Setup and Re-orientation
 
+**Pending feedback changes come first,** on a fresh start and on every resume. A `{name}-pending-feedback-changes.md` beside the PRD means a stakeholder round has changed what it must say: apply it with `assumptions-document-feedback`, which resumes from that file (its Step 4a, "Resuming"), commit that amendment on its own, then continue.
+
 1. **Check for a state file** at the expected location. If present, read it, confirm the documents still exist, and continue from **Next action**. Do not restart from discovery unless the state file says the current pass is complete.
 2. **If starting fresh**, locate all requirements documents — PRD, technical design, assumptions (if any), and supporting materials the documents reference — and create the state file from the template. Record the paths, the PRD's word count, and the existing code posture; do not read full contents here (search the PRD and design for a stated posture rather than reading them whole).
 3. **Verify environment access** — databases, APIs, infrastructure, whatever investigation may need. Record limitations up front under Blockers rather than discovering them mid-pass.

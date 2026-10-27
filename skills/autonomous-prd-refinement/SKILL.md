@@ -254,6 +254,8 @@ On a session-limit or context warning: finish the step in flight, update the sta
 
 ### Phase 1: Setup and Re-orientation
 
+**Pending feedback changes come first,** on a fresh start and on every resume. A `{name}-pending-feedback-changes.md` beside the PRD means a stakeholder round has changed what it must say: apply it with `assumptions-document-feedback`, which resumes from that file (its Step 4a, "Resuming"), commit that amendment on its own, then continue.
+
 1. **Check for a state file** beside the PRD. If one exists, read it and check Status first: a paused run waits for what its **Next action** names (a raised cap, an answer, access) until the user gives it. Otherwise confirm the documents still exist and continue from **Next action**.
 2. **If starting fresh**, find the documents listed under Required Inputs and create the state file. Have one sub-agent read the PRD and its source material and return the intent, the decisions the sources settle, how the mockups render and the width their main users work at, and write them into the state file. The orchestrator does not read the full documents itself.
 3. **Confirm the repo state:** the branch, and which files other sessions have uncommitted changes in. Record the branch.

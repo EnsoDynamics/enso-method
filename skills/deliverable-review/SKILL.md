@@ -93,7 +93,7 @@ The caller passes, beyond Step 2's context, the previous round's findings with t
 - does not re-read unchanged material in full
 - rates and reports new findings as in a full round
 
-A delta round sees only what the fixes touched, so it cannot show that the deliverable is clean. A caller that loops on this review ends on a full round.
+A delta round sees only what the fixes touched, so it cannot show that the deliverable is clean. A caller that loops on this review ends on a full round. The one exception is the bounded check `assumptions-document-feedback` gives an amended PRD (its Step 5a): it is not a loop, it ends on its delta round by design, and the PRD's phase planning and build catch what it leaves.
 
 ### Commit Message
 

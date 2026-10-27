@@ -122,6 +122,8 @@ If the PRD directory has a `project-plan.md` or any table that lists the phases,
 
 ## Process
 
+**Pending feedback changes come first.** If the PRD directory holds a `{name}-pending-feedback-changes.md`, a stakeholder round has changed what this PRD must say and its documents may not carry it yet. Apply it first with `assumptions-document-feedback`, which resumes from that file (its Step 4a, "Resuming"), and commit that amendment on its own before planning; then plan against the amended documents.
+
 ### Step 1: Confirm the Work Is Too Large
 
 Before splitting anything, confirm the work actually needs splitting. The unit is **a single AI session**, not human calendar time.

@@ -1,6 +1,6 @@
 ---
 name: assumptions-document-feedback
-description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, partial answers and pushback (a doubt or question is researched and the assumption restated to meet it, never pasted in as the answer) while keeping the project moving forward. Checks every requested change against the whole initiative as it stood before the feedback, then sorts it into a fix or a new ask; once the PRD's build has started, fixes go into its phase plan and new asks, apart from minor ones, into one follow-on PRD, so a build in progress finishes on the scope it started with.
+description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, partial answers and pushback (a doubt or question is researched and the assumption restated to meet it, never pasted in as the answer) while keeping the project moving forward. Checks every requested change against the whole initiative as it stood before the feedback, then sorts it into a fix or a new ask; once the PRD's build has started, fixes go into its phase plan and new asks, apart from minor ones, into one follow-on PRD, so a build in progress finishes on the scope it started with. Finishes every change in each PRD it reaches, including each PRD that consumes a changed contract, and gives each amended PRD one fresh check instead of rerunning its refinement.
 ---
 
 # Assumptions Document Feedback Processing
@@ -26,6 +26,7 @@ Use this skill when:
 - You receive stakeholder feedback on an assumptions document (email, Slack, meeting notes)
 - Feedback is a mix of clear answers, partial answers, and corrections
 - You need to update the assumptions document while maintaining its utility
+- A PRD directory holds a `{name}-pending-feedback-changes.md`: an earlier round left changes there (Step 4a), and this skill resumes it
 
 ---
 
@@ -118,7 +119,7 @@ Without this, a document full of already-answered items reads as being asked to 
 2. **The parent PRD** — per `assumptions-document-writing`, the assumptions doc lives inside its parent PRD's directory (`docs/prds/{prd-name}/` or `docs/changes/{prd-name}/`), so the PRD is a sibling file.
 3. **The Technical Design** — also colocated with the PRD
 4. **Any field mapping or related docs** referenced by the assumptions being discussed
-5. **The plan around the PRD** — its phase documents and their `**Closed:**` lines, and, when the PRD came from an initiative, every other PRD in it: the PRD list and PRD contracts, each written PRD with its Out of Scope and assumptions register, the initiative brief's deferred list and open questions, and the coverage matrix if there is one. Outside an initiative, every other PRD or change directory the feedback touches. Step 1a decides from them whether the build has started and where each change already lives. A stakeholder sees one product, not the PRDs it was cut into, so a change judged against this PRD alone can look new when another PRD already plans it.
+5. **The plan around the PRD** — its phase documents and their `**Closed:**` lines, and, when the PRD came from an initiative, every other PRD in it: the PRD list and PRD contracts (its Seams table names which PRDs consume what each PRD owns), each written PRD with its Out of Scope and assumptions register, the initiative brief's deferred list and open questions, and the coverage matrix if there is one. Outside an initiative, every other PRD or change directory the feedback touches. Step 1a decides from them whether the build has started and where each change already lives. A stakeholder sees one product, not the PRDs it was cut into, so a change judged against this PRD alone can look new when another PRD already plans it.
 
 **Why this is not optional**: Every decision this skill makes downstream depends on this context. Classifying feedback requires knowing what the PRD already specifies (feedback may restate an existing requirement, or quietly contradict one). Gap-filling assumptions are explicitly supposed to draw on "existing context (code, docs, domain reasoning)" — which you can't do without having read it. The ≥95% confidence graduation folds decisions *into* the PRD/Technical Design — impossible to do coherently for documents you haven't read. And Step 5's propagation targets should be identified up front, not discovered at the end.
 
@@ -286,11 +287,43 @@ Apply all updates to the assumptions document:
 - Mark validated items `✅ VALIDATED (date)`; once Step 5 has propagated them, move each to the Validated Assumptions table (one line, original ID) and out of the body
 - Move each item whose answer went to a follow-on or another PRD (Step 1a) to the Validated Assumptions table the same way, naming where the answer now lives
 
+### 4a. List Every PRD the Round Reaches
+
+A change reaches more than the PRD that owns it. When it alters something one PRD owns and others consume (a shared record, a rule, a status vocabulary), every consumer already written has to change too, or it is designed and built against a contract that no longer exists. Step 1a found each change's owner; this step finds its consumers, so the round finishes every PRD it reaches.
+
+1. **Find the consumers.** For each change that landed in this PRD, another written PRD or a planned PRD's scope entry: every PRD on the receiving side of a Seams-table row whose contract it alters ("What crosses the seam" or "What the later PRD may assume"), and every PRD or change directory whose criteria or design cite a criterion it changed (search for the labels). Outside an initiative, the label search alone. A change sent to a follow-on reaches no consumer yet: the source PRD still ships the old behavior, and the follow-on's **Changes:** line and the conflict check carry it to its consumers when the follow-on is written. Update each altered seam row now, in the PRD contracts, and any line of a planned PRD's entry that restates the old contract. A minor ask (Step 1a) that turns out to reach another written PRD's criteria fails the minor test: sort it again.
+2. **Decide what each needs.** A consumer still `planned` needs nothing more: its entry and the seam row are what its PRD will be written from. Every written PRD the round reaches, this one, the owner of a change (Step 1a) or a consumer, gets a list of what it must now say: each change, by criterion label or seam row, and what it means for that PRD. Edits an ownership move (Step 1a) makes to a written PRD go on its list too, so one writer makes all of them. Apply Step 1a's build-started test to each, with the same evidence, and record what it found: one whose build has started also goes through Step 6 for any code the change needs.
+3. **Write each list down before amending anything,** as a block in `{name}-pending-feedback-changes.md` in that PRD's own directory:
+
+```markdown
+# Pending feedback changes: {PRD title}
+
+## From {source PRD title} stakeholder feedback, YYYY-MM-DD
+
+**Reply:** {where the reply is saved}
+**Base:** {the commit the round started from}
+**Stage it had reached:** {e.g. design refined, not yet split into phases}
+**Build:** {not started | phases closed: …; under way: …}
+**Status:** not started | amended, check pending | needs a chat of its own
+**Why a chat of its own:** {only with that status: the design decisions the round did not make}
+
+- {change, by criterion label or seam row}: {what this PRD must now say}
+```
+
+When the PRD already has a pending file, add this round's block below the ones there; never replace one. The file is how any session that opens the PRD sees that its documents are about to change, and how this skill resumes ("Resuming", below). A block is removed in the change that finishes its PRD for that round (Step 5a), and the file goes with its last block.
+
+4. **Size each list.** Almost always the PRD is finished **in this round**: it only consumes what the round decided, restating criteria against the new contract, dropping what the upstream now provides, redrawing the screens that show it. How many PRDs the round reaches, or how long a list is, is never a reason to stop: each PRD's writer and reviewer work in their own context, and this chat reads only their reports. A PRD needs **a chat of its own** only when it must make design decisions the round did not make, such as a new data model, interface or flow of its own; name them on the block's **Why a chat of its own:** line. That is usually plain from the list; otherwise Step 5a's check finds it.
+5. **Check that no other session is working on the PRD** before its writer starts: a refinement state file in its directory, uncommitted changes to its documents in any checkout `git worktree list` shows (other than the pending file this round wrote), or a live session log naming it (`implementation-lifecycle`, "Parallel Sessions: Where to Work"). If one is, leave its block `not started` for that session, whose skill applies pending changes first, and name it in the report. This round's own session log names every PRD it holds a block for, so a later session can tell the round is still at work on it.
+
+**Resuming.** When this skill runs on a PRD whose directory holds a pending file and no new reply came with it (a rerun after an interruption, from the map, from `phase-split` or `implement-from-requirements`, or as a chat of its own), the feedback is already interpreted: skip Steps 0a to 4 and work from each block, oldest first, with that PRD as the subject; where two blocks change the same criterion, the later one wins. When a new reply came too, finish the existing blocks this way first, then process the reply from Step 0. Start each block with item 5's check: when the round that wrote it is still live, leave the block to it. Rerun Step 1a's build-started test and update the **Build:** line, since the build may have moved on since the block was written. Load the reply its **Reply:** line names, the upstream criteria and seam rows its list names, and the PRD's documents, then act on its **Status**. `not started` goes to the writer (Step 5) and `amended, check pending` to the check (Step 5a). `needs a chat of its own` goes to the decisions first: this chat makes each one the **Why** line names, researching it (Step 7), writing it into the design under `technical-design-writing-standards` and recording any business call below 95% as an assumption, then sends the block to the writer and the check like any other. Neither refinement runs here either. Finish with Step 8.
+
 ### 5. Propagate to Implementation Documents (CRITICAL)
 
 **This step is essential and must not be skipped.** Every decision this skill settles or changes must be reflected in the actual implementation documents—otherwise the assumptions document becomes a dead end.
 
-For each decision this skill settles or changes, at any confidence: a validated or corrected item, a resolved Pushback, a stated change to a criterion or mockup, and an assumption added or restated with a different answer (below 95% the PRD still states the answer it rests on, citing the entry's ID, per `prd-writing-standards`). A reopened stakeholder ruling is the exception: the PRD, its mockups and the Technical Design keep the stakeholder's decision until the stakeholder revises it (Principle 5). The documents are this PRD's only for what Step 1a kept here, including a criterion it retired or switched off. A new ask sent to a follow-on goes into the follow-on's scope, never into this PRD; an ask sent to another PRD is propagated into that PRD's documents.
+For each decision this skill settles or changes, at any confidence: a validated or corrected item, a resolved Pushback, a stated change to a criterion or mockup, and an assumption added or restated with a different answer (below 95% the PRD still states the answer it rests on, citing the entry's ID, per `prd-writing-standards`). A reopened stakeholder ruling is the exception: the PRD, its mockups and the Technical Design keep the stakeholder's decision until the stakeholder revises it (Principle 5). The documents are this PRD's only for what Step 1a kept here, including a criterion it retired or switched off. A new ask sent to a follow-on goes into the follow-on's scope, never into this PRD; an ask sent to another PRD is propagated into that PRD's documents, and so is every line of a pending block (Step 4a).
+
+**Who writes each PRD's changes.** This chat amends this PRD itself. Each other PRD with a block to finish in this round gets one writer subagent, launched by this chat, given that block, the amended upstream criteria and seam rows it names, and that PRD's documents. The writer applies items 1 to 5 below and Step 6 to that PRD, under its writing standards, with the block's **Build:** line as Step 6's evidence. Then the block's **Status** becomes `amended, check pending` when Step 5a calls for a check; otherwise the PRD is finished and its block is removed. Writers on different PRDs can run side by side. The initiative's shared files (PRD list, PRD contracts, coverage matrix) are edited by this chat alone, so no two writers touch one file. A writer launches no subagents of its own: every subagent in the round is launched from this chat, one level deep.
 
 1. **Identify affected documents**: Which documents reference this decision?
    - PRD: Business decisions and acceptance criteria
@@ -323,9 +356,20 @@ For each decision this skill settles or changes, at any confidence: a validated 
 - [ ] Mockups drawn or redrawn wherever the decision changed what a screen shows
 - [ ] All documents have consistent information (no contradictions)
 
+### 5a. Check Each Amended PRD Once
+
+An amended PRD needs one fresh check, not its refinement again. `autonomous-prd-refinement` and `autonomous-design-refinement` take a draft to ready over many passes; an amendment changes a bounded part of documents that were already ready, to match decisions this round has already made. Never rerun either on a PRD this round amended: the stage it had reached stays reached.
+
+- **Which PRDs:** every PRD this round amended whose documents had been refined, this one included. A PRD still in draft gets no check: its own refinement will read the amendment, and it is finished once its writer is done.
+- **The check:** this chat runs `deliverable-review` for each PRD, launching its one reviewer subagent, scoped like a delta round ("Delta Rounds") with the PRD's diff since the block's **Base:** commit as the change. The reviewer gets the block's list as the decisions the work had to carry out, the upstream criteria and seam rows it names, and that diff. It reads the diff in full and everything that shares a term, rule or interface with it, and renders only the screens that changed. It asks two questions. Does the PRD now agree, everywhere, with the decisions and contracts it consumes? Would someone building the changed parts have to make a judgment call the documents leave open? The second is the test in `autonomous-design-refinement` ("The Scope Gate"), which also keeps the check from adding scope.
+- **The fixes:** a new writer subagent for that PRD, or this chat for this PRD, fixes each finding. A technical question is researched (Step 7); a business call below 95% becomes an assumption in that PRD's register.
+- **At most one more check,** a delta round over the fixes, and only when they changed a rule or an interface. This bounded check is not a review loop, so it does not end on a full round: what a third pass would find, that PRD's phase planning and build find and settle in their own sessions, and `delivery-audit` catches what they miss.
+- **When the check finds design decisions** the round did not make and its fixes cannot settle, set the block's **Status** to `needs a chat of its own` and name them on its **Why** line; Step 8 hands it off.
+- **Finishing a PRD:** once its fixes are in, refresh its review package when Step 8 calls for it, and remove its block in the same change.
+
 ### 6. Give the Work a Place in the Plan
 
-**This step applies only to changes that change what the code must do, in this PRD or in another PRD Step 1a sent them to.** For a change sent to another PRD, apply it to that PRD's plan and build state. Confirmed assumptions that validate existing behavior, blockers that remain blocked, and items the code already handles correctly need nothing here.
+**This step applies only to changes that change what the code must do, in this PRD or in another PRD Step 1a or Step 4a reached.** For a change sent to another PRD, apply it to that PRD's plan and build state. Confirmed assumptions that validate existing behavior, blockers that remain blocked, and items the code already handles correctly need nothing here.
 
 A PRD of any size is built one phase at a time, and each session builds what its phase lists, not the whole PRD. So once the build has started, an amended criterion with no place in the plan goes unbuilt. Where the work goes depends on how far the build has got:
 
@@ -345,14 +389,17 @@ Then set each entry at the confidence the investigation leaves it at: at 95%+ it
 
 ### 8. Hand Off
 
-When this round drew or redrew a mockup for a change kept in this PRD or sent to another written PRD, refresh that PRD's stakeholder review package first, or create one if none exists, unless the user declined it (`stakeholder-review-package`), so the stakeholder sees how their feedback will look. Nothing waits on their reply.
+**The round is finished only when every PRD it reached is.** Each carries its changes and has had its check where Step 5a calls for one, and no pending block from this round is left apart from one that needs a chat of its own or was left for a session already working on that PRD (Step 4a). Never end on a sentence saying another PRD "needs alignment", "should be updated" or "will need review": the change is in its documents, or it is in a pending block with a prompt below or a session already on it. If this chat stops before then, running this skill again in the same checkout resumes from the blocks that are left (Step 4a, "Resuming").
+
+When this round drew or redrew a mockup for a change kept in this PRD or sent to another written PRD, refresh that PRD's stakeholder review package first (for another PRD, after its check, by the writer that made its fixes, or by a writer launched for the refresh when the check found nothing), or create one if none exists, unless the user declined it (`stakeholder-review-package`), so the stakeholder sees how their feedback will look. Nothing waits on their reply.
 
 End with a prompt for each new chat this round needs, written with `continuation-prompt` and shown in full in the report, so the user knows exactly what to start:
 
 - **A follow-on was created, or got new asks, and its PRD is not written yet:** a prompt to write it (`prd-writing-standards`). Writing it doesn't wait for this PRD's build: its stakeholder review can go out while this PRD is still being built.
 - **Feedback phases were appended to a finished plan:** a prompt to build the first one (`implement-from-requirements`).
+- **A PRD's pending block needs a chat of its own** (Step 4a or 5a): a prompt to finish it, with this skill resuming from that file, stated as the outcome ("make {PRD title} ready for its next stage against the amended contracts"). The decisions and the list it works from are in the block, not the prompt.
 
-Otherwise no prompt is needed: an open plan's next session picks up its carried-forward sections, and an unstarted PRD carries on along its usual sequence of documents. When a session is already writing the follow-on (its session log shows it), write no second prompt; name the asks its scope gained, for the user to pass to that chat.
+Otherwise no prompt is needed: an open plan's next session picks up its carried-forward sections, and an unstarted PRD carries on along its usual sequence of documents. Every other PRD the round reached is back at the stage it had reached, and its own track carries on from there; its next stage is not a prompt from this round. When a session is already writing the follow-on (its session log shows it), write no second prompt; name the asks its scope gained, for the user to pass to that chat.
 
 The prompts point at documents this chat changed, so present the commit for them first and label each prompt as valid once it lands (`continuation-prompt`, Step 5).
 
@@ -434,6 +481,18 @@ and PENDING is the safe default for unclassified accounts.
 
 **Result:** one follow-on, *Customer Exchanges*, added after Customer Returns in the initiative's order. Its **Changes:** line names AC-RET-05, and the stakeholder's reply is saved under `source-material/`. The confirm screen's mockup is redrawn with the fee, and the review package is refreshed. The report gives one prompt, to write Customer Exchanges. Phases 5 and 6 still finish Customer Returns on the scope it started with.
 
+## Example: A Change Another PRD Consumes
+
+**State:** the stakeholder corrects Customer Returns: the restocking fee is a line of its own on the refund, not netted from it. That is a fix. The Seams table has a row "Customer Returns → Returns Reporting, Refund Notifications: the refund record". Returns Reporting is written, its design refined, not yet split into phases; Refund Notifications is still `planned`.
+
+**The round:**
+
+1. **Step 4a:** the seam row now says the fee is a separate line. Refund Notifications needs nothing more. Customer Returns and Returns Reporting each get a pending block; Returns Reporting's has one line: refund totals read the fee line, and the refunds screen shows it. It only consumes what the round decided, so it is finished in this round.
+2. **Step 5:** this chat amends Customer Returns; a writer subagent amends Returns Reporting's criterion, its design and its refunds-screen mockup.
+3. **Step 5a:** Returns Reporting's check finds two things: its design's export still lists one amount column, and nothing says how refunds recorded before the change are shown. A new writer fixes the export and adds an assumption for the old refunds (shown netted, and labelled so). That assumption sets a display rule, so one more check runs over the fixes and finds nothing. The writer refreshes the review package and removes the block.
+
+**Result:** the report lists Returns Reporting as changed and checked, still at phase planning, and names the seam row for Refund Notifications. No prompt for either: Returns Reporting's own track carries on when the user starts its phase planning.
+
 ---
 
 ## Output Format
@@ -445,13 +504,14 @@ After processing feedback, provide:
 3. **Items Updated**: List assumptions that were modified with what changed
 4. **New Assumptions Made**: Any assumptions created to fill gaps from partial/unclear feedback (with confidence levels). These are NOT questions — they are implementable decisions.
 5. **Updated Assumptions Document**: The revised assumptions document
-6. **Propagation Summary**: List of changes made to PRD, Technical Design, mockups and other implementation documents
+6. **Propagation Summary**: List of changes made to PRD, Technical Design, mockups and other implementation documents, and what this PRD's check found and fixed (Step 5a)
    - What was added/updated in each document
    - Location of changes (section names or line references)
 7. **Code Changes Routed**: for each item that now needs code, where it went, in whichever PRD owns it: the amended PRD a build will read, an open phase's carried-forward section or "Acceptance criteria covered" list, or a feedback phase (Step 6)
 8. **Research Done** (only if Step 7 investigated new assumptions below 95% or Pushback items): one line per assumption — confidence before and after, and what settled it; for Pushback, also how you read their concern and whether research resolved it — plus any Blocking Open Question with what would let you decide
 9. **Routing** (Step 1a): whether this PRD's build has started and what that was read from; then one line per change: where it already lived (this PRD, another PRD by name, deferred or an open question by label, an extension of named behavior, or absent), its owner and how far that owner's build has got, fix or new ask, where it went (this PRD, another PRD by name, or the follow-on by name) and, for a reversal, what happens to the old behavior and why. Then the round's added work for the stakeholder in three parts: net additional scope (naming any the initiative had deferred), work brought forward from another PRD, and rework of what was specified or built. Added phases are never described as new requests. Decisions, not questions
-10. **Next chats** (Step 8): each prompt in full, or "none needed" with the reason
+10. **Other PRDs reached** (Steps 4a and 5a): one line per PRD that changed, other than this one: why it was reached (owner of a change, or consumer by a named seam row or criterion label), what changed in it, what its check found and fixed, and its stage, unchanged; or that it needs a chat of its own, and why, or was left for a session already working on it. A consumer still `planned` gets its seam row named and nothing more. PRDs the round did not reach are left out
+11. **Next chats** (Step 8): each prompt in full, or "none needed" with the reason
 
 **Propagation Checklist** (include in output):
 - [ ] PRD updated with validated decisions
@@ -461,6 +521,7 @@ After processing feedback, provide:
 - [ ] All documents now consistent
 - [ ] Every change checked against the whole initiative before the feedback, sorted as a fix or a new ask, and in exactly one place: this PRD, another PRD, or the follow-on, with no capability owned by two PRDs (Step 1a)
 - [ ] Code changes routed per Step 6 (amended PRD, carried-forward section, or feedback phase)
+- [ ] Every written PRD the round reached, as owner or consumer, carries its changes and had its check where Step 5a calls for one, with no refinement rerun; no pending block from this round left except one with a prompt or a session already on it (Steps 4a, 5a, 8)
 - [ ] A prompt for each next chat (Step 8)
 - [ ] All gaps filled with assumptions (no follow-up questions)
 
