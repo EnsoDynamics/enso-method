@@ -35,12 +35,14 @@ For any other agent, install plain copies with the
 Gemini CLI and most other coding agents:
 
 ```bash
-npx skills add EnsoDynamics/enso-method -g     # every agent it finds on this machine
+npx skills add EnsoDynamics/enso-method -g     # agents without plugin support
 npx skills update -g                           # later, to update
 ```
 
-`-g` installs for your user rather than for one project. In a tool that has the plugin, use
-the plugin rather than the skills CLI, or every skill loads twice.
+`-g` installs for your user rather than for one project. Use it only when your agent has no
+plugin. In Claude Code and Codex use the plugin, even when you use several agents, or every
+skill loads twice. An agent asked to install the method follows
+[the steps for agents](../README.md#installing-through-an-agent).
 
 ### Switch from the skills CLI to the plugin
 

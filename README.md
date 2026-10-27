@@ -140,6 +140,10 @@ codex plugin add enso-method@enso-method
 npx skills add EnsoDynamics/enso-method -g
 ```
 
+Or have your agent do it. Tell it "Install the Enso Method from
+github.com/EnsoDynamics/enso-method" and it follows [the steps for agents](#installing-through-an-agent),
+which install the plugin for Claude Code and Codex both when you have both.
+
 To update later (or, in Claude Code, turn on auto-update for `enso-method` under `/plugin` →
 Marketplaces):
 
@@ -191,6 +195,28 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
 
 Before your first real project, plug in your team's engineering standards and add two
 recommended lines to your global instructions: see the [setup guide](docs/enso-method-setup-guide.md).
+
+### Installing through an agent
+
+If you are an AI agent asked to install the Enso Method, follow these steps. Don't clone the
+repository or copy skill folders.
+
+1. **Install for every supported tool on the machine, not only the one you are running in.**
+   Run `command -v claude` and `command -v codex`. For each one found, run its plugin commands
+   from the install block above. Never use the skills CLI (`npx skills`) for Claude Code or
+   Codex. It is only for agents that have no plugin support.
+2. **Remove older copies first.** If `npx skills ls -g` lists Enso Method skills, remove them
+   with the command in [switch from the skills CLI to the plugin](docs/enso-method-setup-guide.md#switch-from-the-skills-cli-to-the-plugin)
+   before installing, or every skill loads twice. If Node isn't installed, skip this step.
+3. **Update rather than reinstall.** If `claude plugin list` already shows
+   `enso-method@enso-method`, or `codex plugin marketplace list` already shows `enso-method`,
+   run that tool's update commands instead.
+4. **Ask for approval, don't work around it.** The commands need network access and write to
+   the user's home directory. If your sandbox blocks them, ask the user to approve them.
+5. **Finish by telling the user to restart.** The skills load in the next session, so they
+   should restart Claude Code and start a new Codex chat. Leave their global instructions
+   alone and point them to the [setup guide](docs/enso-method-setup-guide.md) for the
+   recommended lines.
 
 ## The skills
 
