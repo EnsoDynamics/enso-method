@@ -28,7 +28,96 @@ class ReviewTests(unittest.TestCase):
         self.assertNotIn('id="RULE-002"', output)
         self.assertEqual(output.count('class="decision"'), 2)
         self.assertNotIn(' checked', output)
-        self.assertIn('UNANSWERED', output)
+        self.assertIn('No response given:', output)
+
+    def export_feedback(self, answers, notes=None, output=None):
+        """Execute the rendered JavaScript formatter; browser actions are checked separately."""
+        output = output or render(self.data, self.root, None)
+        data = embedded_json(output, 'review-data')
+        state = {'reviewer': 'Example Reviewer', 'answers': answers,
+                 'notes': notes if notes is not None else {'booking': ''}}
+        start = output.index('function feedbackText()')
+        end = output.index("document.getElementById('export-feedback')", start)
+        script = ('const data=' + json.dumps(data) + ';\nconst state=()=>('
+                  + json.dumps(state) + ');\n' + output[start:end]
+                  + '\nprocess.stdout.write(feedbackText());')
+        result = subprocess.run(['node', '-e', script], text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stderr)
+        return result.stdout
+
+    def test_reply_separates_feedback_from_exact_reviewed_wording(self):
+        decisions = self.data['sections'][0]['decisions']
+        decisions[0]['proposal'] = ['Cancel until the class starts.', 'Keep the original booking in history.']
+        comment = 'Agreed, except for prepaid classes.\n\nKeep that exception visible.'
+        correction = 'Use the booking date.\nIs that available for transfers?'
+        note = 'Move the queue above the calendar.\n\nKeep the filter.'
+        reply = self.export_feedback({'RULE-001': {'choice': 'confirm', 'comment': comment},
+                                      'UI-001': {'choice': 'change', 'comment': correction}},
+                                     {'booking': note})
+        front, appendix = reply.split('WORDING REVIEWED — REFERENCE ONLY', 1)
+        self.assertIn('RULE-001 — Confirmed\n' + comment, front)
+        self.assertIn('UI-001 — Change\n' + correction, front)
+        self.assertIn('Book a class', front)
+        self.assertIn('Acceptance criteria and mockup feedback:\n' + note, front)
+        self.assertIn('No response given: None', front)
+        self.assertIn('Review version:', front)
+        for decision in decisions:
+            self.assertNotIn(decision['title'], front)
+            self.assertIn('Question: ' + decision['title'], appendix)
+            for paragraph in decision['proposal']:
+                self.assertNotIn(paragraph, front)
+                self.assertIn(paragraph, appendix)
+        self.assertIn('Cancel until the class starts.\n\nKeep the original booking in history.', appendix)
+        self.assertNotIn('Source:', front)
+        self.assertIn('Source: https://example.org/class-bookings-assumptions.md', appendix)
+        self.assertNotIn(comment, appendix)
+        self.assertNotIn(note, appendix)
+        self.assertIn('------------------------------------------------------------', front)
+
+    def test_silence_comment_only_and_incomplete_change_are_distinct(self):
+        for choice, comment, label in [('', '', None), ('', '  \n', None),
+                                       ('', 'Not sure about transfers.', 'Comment only'),
+                                       ('change', '', 'Change — INCOMPLETE'),
+                                       ('confirm', '', 'Confirmed')]:
+            with self.subTest(choice=choice, comment=comment):
+                reply = self.export_feedback({'RULE-001': {'choice': choice, 'comment': comment},
+                                              'UI-001': {'choice': '', 'comment': ''}})
+                front, appendix = reply.split('WORDING REVIEWED — REFERENCE ONLY', 1)
+                self.assertNotIn('Show a queue position?', reply)
+                self.assertNotIn('UI-001', appendix)
+                if label is None:
+                    self.assertIn('No response given: RULE-001, UI-001', front)
+                    self.assertNotIn('RULE-001', appendix)
+                    self.assertIn('No responses or section feedback supplied.', front)
+                else:
+                    self.assertIn('RULE-001 — ' + label, front)
+                    self.assertIn('No response given: UI-001', front)
+                    self.assertIn('Cancel before the class?', appendix)
+                    if comment:
+                        self.assertIn(comment, front)
+
+    def test_reply_keeps_snapshot_when_current_source_changes(self):
+        output = render(self.data, self.root, None)
+        (self.root / 'class-bookings-assumptions.md').write_text('Cancellations now require a fee.')
+        self.data['sections'][0]['decisions'][0]['proposal'] = ['Charge a cancellation fee.']
+        reply = self.export_feedback({'RULE-001': {'choice': 'confirm', 'comment': ''},
+                                      'UI-001': {'choice': '', 'comment': ''}}, output=output)
+        self.assertIn('Proposed behavior.', reply)
+        self.assertNotIn('Charge a cancellation fee.', reply)
+        self.assertIn(embedded_json(output, 'review-data')['version'], reply)
+
+    def test_section_only_feedback_needs_no_assumptions(self):
+        (self.root / 'class-bookings-assumptions.md').unlink()
+        self.data['assumptions_source'] = None
+        del self.data['sources']['assumptions']
+        self.data.update(open_assumption_ids=[], inventory_note='No open assumptions.')
+        self.data['sections'][0]['decisions'] = []
+        reply = self.export_feedback({}, {'booking': 'Show seats remaining.'})
+        self.assertIn('Book a class', reply)
+        self.assertIn('Acceptance criteria and mockup feedback:\nShow seats remaining.', reply)
+        self.assertIn('No response given: None', reply)
+        self.assertNotIn('No responses or section feedback supplied.', reply)
+        self.assertIn('No items received a response or comment.', reply)
 
     def test_missing_duplicate_and_unexpected_decisions_fail(self):
         for mode in ('missing','duplicate','extra'):

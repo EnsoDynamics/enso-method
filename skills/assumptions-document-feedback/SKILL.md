@@ -123,6 +123,18 @@ Without this, a document full of already-answered items reads as being asked to 
 
 Do not begin cataloging feedback until this context is loaded.
 
+### 0a. Establish What the Reviewer Answered
+
+Accept feedback through any channel: review-package TXT or clipboard replies, older exports, email, chat, meeting notes or comments on raw Markdown. Do not require a review package, Git commit hash or a particular export format.
+
+When the response includes the wording reviewed (in a reference appendix, an older export or a quote), treat that wording as the historical proposal the reviewer answered. The appendix is context, not another set of answers. Match by permanent assumption ID and compare the reviewed question and proposal with the current register and relevant requirements **before applying the response**. Use the review version and source references for traceability; a link to a moving branch does not establish what was shown. A self-contained reply does not require fetching an old Git revision.
+
+- **Same meaning:** process the response normally; editorial wording changes alone do not invalidate confirmation.
+- **Materially changed meaning:** do not carry confirmation of the old proposal onto the changed proposal. Preserve what was actually confirmed, apply corrections only to the parts they address, and report the mismatch and any unsettled current decision. Do not silently overwrite a newer stakeholder ruling; use the existing reopening rules where applicable.
+- **No reviewed wording supplied:** use the available conversation, quoted text and current documents. If there is evidence of a version mismatch or an ambiguous referent, investigate available document history or prior correspondence and state any unresolved interpretation; do not invent the historical wording or claim confirmation of a materially different proposal. Missing version metadata alone does not invalidate ordinary feedback.
+
+A grouped **No response given** list, an older UNANSWERED entry with no comment, or an omitted item supplies no decision: keep its assumption and confidence unchanged, without inferring approval, disagreement or whether it was read. A comment without a button selection is still feedback and must be classified by its words. Change with no explanation records an incomplete response, not a supplied correction or confirmation. Preserve qualifications in comments accompanying Confirm; the selected button never overrides what the reviewer wrote.
+
 ### 1. Catalog the Feedback
 
 For each item in the stakeholder response, classify it:
