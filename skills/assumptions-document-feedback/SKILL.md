@@ -1,6 +1,6 @@
 ---
 name: assumptions-document-feedback
-description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, partial answers and pushback (a doubt or question is researched and the assumption restated to meet it, never pasted in as the answer) while keeping the project moving forward.
+description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, partial answers and pushback (a doubt or question is researched and the assumption restated to meet it, never pasted in as the answer) while keeping the project moving forward. Sorts every requested change into a fix or a new ask; once the PRD's build has started, fixes go into its phase plan and new asks, apart from minor ones, into one follow-on PRD, so a build in progress finishes on the scope it started with.
 ---
 
 # Assumptions Document Feedback Processing
@@ -118,6 +118,7 @@ Without this, a document full of already-answered items reads as being asked to 
 2. **The parent PRD** — per `assumptions-document-writing`, the assumptions doc lives inside its parent PRD's directory (`docs/prds/{prd-name}/` or `docs/changes/{prd-name}/`), so the PRD is a sibling file.
 3. **The Technical Design** — also colocated with the PRD
 4. **Any field mapping or related docs** referenced by the assumptions being discussed
+5. **The plan around the PRD** — its phase documents and their `**Closed:**` lines, and, when the PRD came from an initiative, the initiative's PRD list and PRD contracts. Step 1a decides from them whether the build has started and where a new ask belongs.
 
 **Why this is not optional**: Every decision this skill makes downstream depends on this context. Classifying feedback requires knowing what the PRD already specifies (feedback may restate an existing requirement, or quietly contradict one). Gap-filling assumptions are explicitly supposed to draw on "existing context (code, docs, domain reasoning)" — which you can't do without having read it. The ≥95% confidence graduation folds decisions *into* the PRD/Technical Design — impossible to do coherently for documents you haven't read. And Step 5's propagation targets should be identified up front, not discovered at the end.
 
@@ -150,7 +151,56 @@ For each item in the stakeholder response, classify it:
 
 **Classify by what the words say, not by the box ticked.** Review packages offer only Confirm and Change, so every doubt comes back marked Change (`stakeholder-review-package`), and an emailed "Wrong" is often followed by a question rather than an answer. A response is **Corrected** only when it supplies the answer — what to do instead. A Change that asks, hedges or raises a concern is **Pushback**. One reply can hold both ("use ship date — not sure about returns, though"): process each part under its own class.
 
-**Feedback on acceptance criteria or mockups is classified the same way.** A review package exports it separately from the assumption answers, labelled with its section (`stakeholder-review-package`). It answers no assumption, so there is nothing to mark validated. A stated change is a correction to the requirement itself and goes straight into the PRD and its mockups through Step 5. A doubt or question is researched like Pushback, against the criterion or screen it names; if research stays below 95%, open a new assumption (Step 3), or bring back the original ID when the criterion came from a ruling the stakeholder gave (`assumptions-document-writing`, "When an answered item may sit in the body at all"), stating the answer the criterion now rests on, with a "Why your [date] answer didn't close this" section quoting their words, so it goes back to them next round.
+**Feedback on acceptance criteria or mockups is classified the same way.** A review package exports it separately from the assumption answers, labelled with its section (`stakeholder-review-package`). It answers no assumption, so there is nothing to mark validated. A stated change is a change to the requirement itself: Step 1a decides whether it amends this PRD or goes to a follow-on, and Step 5 applies it. A doubt or question is researched like Pushback, against the criterion or screen it names; if research stays below 95%, open a new assumption (Step 3), or bring back the original ID when the criterion came from a ruling the stakeholder gave (`assumptions-document-writing`, "When an answered item may sit in the body at all"), stating the answer the criterion now rests on, with a "Why your [date] answer didn't close this" section quoting their words, so it goes back to them next round.
+
+### 1a. Sort Each Change: Fix or New Ask
+
+Feedback often arrives after much of the PRD is built, and it mixes corrections with requests for things the PRD never set out to do. Folded into the PRD together, the requests turn a build that was nearly done into one that is barely started, and the new functionality never gets its own mockups, assumptions or stakeholder review. This step keeps every request and sends each to the place that can build it cleanly.
+
+Every answer that changes what gets built (a Corrected item, a Pushback or Partial item whose research changed the answer, a stated change to a criterion or mockup) is one of two kinds. Judge it against what the PRD set out to deliver, its Summary and Business Context:
+
+- **Fix:** it makes the PRD deliver what it already set out to deliver. A clarification, a rule we got wrong, a case the stated outcome plainly needed and the criteria missed. However large, a fix amends this PRD.
+- **New ask:** it adds an outcome the PRD did not set out to deliver, or reverses something the PRD explicitly decided or excluded. The surest sign is a request that contradicts an Out of Scope line or a ruling the PRD records.
+
+Confirmations and items with no response change nothing and need no sorting. One reply can hold both kinds; sort each part.
+
+**An ask that belongs to another PRD is feedback on that PRD.** When it falls within the stated outcome of another PRD (another planned PRD in the initiative, or another PRD or change directory in the repository), apply this step to it as that PRD's, with that PRD's build state, and record it there: in its PRD, or in its scope entry in the PRD contracts while it is still planned. Check this first for every new ask; a home that already exists beats a new follow-on.
+
+**Where a change lands depends on whether this PRD's build has started.**
+
+| This PRD's build | Fixes | New asks |
+|---|---|---|
+| Not started | Amend this PRD | Amend this PRD. This is still requirements work; the size check in `prd-writing-standards` re-cuts it within its initiative if it outgrows the band |
+| Started | Amend this PRD; Step 6 gives the work a place in the plan | Amend this PRD only when the ask is minor (below); otherwise send it to the follow-on |
+
+**The build has started** when a phase plan for the PRD is committed, any of its phases has a `**Closed:**` line, or a commit or session log (`implementation-lifecycle`, "Session Markers") shows code being written for it. Look on the shared branch, in every checkout `git worktree list` shows, and in each checkout's `.agent-sessions/` logs. Nothing is published when a build starts, so a build on another machine can be invisible. On a split PRD a wrong guess costs little: a new ask folded into a PRD whose build was under way elsewhere sits in no phase, or in one already closed, and `delivery-audit` finds it unbuilt when the PRD closes and adds a completion phase for it. An unsplit PRD has no such backstop, because `delivery-audit` skips it by default, so when the evidence for one is unclear, treat its build as started.
+
+**A new ask is minor**, and amends this PRD even after its build started, only when all four hold:
+
+1. It serves the PRD's existing stated outcome and reverses nothing the PRD decided or excluded.
+2. It needs no new screen and no new assumption for the stakeholder.
+3. It changes no other PRD's criteria.
+4. The round's minor asks together fit in one phase (`phase-split`, "Session Capacity Calibration"). When they don't, none of them is minor.
+
+**A new ask that reverses behavior this PRD defines**, once its build has started: the follow-on builds the replacement, and these rules, in order, decide what happens to the old behavior in this PRD:
+
+1. **Not built yet:** don't build it. Retire the criterion (`prd-writing-standards`, "Stable Acceptance-Criterion Labels") with a retirement note naming the follow-on, and take it out of its phase. When this PRD cannot deliver its stated outcome without that behavior, pull the replacement into this PRD as a fix instead.
+2. **Built, and it leaves nothing behind for the replacement to clean up:** it ships as built, and the follow-on replaces it. Something left behind means stored records the replacement must migrate or reconcile, writes to other systems, people's work the replacement makes pointless, or an output other systems will start to depend on.
+3. **Built, and it leaves something behind:** switch it off. That is a fix to this PRD: amend the criterion to say the behavior is not available until the follow-on replaces it, and Step 6 routes the work. When switching it off leaves this PRD unable to deliver its stated outcome, pull the replacement into this PRD as a fix instead.
+
+**A removal with nothing to replace it** ("drop the PDF export") needs no follow-on, because there is nothing new to build. Retire the criterion with a note citing the feedback; if the behavior is already built, amend the PRD to remove it, and Step 6 routes the removal like a fix.
+
+**The follow-on.** Every new ask that is not minor and has no other home goes to one follow-on PRD:
+
+- **One open follow-on per PRD.** A follow-on is found by its `**Follow-on to:**` line naming the PRD it follows: under its PRD's H1 once written, in its PRD contracts entry or scope file before that. If this PRD already has a follow-on whose build has not started (the same test as above), the asks join it, as amendments to its PRD once that is written. Otherwise create one. One round never creates more than one follow-on for a PRD.
+- **Keep the stakeholder's words.** Save the reply exactly as received in this PRD's directory as `{prd-dir}-stakeholder-feedback-YYYY-MM-DD.txt`, unless the repository already keeps it. The follow-on's scope points at it, so the session that writes the follow-on works from the stakeholder's words, not a paraphrase.
+- **In an initiative:** add the follow-on as a row in the PRD list and an entry in the PRD contracts, in the formats `initiative-breakdown` defines (Step 5), with status `planned`. Give it a title that says what it delivers, and put it right after this PRD in the order, ahead of any planned PRD whose criteria it changes (the conflict check in `implementation-lifecycle` finds those). Its **Depends on:** and **Follow-on to:** lines name this PRD. Its **In this PRD:** line names each ask in a few words and points at the saved feedback. A **Changes:** line names each criterion of this or another PRD that it changes, by label, so its PRD can carry the `Replaces:` lines.
+- **Outside an initiative:** create a change directory, `docs/changes/{name}/`, holding one file, `{name}-follow-on-scope.md`, with the same lines as a PRD contracts entry. The chat that writes the PRD deletes that file in the commit that writes the PRD.
+- **Not written here.** Writing the follow-on's PRD, with its mockups and assumptions, is a session of its own. This chat ends with the prompt for it (Step 8).
+
+An assumption whose answer went to the follow-on leaves this register as a row in the Validated Assumptions table that names the follow-on, where the answer now lives.
+
+**Every call in this step is the session's.** Make each one yourself, from the documents and the code, and record it in one line of the report (Output Format, item 9). Never stop to ask the user to choose: the session can see the documents, the code and the other work in flight, which the user can't without a long conversation. A wrong call costs one more round of feedback to correct.
 
 ### 2. Process Each Classification
 
@@ -224,12 +274,13 @@ Apply all updates to the assumptions document:
 - Update individual assumptions with new information
 - Update Last Updated date
 - Mark validated items `✅ VALIDATED (date)`; once Step 5 has propagated them, move each to the Validated Assumptions table (one line, original ID) and out of the body
+- Move each item whose answer went to a follow-on or another PRD (Step 1a) to the Validated Assumptions table the same way, naming where the answer now lives
 
 ### 5. Propagate to Implementation Documents (CRITICAL)
 
 **This step is essential and must not be skipped.** Every decision this skill settles or changes must be reflected in the actual implementation documents—otherwise the assumptions document becomes a dead end.
 
-For each decision this skill settles or changes, at any confidence: a validated or corrected item, a resolved Pushback, a stated change to a criterion or mockup, and an assumption added or restated with a different answer (below 95% the PRD still states the answer it rests on, citing the entry's ID, per `prd-writing-standards`). A reopened stakeholder ruling is the exception: the PRD, its mockups and the Technical Design keep the stakeholder's decision until the stakeholder revises it (Principle 5).
+For each decision this skill settles or changes, at any confidence: a validated or corrected item, a resolved Pushback, a stated change to a criterion or mockup, and an assumption added or restated with a different answer (below 95% the PRD still states the answer it rests on, citing the entry's ID, per `prd-writing-standards`). A reopened stakeholder ruling is the exception: the PRD, its mockups and the Technical Design keep the stakeholder's decision until the stakeholder revises it (Principle 5). The documents are this PRD's only for what Step 1a kept here, including a criterion it retired or switched off. A new ask sent to a follow-on goes into the follow-on's scope, never into this PRD; an ask sent to another PRD is propagated into that PRD's documents.
 
 1. **Identify affected documents**: Which documents reference this decision?
    - PRD: Business decisions and acceptance criteria
@@ -262,18 +313,18 @@ For each decision this skill settles or changes, at any confidence: a validated 
 - [ ] Mockups redrawn wherever the decision changed what a screen shows
 - [ ] All documents have consistent information (no contradictions)
 
-### 6. Route the Code Changes (For Items That Now Need Implementation)
+### 6. Give the Work a Place in the Plan
 
-**This step applies only to items that require code changes.** Confirmed assumptions that validate existing behavior, blockers that remain blocked, and items the code already handles correctly need nothing here.
+**This step applies only to changes Step 1a kept in this PRD that change what the code must do.** Confirmed assumptions that validate existing behavior, blockers that remain blocked, and items the code already handles correctly need nothing here.
 
-For each corrected assumption, new requirement, or newly unblocked item that changes what the code must do:
+A PRD of any size is built one phase at a time, and each session builds what its phase lists, not the whole PRD. So once the build has started, an amended criterion with no place in the plan goes unbuilt. Where the work goes depends on how far the build has got:
 
-- **If the work is still being built and was never split**, the amendment in Step 5 is enough — the build reads the PRD and Technical Design.
-- **If the work is split and a future phase will build it**, add the item to that phase document too (`implementation-lifecycle`, disposition rule) so the implementing session inherits it without this chat's history.
-- **If nothing will build it** (the work is complete), name the item in the final report as a one-line action item for the user: what the code must now do and the commit that amended the requirements, so they can run `implement-from-discovery` against that diff. A session never opens a change directory for it, and never implies the item is tracked or scheduled anywhere.
+- **Build not started:** the amendment in Step 5 is enough. Phase planning reads the amended PRD.
+- **Build started, planned phases still open:** each change goes into the next open planned phase whose build has not started, under a `## Carried forward from stakeholder feedback, YYYY-MM-DD` section, one line per change, saying what changed and pointing at the amended criterion. Never edit the document of a phase a session is building: the session has already loaded it and would close the phase without the change. Step 1a's evidence (worktrees and session logs) shows which are under way. A criterion an unstarted planned phase already owns stays with that phase, and its line goes there instead. A new criterion (a minor ask, or a fix that adds one) goes to the first unstarted planned phase that can build it and is listed in that phase's "Acceptance criteria covered", so every criterion is still in exactly one phase (`phase-split`). A criterion retired under Step 1a comes off its phase's list; if that phase is under way, its session will build the behavior anyway, so treat it as built (Step 1a, rules 2 and 3). Fixing here, rather than at the end, keeps later phases from building on behavior already known to be wrong. A phase that outgrows a session is re-split by `phase-split`. When every open planned phase is already under way, use a feedback phase, as below.
+- **No unstarted planned phase left** (every planned phase closed or under way, or an unsplit PRD whose build has started): append feedback phases to the end of the plan in `phase-split`'s form ("Completion Phases"), marked `**Added by stakeholder feedback:**`, and sized by `phase-split`'s Step 2. Usually one is enough. A feedback phase from an earlier round whose build has not started takes the new changes instead of a second one being added. An open completion phase an audit added is never a destination.
 
 **Checklist:**
-- [ ] Every item needing code changes is either in the requirements a build will read (the amended PRD, plus the phase document when split), or named for the user as an action item
+- [ ] Every change that needs code is in the amended PRD and, once the build has started, has a place in the plan: an open phase's carried-forward section or a feedback phase
 - [ ] No item is described as scheduled, tracked, or "will be done" unless a build will read it
 
 ### 7. Research First (New Assumptions Below 95%, and Pushback)
@@ -281,6 +332,17 @@ For each corrected assumption, new requirement, or newly unblocked item that cha
 This step applies when Step 3 produced new assumptions below 95% confidence, and to every Pushback item (Step 2). **Investigate each one before finalizing it**, as `implementation-lifecycle` requires — code, data, documents, the stakeholder's own written feedback. The research decision is part of the work; don't hand it to the user.
 
 Then set each entry at the confidence the investigation leaves it at: at 95%+ it folds into requirements, below that it stays a pending assumption and work proceeds on it, and only when the evidence favors no answer at all does it become a Blocking Open Question. Report what moved in one line each: the assumption, its confidence before and after, and what settled it.
+
+### 8. Hand Off
+
+End with a prompt for each new chat this round needs, written with `continuation-prompt` and shown in full in the report, so the user knows exactly what to start:
+
+- **A follow-on was created, or got new asks, and its PRD is not written yet:** a prompt to write it (`prd-writing-standards`). Writing it doesn't wait for this PRD's build: its stakeholder review can go out while this PRD is still being built.
+- **Feedback phases were appended to a finished plan:** a prompt to build the first one (`implement-from-requirements`).
+
+Otherwise no prompt is needed: an open plan's next session picks up its carried-forward sections, and an unstarted PRD carries on along its usual sequence of documents. When a session is already writing the follow-on (its session log shows it), write no second prompt; name the asks its scope gained, for the user to pass to that chat.
+
+The prompts point at documents this chat changed, so present the commit for them first and label each prompt as valid once it lands (`continuation-prompt`, Step 5).
 
 ---
 
@@ -344,6 +406,22 @@ and PENDING is the safe default for unclassified accounts.
 >
 > **Why your 2026-03-12 answer didn't close this**: You asked whether store credit is treated the same ("What about store credit? Not sure we treat those the same"). We read that as store credit possibly following its own rule. The finance close procedure says it does, so the assumption now names each kind separately. Confirm that is how finance treats it today.
 
+## Example: Feedback After the Build Has Started
+
+**State:** the Customer Returns PRD has six phases; 1 to 4 are closed, and no session is building 5 or 6. AC-RET-05 says a return is always refunded, and its Out of Scope says "No exchanges." It is a planned PRD in an initiative.
+
+**Feedback**, in one reply:
+> "Restocking fee should be 10%, not 15%. Show the fee on the confirm screen, not only the receipt. Customers must also be able to exchange for another size. And returns staff should get a daily export."
+
+**Sorting (Step 1a):**
+
+1. **10% restocking fee:** a fix, the rule was wrong. Phase 2 built it, so the change goes into phase 5 under "Carried forward from stakeholder feedback".
+2. **Fee on the confirm screen:** a new ask, and minor. It serves the stated outcome (customers understand their refund), changes an existing screen rather than adding one, needs no new assumption, and fits well within a phase. It becomes a new criterion owned by phase 5.
+3. **Exchanges:** a new ask that reverses an explicit exclusion, so it goes to the follow-on. The refund-only flow is built, and shipping it leaves nothing for exchanges to clean up, so it ships as built.
+4. **Daily export:** an outcome the PRD never set out to deliver. The initiative's planned Returns Reporting PRD covers exports for staff, so the ask goes into that entry's scope, not the follow-on.
+
+**Result:** one follow-on, *Customer Exchanges*, added after Customer Returns in the initiative's order. Its **Changes:** line names AC-RET-05, and the stakeholder's reply is saved beside the PRD. The report gives one prompt, to write Customer Exchanges. Phases 5 and 6 still finish Customer Returns on the scope it started with.
+
 ---
 
 ## Output Format
@@ -358,8 +436,10 @@ After processing feedback, provide:
 6. **Propagation Summary**: List of changes made to PRD, Technical Design, mockups and other implementation documents
    - What was added/updated in each document
    - Location of changes (section names or line references)
-7. **Code Changes Routed**: for each item that now needs code, where it went — the amended PRD a build will read, the phase document that will build it, or a one-line action item for the user (Step 6)
+7. **Code Changes Routed**: for each item that now needs code, where it went: the amended PRD a build will read, an open phase's carried-forward section or "Acceptance criteria covered" list, or a feedback phase (Step 6)
 8. **Research Done** (only if Step 7 investigated new assumptions below 95% or Pushback items): one line per assumption — confidence before and after, and what settled it; for Pushback, also how you read their concern and whether research resolved it — plus any Blocking Open Question with what would let you decide
+9. **Routing** (Step 1a): whether this PRD's build has started and what that was read from; then one line per change: fix or new ask, where it went (this PRD, another PRD by name, or the follow-on by name) and, for a reversal, what happens to the old behavior and why. Decisions, not questions
+10. **Next chats** (Step 8): each prompt in full, or "none needed" with the reason
 
 **Propagation Checklist** (include in output):
 - [ ] PRD updated with validated decisions
@@ -367,7 +447,9 @@ After processing feedback, provide:
 - [ ] Field mapping docs updated (if applicable)
 - [ ] Mockups redrawn wherever a decision changed what a screen shows
 - [ ] All documents now consistent
-- [ ] Code changes routed per Step 6 (amended PRD, phase document, or action item for the user)
+- [ ] Every change sorted as a fix or a new ask, and every new ask in exactly one place: this PRD, another PRD, or the follow-on (Step 1a)
+- [ ] Code changes routed per Step 6 (amended PRD, carried-forward section, or feedback phase)
+- [ ] A prompt for each next chat (Step 8)
 - [ ] All gaps filled with assumptions (no follow-up questions)
 
 ---
