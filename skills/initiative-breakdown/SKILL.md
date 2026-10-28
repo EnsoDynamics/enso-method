@@ -83,7 +83,7 @@ Hard rules about the output:
 
 ### Step 1: Read Everything
 
-Read every input document in full, then the documents they cite, then, when the idea rebuilds something already running, the live system. Each is handled differently:
+Read every input document in full, then the documents they cite, then, when the idea rebuilds something already running, the live system. When the inputs are raw material (meeting transcripts, long threads, earlier AI sessions, a prior attempt's documents, a large mixed pile) and no requirements intake record exists for them yet, run `requirements-intake` first and take its record as the input in place of the pile. Each is handled differently:
 
 - **Inputs** are what the user handed over for this idea: the main brief or notes, and any supplement or amendment written later for it. Supplements matter most. A later document that refines an earlier one ("additional context", "amendments") carries decisions the main document lacks. Inputs are merged into the initiative brief in Step 3.
 - **Cited context** is everything else the inputs point to: a product overview, market research, terminology, the current system's PRD and technical design. Read it for understanding. It stays where it is and is linked from the initiative brief, never merged into it.
@@ -122,6 +122,8 @@ Users name their inputs anything ("Product Brief", "context package", `notes.md`
 6. **Fix links, in both directions.** Rewrite the moved file's own relative links so they resolve from its new directory. Search the repository for the old filenames and update every inbound link. Add `docs/initiatives/` to any index of the repository's documentation layout (a README's layout list, for example), which a filename search will not find.
 
 **Changes already staged when the skill starts.** An input often arrives in the same uncommitted change as edits made because of it: an index that now lists it, a feature list that now points at it. Those edits ride in this skill's commit, updated to the new paths, and the commit message names them. Changes staged for unrelated work are someone else's: leave them staged and untouched, stage only this skill's files beside them, and limit the commit to this skill's paths (`pre-commit-validation`).
+
+**When the input is a requirements intake record** (`source-material/{name}/{name}-requirements-intake.md`): its decisions, constraints, conflicts and unresolved items are merged into the brief like any input, stated in the brief's words and the stakeholders' terms, with the quotes left in the record, but the record itself is not moved or removed by items 3 and 4. It stays in `source-material/` as the trace back to what the stakeholders said, and the brief links it.
 
 **When the input is an oversized draft PRD** (the size check in `prd-writing-standards` tripped mid-draft): the draft becomes the initiative brief. Move it out of `docs/prds/`, and remove its now-empty PRD directory, since it was never one PRD. Its acceptance criteria stay in the brief as source material for the planned PRDs. This is for a draft that belongs to no initiative. A planned PRD that outgrows the band while it is being written is re-cut inside its own initiative instead ("Re-cutting a planned PRD", in Keeping the Initiative Current), never made a new one.
 

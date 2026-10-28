@@ -59,8 +59,9 @@ npx skills remove -g -y assumptions-document-feedback assumptions-document-writi
   implement-from-discovery implement-from-requirements implementation-lifecycle \
   implementation-readiness-check initiative-breakdown investigate-question phase-chain \
   phase-split prd-roadmap prd-writing-standards pre-commit-validation refactor-pass \
-  review-technical-design stakeholder-review-package technical-design-writing-standards \
-  test-audit test-hardening using-the-enso-method wall-clock-awareness
+  requirements-intake review-technical-design stakeholder-review-package \
+  technical-design-writing-standards test-audit test-hardening using-the-enso-method \
+  wall-clock-awareness
 
 claude plugin marketplace add EnsoDynamics/enso-method
 claude plugin install enso-method@enso-method

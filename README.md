@@ -174,7 +174,9 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
 
 1. **Write the PRD.** Run `/prd-writing-standards` and describe what you want in your own
    words, pointing it at your notes, transcripts, mockups or prototype. Talk it through; the
-   messy version is better than a tidy instruction. Then run `/autonomous-prd-refinement`,
+   messy version is better than a tidy instruction. When what you have is raw (long meeting
+   transcripts, threads, earlier AI sessions), run `/requirements-intake` on it first, then
+   start the PRD in a new chat from the record it writes. Then run `/autonomous-prd-refinement`,
    which reviews and fixes it in rounds, ready for your review. If you own the business
    decisions but won't take the design further yourself, run `/stakeholder-review-package`
    now, answer it, and hand the folder to whoever builds it.
@@ -228,6 +230,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `using-the-enso-method` — the map: which skill runs at each stage, in what order, and where you review. Ask your agent to "use the Enso Method" and it loads this
 
 **Requirements and design**
+- `requirements-intake` — when the material is raw (meeting transcripts, long threads, earlier AI sessions, a prior attempt's documents or code), bring what is worth keeping into the repo as marked reference material, and record what the stakeholders actually decided, in their own words, before any requirements are written
 - `initiative-breakdown` — cut an initiative, an idea too big for one PRD, into right-sized planned PRDs that each reach production
 - `prd-writing-standards` — write a PRD, and where the documents live
 - `technical-design-writing-standards` — write or check a technical design
