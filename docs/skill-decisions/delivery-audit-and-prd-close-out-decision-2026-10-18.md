@@ -65,3 +65,25 @@ When the last phase of a split PRD closed, the method ended with a one-line reco
 ## Update, 2026-10-25
 
 The historical-audit-exists routing rule above is replaced: after completion phases from either audit, or direct implementation fixes during a test audit, run a fresh whole-PRD delivery audit before returning to the test audit. Repeat repairs and delivery audits until clean. A clean audit remains current only while the governing requirements and implementation are unchanged; test-only and audit-record-only edits retain it. This closes the gap where the first audit's existence let later repairs bypass delivery verification.
+
+## Update, 2026-10-27: read in rounds
+
+**What happened.** Once the 2026-10-25 rule sent every repair back through a fresh whole-PRD audit, PRDs started circling: one went through five delivery audits in a day, another through four, three of which found exactly one gap. Every gap a later audit found was already in the code the first audit read; none came from a repair. The same few criteria were reported Partly implemented round after round with a different missing part each time (one provider's reader, then the other's; leaf help, then root help), and criteria read as Implemented for three rounds turned out to have gaps. The rule wasn't wrong. It exposed that a single reading has poor recall, and turned each miss into a build chat plus an audit chat.
+
+**Why one reading misses.** The status needs only one missing part to read Partly implemented, so an assessor that found one moved on. Required parts were written per criterion, not per variant the criterion covers, so a sibling path went unchecked. The main agent's confirm step guarded against false gaps but nothing guarded against missed ones. And up to eight dense criteria per assessor left each one little attention.
+
+**Chosen.**
+
+- **Rounds inside the audit chat.** A round that confirms a new gap is followed by another full round with fresh assessors, re-paired within their themes and briefed exactly as the first; the main agent drops what earlier rounds already confirmed. Later rounds are not told earlier findings, as in `deliverable-review`'s full rounds, so they neither anchor on a known gap nor read the brief as a promise that more exist. The assessment ends on a round that confirms nothing new, or after four. A clean first round costs somewhat more than before (smaller batches, every variant traced); the extra rounds cost sub-agent tokens, where the outer loop cost the user two chats per miss.
+- **Implemented records read for completeness.** The main agent checks that each one traces every variant, entry point and case the criterion or design names, and traces any it skips. This reads the record, so it is cheap, and it is the only check that starts from a criterion read as built.
+- **Sibling check at confirmation.** Confirming a gap means reading the code where it sits, so the variants beside it are checked then. A sibling counts only when a criterion in scope requires it, so the check can't turn an observation into scope.
+- **Every part traced, every variant a part.** A missing part settles the status, not the record.
+- **About four criteria per assessor,** a dense criterion alone. The test audit's assessment takes the same batch size and the same per-variant parts, since it derives required parts the same way.
+
+**Rejected.**
+
+- **A delta audit after repairs** (re-check only the repaired criteria). It would have missed every gap the later rounds found in untouched criteria. With the first audit converging, the full post-repair audit is expected to be clean, and stays as the check on the repairs.
+- **The audit fixing small gaps itself.** Still rejected for the reasons above; with rounds, completion phases carry several gaps each and the overhead question mostly goes away.
+- **Rounds in the test audit.** It already remediates in its own chat until the target and re-grades with a fresh reader, so its misses don't become chat cycles.
+
+**Revisit when** the post-repair audit regularly finds gaps the earlier one missed (rounds aren't converging), or audits regularly hit the four-round cap.

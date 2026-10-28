@@ -95,7 +95,7 @@ Remediation is implementation work and runs under `implementation-lifecycle`'s s
 
 ### Step 2: Fresh-eyes assessment (sub-agents)
 
-Launch general-purpose sub-agents in parallel, each with up to about eight criteria grouped by theme or phase, so related criteria share one reader. Give each:
+Launch general-purpose sub-agents in parallel, each with up to about four criteria grouped by theme or phase, so related criteria share one reader; give a criterion that covers many variants or cases a reader to itself. Give each:
 
 - The labels to assess, and the paths of the PRD, its assumptions document, its technical design and the phase documents it needs: in a phase audit, that phase's; for a cross-cutting criterion, every phase document that lists it. **Not** the criterion text, a summary of the work, or earlier grades: it reads the requirements from disk.
 - Where the tests live, and the baseline results file.
@@ -153,7 +153,7 @@ High-risk criteria go first within a tier, and a tier is finished before the nex
 
 ### Step 6: Re-grade, record, hand off
 
-1. **Re-grade with fresh eyes.** Send the criteria this chat touched to one sub-agent under the Assessment Checklist, as in Step 2; the grades come from it, not from the chat that wrote the tests. This replaces a separate `test-hardening` pass.
+1. **Re-grade with fresh eyes.** Send the criteria this chat touched to fresh sub-agents under the Assessment Checklist, batched as in Step 2; the grades come from them, not from the chat that wrote the tests. This replaces a separate `test-hardening` pass.
 2. **Update `test-audit.md`:** the table, To fix, Waiting and the Status line. It reads `Done <date>` only when nothing is left to fix and no row waits on delivery; a blocked row can still be waiting. While rows wait on delivery it names them, as in `Waiting on delivery: AC-RET-08 (phase 8)`.
 3. **Run the full suite**, naming the command: green apart from pre-existing failures, which are named.
 4. **Commit** per `pre-commit-validation`: the tests, any code fixes, any completion phase or carried-forward section and plan-table row Step 5 wrote, and `test-audit.md`, under `test(scope): …`, or `fix(scope): …` when it fixed code, with the repo named. Committed by default, and pushed when the push lands on a feature branch ("Who Commits").
@@ -246,7 +246,7 @@ The sub-agent follows this. Read everything from disk; work from no one's memory
 
 For each criterion:
 
-1. **Required parts, from the requirements alone.** Read the criterion in the PRD, the assumption entries and technical-design sections it depends on, and in a phase audit the phase document. Before opening a test, write down what would have to be observed for it to hold: each required part as something a test could check, including any error or boundary case the criterion states. Derive them from the requirements, never from the code; expectations read off the implementation bless whatever it does.
+1. **Required parts, from the requirements alone.** Read the criterion in the PRD, the assumption entries and technical-design sections it depends on, and in a phase audit the phase document. Before opening a test, write down what would have to be observed for it to hold: each required part as something a test could check, including any error or boundary case the criterion states. Where the criterion covers several of something (providers, channels, entry points, the states it names), each one is its own required part, graded on its own evidence. Derive them from the requirements, never from the code; expectations read off the implementation bless whatever it does.
 2. **Find the evidence and the code.** Search the tests by label, by the names the criterion uses, and by the code the technical design names for it. Map each test to the parts it exercises, and note the files that implement the criterion.
 3. **Check each mapped test.** Did it pass in the baseline, and does the project's normal test run collect it? Does it reach the boundary its part is about, or mock it? Do its assertions pin the required outcome with values taken from the requirements? Would it fail if that part broke?
 4. **Grade** by "The Grades", or give a status (Not implemented, Person-checked, Superseded, Changed outside the requirements). Add `blocked: <what is missing>` when the criterion's boundary has no non-production counterpart.

@@ -1,6 +1,6 @@
 ---
 name: delivery-audit
-description: Independent check, once every planned phase of a PRD is closed, that each acceptance criterion is actually built — every required part present and reachable from the entry point a user or calling system would use, not logic nothing calls. Sub-agents read the criteria from the PRD themselves and trace each one through the code; the main agent confirms every gap before acting on it. It writes no code. Gaps become completion phases at the end of the plan, each marked at its top as added by the delivery audit, which implement-from-requirements builds like any other phase; test-audit follows once nothing is left to build. Use when the last phase of a split PRD closes, when implement-from-requirements hands off to it, or when the user asks whether a finished PRD or phase delivered everything it promised. Not the review inside a build (deliverable-review), not a test audit, and never for work without written acceptance criteria.
+description: Independent check, once every planned phase of a PRD is closed, that each acceptance criterion is actually built — every required part present and reachable from the entry point a user or calling system would use, not logic nothing calls. Sub-agents read the criteria from the PRD themselves and trace each one through the code, in fresh rounds until one finds no new gap; the main agent confirms every gap, and checks its siblings, before acting on it. It writes no code. Gaps become completion phases at the end of the plan, each marked at its top as added by the delivery audit, which implement-from-requirements builds like any other phase; test-audit follows once nothing is left to build. Use when the last phase of a split PRD closes, when implement-from-requirements hands off to it, or when the user asks whether a finished PRD or phase delivered everything it promised. Not the review inside a build (deliverable-review), not a test audit, and never for work without written acceptance criteria.
 user-invocable: true
 ---
 
@@ -13,6 +13,8 @@ Every phase already ran `deliverable-review`. That is not enough on its own:
 - **Each review saw one phase's diff.** Nothing re-checks a criterion a later phase broke, a cross-cutting criterion across all the phases, or a part that fell between two of them.
 - **A phase's Closed line is written by the session that built it.** Its own wrap-up decided the criteria were met.
 - **Gaps are usually partial, not total.** The logic exists but nothing calls it; the main path works and the error case the criterion names doesn't; one of two channels is wired. A missing feature is easy to notice, a half-wired one is not.
+
+**One reading misses parts, so the audit reads in rounds.** A reader who finds one missing part tends to stop there, and a criterion read as Implemented can still hide one. Every round sends every criterion to fresh assessors, and the assessment ends when a round confirms nothing new, or after four rounds. All the gaps go into one set of completion phases, so the build-and-audit cycle after them checks the repairs instead of finding the gaps one build at a time.
 
 At the end of a split PRD, this audit hands off to `test-audit` only when it finds no gaps. When either audit adds completion phases, `implement-from-requirements` builds them, then a fresh whole-PRD delivery audit checks the repairs. Repeat until no gaps remain. Building comes before proving, so the test audit never grades tests for behavior that isn't there yet.
 
@@ -73,7 +75,7 @@ The assessment is review mode within the criteria in scope (`implementation-life
 
 ### Step 2: Fresh-eyes assessment (sub-agents)
 
-Launch general-purpose sub-agents in parallel, each with up to about eight criteria grouped by theme or phase, so related criteria share one reader. Give each:
+Launch general-purpose sub-agents in parallel, each with up to about four criteria grouped by theme or phase, so related criteria share one reader; give a criterion that covers many variants or cases a reader to itself. Give each:
 
 - The labels to check, and the paths of the PRD, its assumptions document, its technical design and the phase documents it needs. **Not** the criterion text, a summary of the work, or `test-audit.md`: it reads the requirements from disk. The phase documents set scope; a Closed line in one is a claim to check, not evidence.
 - The repository root.
@@ -81,25 +83,30 @@ Launch general-purpose sub-agents in parallel, each with up to about eight crite
 
 ### Step 3: Confirm every gap (main agent)
 
-A gap costs a whole build session, so a false one is expensive. For every Partly implemented or Not implemented record:
+A gap costs a whole build session, so a false one is expensive; a missed one costs a build session and another audit later. Before confirming anything, read every Implemented record against its criterion: each variant, entry point and case the criterion or technical design names needs its own traced file and function. Trace any the record skips yourself; one that turns out missing becomes a gap record.
 
-1. **Read the code yourself** at the places the record names, and confirm the missing part really is missing or unreachable. A part found implemented after all moves the row to Implemented.
-2. **Run the conflict check** for the confirmed gaps (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one check covers every row). A later PRD changed the criterion: add the missing pointer pair and list the row as Superseded. The code deliberately does something else a person could have chosen: list it as Changed outside the requirements. Otherwise it is a gap.
-3. **A gap the requirements don't settle** (the criterion needs a value or rule nobody wrote down) is a business question. Write it to the assumptions document with `assumptions-document-writing`; the completion phase builds on the proposed answer, because an assumption is a green light.
-4. **A gap that is costing money, data or production correctness now** stops the audit: "Critical finding, stopping to surface."
+For every Partly implemented or Not implemented record:
+
+1. **Read the code yourself** at the places the record names, and confirm the missing part really is missing or unreachable, and that the requirements really state it. A part found implemented after all, or one no requirement states, leaves the record; the row is Implemented only when no missing part is left.
+2. **Check its siblings while the code is open.** Gaps cluster. A part missing for one provider, channel, entry point or state is often missing for the others the criterion covers, and a missing part in one function is often missing in the functions beside it that do the same job. Read each sibling. One missing the same way is a confirmed gap too, when a criterion in scope requires it; one no criterion in scope requires is not a finding.
+3. **Run the conflict check** for the confirmed gaps (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one check covers every row). A later PRD changed the criterion: add the missing pointer pair and list the row as Superseded. The code deliberately does something else a person could have chosen: list it as Changed outside the requirements. Otherwise it is a gap.
+4. **A gap the requirements don't settle** (the criterion needs a value or rule nobody wrote down) is a business question. Write it to the assumptions document with `assumptions-document-writing`; the completion phase builds on the proposed answer, because an assumption is a green light.
+5. **A gap that is costing money, data or production correctness now** stops the audit: "Critical finding, stopping to surface."
+
+**Read again while rounds find gaps.** A round that confirmed a new gap is followed by another full round: Step 2 again over every criterion in scope, briefed exactly as the first, with fresh assessors and the criteria split or paired differently within their themes. Then this step again, for the missing parts no earlier round confirmed; drop the ones already confirmed. A round that confirms no new gap ends the assessment, so a clean first round is the whole of it. After four rounds the assessment ends regardless, and the report says new gaps were still turning up.
 
 ### Step 4: Write the completion phases
 
 With no gaps, go to Step 5. **Before every planned phase is closed** (a phase audited on request mid-PRD), write no completion phase: add each gap to the next open planned phase as a `## Carried forward from Phase N` section (`implementation-lifecycle`), which that phase's build then delivers. Otherwise load `phase-split` and follow its "Completion Phases" section, which owns their ids, file names, the line that marks them at the top, and the template. This skill decides what goes in them:
 
-- **Group the gaps by the code they share.** Gaps in one capability or one area of code go in one phase. Size the set by `phase-split`'s Session Capacity Calibration; usually every gap fits one completion phase.
+- **Group the gaps by the code they share.** Gaps in one capability or one area of code go in one phase. Size the set by `phase-split`'s Session Capacity Calibration, which may make it more than one phase.
 - **Each gap gets one line under "What the audit found missing"**, from the confirmed record: what is missing, where (file and function, and the entry point), so the build starts from the finding instead of auditing again.
 - **Nothing but gaps.** No improvement, refactor or test work goes in a completion phase. Test gaps are `test-audit`'s.
 
 ### Step 5: Record and hand off
 
 1. **Write the next chat's prompt** with `continuation-prompt`, before the commit so the edits it makes to the governing documents ride in it. Gaps: `implement-from-requirements` on the first completion phase (mid-PRD, the next open planned phase, as usual). No gaps: `test-audit` on the same scope. Either way a fresh chat: this one never builds what it found, and the build gets the implement chain's review and test hardening.
-2. **Commit** per `pre-commit-validation`: the completion phases or carried-forward sections, any plan-table rows, pointer pairs and assumption entries. The subject starts `delivery audit complete` and then names the scope in parentheses, so later sessions can find it and tell a whole-PRD audit from a narrower one: `docs(customer-returns): delivery audit complete (whole PRD), 2 criteria incomplete, Phase 7 of Customer Returns added`, or `docs(customer-returns): delivery audit complete (whole PRD), every criterion implemented`. A narrower audit reads `(phase 3)`. `(whole PRD)` is only for an audit run with every planned phase closed; one run on the whole PRD earlier names the phases it covered, `(phases 1 to 4)`, so it is never mistaken for the close-out audit. The `docs(...)` scope is the one this PRD's commits already use, usually its directory name. When the audit changed no file, commit it empty, `git commit --allow-empty --only -m "<message>"`, which commits nothing else and leaves another session's staged files staged. Put each Changed outside the requirements row in the body, one line each. Committed by default, never pushed by default (`pre-commit-validation`, "Who Commits").
+2. **Commit** per `pre-commit-validation`: the completion phases or carried-forward sections, any plan-table rows, pointer pairs and assumption entries. The subject starts `delivery audit complete` and then names the scope in parentheses, so later sessions can find it and tell a whole-PRD audit from a narrower one: `docs(customer-returns): delivery audit complete (whole PRD), 2 criteria incomplete, Phase 7 of Customer Returns added`, or `docs(customer-returns): delivery audit complete (whole PRD), every criterion implemented`. A narrower audit reads `(phase 3)`. `(whole PRD)` is only for an audit run with every planned phase closed; one run on the whole PRD earlier names the phases it covered, `(phases 1 to 4)`, so it is never mistaken for the close-out audit. The `docs(...)` scope is the one this PRD's commits already use, usually its directory name. When the audit changed no file, commit it empty, `git commit --allow-empty --only -m "<message>"`, which commits nothing else and leaves another session's staged files staged. Put each Changed outside the requirements row in the body, one line each. The body also says how many rounds ran and how many new gaps each confirmed. Committed by default, never pushed by default (`pre-commit-validation`, "Who Commits").
 3. **Present the prompt** after the commit, with its hash.
 4. **Append DONE** to this session's marker, naming the terminal state.
 
@@ -107,7 +114,7 @@ With no gaps, go to Step 5. **Before every planned phase is closed** (a phase au
 
 ## What the Chat Shows
 
-Only what needs attention: no list of what was built, no account of how the audit ran. A headline with how many criteria have gaps; a table of just those, each with what's missing in one line; the user's actions (Changed outside the requirements and Waiting on a human action rows); then the commit and the next chat's prompt. With no gaps, the headline, the commit and the prompt are the whole report.
+Only what needs attention: no list of what was built, no account of how the audit ran. A headline with how many criteria have gaps; a table of just those, each with what's missing in one line; the user's actions (Changed outside the requirements and Waiting on a human action rows); one line if the fourth round still confirmed new gaps; then the commit and the next chat's prompt. With no gaps, the headline, the commit and the prompt are the whole report.
 
 ```markdown
 **Delivery audit, Customer Returns (whole PRD): 2 of 14 criteria aren't fully built.** Added phase 7 to build them.
@@ -130,9 +137,9 @@ The sub-agent follows this. Read everything from disk; work from no one's memory
 
 For each criterion:
 
-1. **Required parts, from the requirements alone.** Read the criterion in the PRD, the assumption entries and technical-design sections it depends on, and in a phase audit the phase document. Before opening any code, write down each required part as behavior someone could observe, including every error or boundary case the criterion states.
-2. **Find the entry point.** Where would a user or calling system get this behavior: a route, command, scheduled job, screen, message handler, export? The technical design usually names it.
-3. **Trace each part from the entry point to the code that does it.** Record the file and function for each part and the call path that reaches it. A part is built only when that path exists. Code nothing calls, a stub, or a branch behind a flag that is off everywhere is not built.
+1. **Required parts, from the requirements alone.** Read the criterion in the PRD, the assumption entries and technical-design sections it depends on, and in a phase audit the phase document. Before opening any code, write down each required part as behavior someone could observe, including every error or boundary case the criterion states. Where the criterion covers several of something (providers, channels, entry points, the states it names), each one is its own required part: a part checked for one variant and not another is half checked.
+2. **Find the entry points.** Where would a user or calling system get this behavior: a route, command, scheduled job, screen, message handler, export? The technical design usually names them; each one the criterion or design names needs its own trace.
+3. **Trace each part from its entry point to the code that does it.** Record the file and function for each part and the call path that reaches it. A part is built only when that path exists. Code nothing calls, a stub, or a branch behind a flag that is off everywhere is not built. **A missing part settles the status, not the record:** keep tracing every remaining part and list every one that is missing.
 4. **Check the values the requirements fix:** limits, amounts, wording, ordering, recipients, timing. The code must use the required value, not a near one.
 5. **Status** by "The Statuses". For Partly implemented and Not implemented, list each missing part in one line, with the file and function where it belongs.
 
@@ -145,8 +152,9 @@ Report one record per criterion with these fields. Do not judge tests, style or 
 ### DO
 
 - Take the criteria from the document pointed at, and have the assessors read the requirements from disk and derive each required part before opening code
-- Trace every part from the entry point a user or calling system would use
-- Confirm every gap yourself, and run the conflict check on the gaps, before writing a completion phase
+- Trace every part, in every variant the criterion covers, from the entry point a user or calling system would use
+- Read every Implemented record for skipped variants, confirm every gap yourself, check its siblings, and run the conflict check on the gaps, before writing a completion phase
+- Read in rounds until one confirms no new gap, up to four, and put every gap found into one set of completion phases
 - Put the gaps in completion phases written by `phase-split`'s rules, marked at the top as added by the delivery audit
 - Hand the build to `implement-from-requirements` in a fresh chat, and the proof to `test-audit` once nothing is left to build
 
