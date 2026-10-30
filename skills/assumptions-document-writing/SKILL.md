@@ -123,7 +123,7 @@ stakeholder check the premise as well as the answer.
 Before assigning an ID, check the places an answer would already be sitting:
 
 - **This document** — the validated table and the entries already in the body.
-- **The requirements intake record**, when the PRD was written from one (`source-material/{name}/`): the stakeholders' decisions in their own words. A decision recorded there is a prior ruling (Gate 3).
+- **The requirements intake record**, when the work has one (a `{name}-requirements-intake.md` under `source-material/`, which the PRD does not name): the stakeholders' decisions in their own words. A decision recorded there is a prior ruling (Gate 3).
 - **The stakeholder's own written feedback** — their emails, the meeting transcripts
   (in your meeting notes or transcripts archive, if you keep one), and whatever
   the PRD directory keeps as evidence. A ruling in their own words beats any inference.

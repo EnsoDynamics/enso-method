@@ -53,7 +53,7 @@ Use this skill when:
 1. **The PRD's path.** The skill also finds, from the PRD's directory and its links:
    - the assumptions document, if any
    - the mockups and whatever generates them
-   - the source material the PRD was written from: the brief, its entry in the PRD contracts and the coverage matrix, a handoff package, a requirements intake record (`requirements-intake`), whose quotes are the stakeholders' own words
+   - the source material the PRD was written from: the brief, its entry in the PRD contracts and the coverage matrix, and, when the work has one, a handoff package or a requirements intake record (`requirements-intake`), whose quotes are the stakeholders' own words. The PRD does not link or name these, so look for them in `source-material/`
    - neighbouring documents the PRD adds lines to, such as its PRD-list row, its PRD-contracts entry and seam rows, and coverage-matrix rows
 2. **Read access to the systems the PRD describes**, where the project allows it (`engineering-principles`, "Production Data"), so facts and sample data can be checked. Credential discovery follows `investigate-question`.
 
