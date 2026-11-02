@@ -140,7 +140,7 @@ Add these lines to the instructions file your tools read (`~/.claude/CLAUDE.md`,
 through their skills:
 
 > - CONTINUATION PROMPTS: Whenever asked for a prompt to paste into a new chat, or when a skill hands work to a fresh chat, use the `continuation-prompt` skill. If a prompt you receive opens with a short name alone on its first line (or a `Chat:` line) and you have a tool that sets the thread or session title, set it to that name before anything else; if you have no such tool, say nothing about it (where the optional title hook is installed, it has already set the title).
-> - ASSUMPTIONS DOCUMENTS: Before editing any `assumptions.md` (or a `*-assumptions.md`), load the `assumptions-document-writing` skill and read its "Editing an Existing Document" section — most edits to these files are made in passing by sessions doing something else, which is how the format drifts.
+> - ASSUMPTIONS DOCUMENTS: Before editing any `assumptions.md` (or a `*-assumptions.md`), load `assumptions-document-feedback` if the edit records a stakeholder's answer to an assumption, however it arrives, including in chat, and `assumptions-document-writing` otherwise; either way, read the writing skill's "Editing an Existing Document" section — most edits to these files are made in passing by sessions doing something else, which is how the format drifts.
 
 ## If your instructions restrict commits
 
@@ -163,8 +163,9 @@ already there:
 - `continuation-prompt/hooks/session-title-from-chat-line.py` (`UserPromptSubmit`) — turns
   a continuation prompt's first-line chat name into the session title.
 - `assumptions-document-writing/hooks/assumptions-doc-skill-reminder.py` (`PreToolUse`,
-  matcher `Edit|Write|MultiEdit`) — reminds any session editing an assumptions register to
-  follow `assumptions-document-writing`. It only adds context; it never approves or blocks
+  matcher `Edit|Write|MultiEdit`) — tells any session editing an assumptions register which
+  skill its edit needs: `assumptions-document-feedback` to record a stakeholder's answer to an assumption,
+  `assumptions-document-writing` otherwise. It only adds context; it never approves or blocks
   an edit.
 
 ```json

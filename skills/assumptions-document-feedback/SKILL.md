@@ -1,13 +1,13 @@
 ---
 name: assumptions-document-feedback
-description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, partial answers and pushback (a doubt or question is researched and the assumption restated to meet it, never pasted in as the answer) while keeping the project moving forward. Checks every requested change against the whole initiative as it stood before the feedback, then sorts it into a fix or a new ask; once the PRD's build has started, fixes go into its phase plan and new asks, apart from minor ones, into one follow-on PRD, so a build in progress finishes on the scope it started with. Finishes every change in each PRD it reaches, including each PRD that consumes a changed contract, and gives each amended PRD one fresh check instead of rerunning its refinement.
+description: Process stakeholder feedback on assumptions documents — incorporate corrections, validations, partial answers and pushback (a doubt or question is researched and the assumption restated to meet it, never pasted in as the answer) while keeping the project moving forward. Checks every requested change against the whole initiative as it stood before the feedback, then sorts it into a fix or a new ask; once the PRD's build has started, fixes go into its phase plan and new asks, apart from minor ones, into one follow-on PRD, so a build in progress finishes on the scope it started with. Finishes every change in each PRD it reaches, including each PRD that consumes a changed contract, and gives each amended PRD one fresh check instead of rerunning its refinement. Use for every stakeholder answer to an assumption, however it arrives (a returned review, an email, meeting notes, a ruling given in chat), even one recorded in passing during a build.
 ---
 
 # Assumptions Document Feedback Processing
 
 Guidelines for incorporating stakeholder feedback on assumptions documents.
 
-**Related skill**: See `assumptions-document-writing` for creating assumptions documents and full ID system details. **When this skill requires creating new assumptions** (e.g., to fill gaps from partial feedback), load and follow the writing skill — it defines the ID system, format, and the filter for what belongs in an assumptions document vs. elsewhere.
+**Related skill**: See `assumptions-document-writing` for creating assumptions documents and full ID system details. **When this skill requires creating new assumptions** (e.g., to fill gaps from partial feedback), load and follow the writing skill — it defines the ID system, format, and the filter for what belongs in an assumptions document vs. elsewhere. Before editing the register, read that skill's "Editing an Existing Document" section: it governs the shape every edit, including this skill's, leaves the register in.
 
 ---
 
@@ -24,6 +24,7 @@ The core philosophy: **Never block waiting for perfect answers.** Stakeholder fe
 Use this skill when:
 
 - You receive stakeholder feedback on an assumptions document (email, Slack, meeting notes)
+- A stakeholder, or the user speaking for one, rules on an assumption entry in the chat itself ("DATA-004 is right"), even a single ruling in the middle of a build. Recording it is this skill's work, not `assumptions-document-writing`'s. A ruling on other behavior, outside a feedback round on the assumptions, does not start this skill; it goes into the requirements as `using-the-enso-method` routes it ("Feedback goes into the requirements before the code")
 - Feedback is a mix of clear answers, partial answers, and corrections
 - You need to update the assumptions document while maintaining its utility
 - A PRD directory holds a `{name}-pending-feedback-changes.md`: an earlier round left changes there (Step 4a), and this skill resumes it

@@ -3,8 +3,8 @@
 
 WHY THIS EXISTS. An assumptions document is edited far more often by sessions doing
 something else — recording a ruling while building a phase — than by sessions that set
-out to edit it. Those sessions have loaded `implement-from-requirements`, not
-`assumptions-document-writing`, so the format rules are simply not in context, and the
+out to edit it. Those sessions have loaded `implement-from-requirements`, not the
+assumptions skills, so neither the feedback procedure nor the format rules are in context, and the
 document drifts a little on each pass: correction history piling up in the body, update
 paragraphs stacking in the header, status narrative in headings, a checklist growing at
 the top.
@@ -50,13 +50,16 @@ def _is_assumptions_doc(file_path: str) -> bool:
 
 
 REMINDER = (
-    "This file is an assumptions document, whose format is owned by the "
-    "`assumptions-document-writing` skill. Load that skill with the Skill tool BEFORE "
-    "making a structural change here — adding or rewriting an entry, folding a "
-    "stakeholder's answer, moving an item to the validated table, or editing the header — "
-    "and read its section 'Editing an Existing Document', which governs edits to a "
-    "register that already exists. If you are folding stakeholder feedback, load "
-    "`assumptions-document-feedback` too. Five rules registers actually drift on, so check "
+    "This file is an assumptions document. Pick the skill by what the edit does, and load "
+    "it with the Skill tool BEFORE editing: (a) recording a stakeholder's answer, "
+    "correction or ruling on an assumption entry — however it arrives, including a "
+    "decision given in this chat — or "
+    "moving an answered item to the validated table: load `assumptions-document-feedback`, "
+    "which owns what the answer changes here and in the PRD and plan; (b) drafting the "
+    "register, adding a new entry, rewording an entry or editing the header: load "
+    "`assumptions-document-writing`. Either way, read the writing skill's section "
+    "'Editing an Existing Document', which governs the shape any edit leaves a register "
+    "in. Five rules registers actually drift on, so check "
     "them even for a small edit: (1) ONE `**Last Updated**` line, replaced rather than "
     "stacked — the commit log is already the narrative of edits, so do not keep a second one "
     "by hand; (2) superseded entry text comes OUT rather than being layered under the live "

@@ -1,13 +1,13 @@
 ---
 name: assumptions-document-writing
-description: Standards for writing business assumptions documents — specific implementable statements, plain English, confidence levels, and stakeholder validation format.
+description: Standards for writing business assumptions documents — specific implementable statements, plain English, confidence levels, and stakeholder validation format. Use to draft a register or add a new entry. A stakeholder's answer to an assumption entry, however it arrives (a returned review, an email, a ruling given in chat), goes through assumptions-document-feedback instead, which applies these format rules.
 ---
 
 # Assumptions Document Writing Standards
 
 Guidelines for writing business assumptions documents.
 
-**Related skill**: See `assumptions-document-feedback` for processing stakeholder responses.
+**Related skill**: `assumptions-document-feedback` records stakeholder responses to assumptions: any answer, correction or ruling on an assumption entry, whether it arrives as a returned review, an email, meeting notes or a line in chat, and even when it is one ruling recorded in passing during a build. Load that skill, not this one, to record it; it sends you back here for the format rules.
 
 ---
 
@@ -479,11 +479,14 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 ```markdown
 # [Feature Name] - Business Assumptions
 
-<!-- ⚠️ EDITING THIS FILE? LOAD THE `assumptions-document-writing` SKILL FIRST ⚠️
-     It owns this document's format, and most edits here are made by sessions
-     doing something else — recording a ruling while building a phase — which is
-     exactly how the format drifts. Folding a stakeholder's answers? Load
-     `assumptions-document-feedback` as well.
+<!-- ⚠️ EDITING THIS FILE? LOAD THE RIGHT SKILL FIRST ⚠️
+     Recording a stakeholder's answer to an assumption below, however it
+     arrives (a reply, an email, a decision given in chat):
+     `assumptions-document-feedback`.
+     Any other edit (a new entry, a rewrite, the header):
+     `assumptions-document-writing`, which owns this document's format.
+     Most edits here are made by sessions doing something else, which is
+     exactly how the format drifts.
 
      Superseded entry text comes OUT — version control holds it, and each entry
      records its ruling date as the handle. Do not layer history under a live
@@ -847,6 +850,11 @@ the record competing with the live question.
 The test at the end of an edit is not "does my change read well" — it is "is the document
 still in a shape this skill describes".
 
+**Recording a stakeholder's answer to an assumption is not this skill's job.** An answer,
+correction or ruling on an entry, however it arrives and however small, goes through `assumptions-document-feedback`, which
+decides what it changes here and in the PRD and plan. This section governs the shape that
+skill's edits leave the register in, as it does every other edit.
+
 ### One `**Last Updated**` line, replaced rather than stacked
 
 The header carries a date, not a changelog. Replace the date; put what changed in the
@@ -983,7 +991,7 @@ Use the simple filename `assumptions.md`. There's no need to repeat the PRD name
 ## Adopting This Skill
 
 **The skill has to be loaded to be followed, and the moment it is most needed is the moment
-nobody thinks to load it** — a session recording one ruling in a register while its actual
+nobody thinks to load it** — a session editing a register in passing while its actual
 work is a build. Three mechanisms close that gap. None depends on the others.
 
 **1. The directive comment in the document.** The template above opens with a comment
@@ -994,8 +1002,10 @@ often on exactly the long documents that need it most, since those get read in p
 **2. The PreToolUse hook (Claude Code).** Deterministic where the comment is probabilistic:
 it is read on every edit however the file was opened. The script in this skill's `hooks/`
 directory watches `Edit`, `Write` and `MultiEdit` calls, and when the target is an
-`assumptions.md` or a `*-assumptions.md`, injects a reminder naming this skill, its
-"Editing an Existing Document" section, and the five rules registers actually drift on.
+`assumptions.md` or a `*-assumptions.md`, injects a reminder naming which skill the edit
+needs (`assumptions-document-feedback` for a stakeholder's answer to an assumption, this
+one otherwise), this
+skill's "Editing an Existing Document" section, and the five rules registers actually drift on.
 
 It emits `additionalContext` and **nothing else** — deliberately no `permissionDecision`,
 which on PreToolUse means "skip the permission prompt" rather than "do not block", and would
@@ -1042,6 +1052,8 @@ template even where the hook is installed. One line in the instructions file you
 reaches both tools, and `continuation-prompt` sets the same precedent for its hook:
 
 > ASSUMPTIONS DOCUMENTS: Before editing any `assumptions.md` (or a `*-assumptions.md`),
-> load the `assumptions-document-writing` skill and read its "Editing an Existing Document"
-> section — most edits to these files are made in passing by sessions doing something else,
-> which is how the format drifts.
+> load `assumptions-document-feedback` if the edit records a stakeholder's answer to an
+> assumption, however it arrives, including in chat, and `assumptions-document-writing` otherwise;
+> either way, read the writing skill's "Editing an Existing Document" section — most edits
+> to these files are made in passing by sessions doing something else, which is how the
+> format drifts.
