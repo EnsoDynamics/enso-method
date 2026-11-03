@@ -296,7 +296,7 @@ Then have the record reviewed with fresh eyes: `deliverable-review`, with the re
 
 Commit the record as `docs({name}): requirements intake` (`pre-commit-validation`, "Who Commits"), with any source brought in during Part 2. Raw material that arrives before the PRD is written goes through both parts again into the same directory and the same record (new sources, new or replaced positions, Changed Positions), committed as `docs({name}): requirements intake update`.
 
-The next skill is `prd-writing-standards`, whose size check sends the work on to `initiative-breakdown` when it is bigger than one PRD. Start it in a new chat with a `continuation-prompt` that points at the record: the next skill writes from the record, not from the pile, and a chat that has just read the pile has neither the room nor the distance to do that.
+The next skill is `initiative-breakdown` when the record fails the PRD-sized test in `initiative-breakdown` (Step 2), otherwise `prd-writing-standards`. Start it in a new chat with a `continuation-prompt` that points at the record: the next skill writes from the record, not from the pile, and a chat that has just read the pile has neither the room nor the distance to do that.
 
 Tell the user in a few lines: how many sources were read and how many came in, how many decisions, conflicts and unresolved items the record holds, the largest categories left out, any unendorsed text found where requirements are read from, and any bracketed correction, unnamed speaker or undated source that left a position Conflicting and that the user could clear up. Their read of the record is welcome and is not a gate.
 

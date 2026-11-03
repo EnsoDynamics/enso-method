@@ -12,7 +12,7 @@ This skill owns three things:
 
 1. **The PRD-sized test** — deciding whether an idea is one PRD or several.
 2. **The cut** — finding the seams, ordering the planned PRDs, and writing the PRD list.
-3. **The initiative brief, PRD list and PRD contracts naming and layout** — what the three documents (and the optional coverage matrix) are called, where they live, and how an input with any name becomes the initiative brief.
+3. **The initiative brief, PRD list and PRD contracts naming and layout** — what its documents are called, where they live, and how an input with any name becomes the initiative brief.
 
 **Terminology note:** An initiative is a known, decided body of work too big for one PRD, not a long-term theme; the looser plan that several initiatives might come from is a roadmap, which this method does not plan. In agile terms, a planned PRD is an epic (a medium body of work) and its phases (`phase-split`) are stories, sized for one AI session instead of a sprint.
 
@@ -50,6 +50,7 @@ docs/initiatives/{name}/
   {name}-initiative-prds.md   ← for people: the ordered list of planned PRDs — tables, nothing else
   {name}-prd-contracts.md     ← for the sessions that write and design the PRDs: scope entries, owned contracts, question assignments, seams
   {name}-coverage-matrix.md   ← when the input has many discrete items: each one mapped to exactly one planned PRD (Step 4)
+  {name}-initiative-overview.html ← for business stakeholders: the whole initiative on one page (Step 5)
 docs/prds/{name}-{short-name}/   ← NOT created here; created when that planned PRD is written
 ```
 
@@ -69,6 +70,7 @@ Hard rules about the output:
 | **Initiative PRDs** (the PRD list) | The initiative brief cut into an ordered list of planned PRDs, written for people: order, priority groups, what each delivers, dependencies, status. | `{name}-initiative-prds.md` |
 | **PRD contracts** | What the PRDs owe each other, written for the sessions that write, refine and design them: each planned PRD's scope until it is written, the contracts each PRD owns, which open questions each settles, and the seams. | `{name}-prd-contracts.md` |
 | **Coverage matrix** | Optional: each discrete input item mapped to one planned PRD, deferred, out of scope, or an open question. | `{name}-coverage-matrix.md` |
+| **Initiative overview** | The whole initiative on one page for business stakeholders: what changes, and the PRDs in order. Derived from the brief and the PRD list; decides nothing. | `{name}-initiative-overview.html` |
 | **Planned PRD** | One row in the PRD list, with a scope entry in the PRD contracts: a right-sized PRD not yet written. Once written, it is simply a PRD. | becomes `docs/prds/{name}-{short-name}/` |
 
 - **`{name}`** is a short kebab-case name for the thing being built, never for the document type: `acme-cloud`, not `product-brief` or `context-package`.
@@ -151,7 +153,7 @@ The guiding principle is `phase-split`'s, one level up: **cut vertically.** Ever
 - **Enough detail to size, and no more.** Every entry is specific enough that its PRD can be written without redoing the cut, and is sized against the band now, as one entry or more; none is left at "plausibly one or two" for later. Sizing needs only which parts of the brief the PRD covers, what reaches production, and its seams. It does not answer the brief's open questions or design anything, and the entry cap (Step 5) holds. An open question that leaves a part's size alone is assigned to its planned PRD as usual (Step 6). Where the brief says too little to size a part at all, the gap is never filled with invented scope: the part gets no planned PRD, goes into the brief's deferred list with an open question naming what the brief must settle, both unassigned, and the declaration names it (Step 7). A planned PRD that cannot reach production without a deferred part is deferred with it. A borderline entry stays one; if its PRD outgrows the band while it is being written, the size check in `prd-writing-standards` sends it back here to be re-cut into two or more planned PRDs of this initiative, in its place ("Re-cutting a planned PRD"). A planned PRD is never broken down into PRDs of its own.
 - **Planned-PRD count is an output, not a target.** See "PRD Size Calibration".
 
-### Step 5: Write the PRD List and the PRD Contracts
+### Step 5: Write the PRD List, the PRD Contracts and the Overview
 
 Two documents, for two readers. **The PRD list is for people**: the list someone opens to see every PRD in the idea, its priority, what it delivers and where it stands. **The PRD contracts is for sessions**: what a session needs to write a planned PRD, and what a technical design must honor so the PRDs fit together. Keep each to its reader. Per-PRD scope prose and the Seams table in the PRD list make a document no person reads end to end, and the list they came for gets lost in it.
 
@@ -225,6 +227,15 @@ The first five lines of an entry (directory through Depends on) are its **scope 
 
 **A PRD list written before the two were separate**, always under the old names, has its scope entries and Seams table inline. It still works; the next time this skill runs on it, rename it first ("The names"), then move the entries and the Seams table into a PRD contracts document and drop the scope lines of PRDs already written.
 
+#### The initiative overview
+
+`docs/initiatives/{name}/{name}-initiative-overview.html`, for the business stakeholders. Each PRD's review package covers only that PRD, so without this page the first one arrives with no picture of the whole. It holds two things:
+
+- **What changes:** how things work today and what the initiative turns that into, a few sentences each, in the stakeholders' terms.
+- **The PRDs in order:** each one's name and, in one sentence, what reaches production.
+
+A busy person who opens a long page closes it, and then the page has failed. So it fits on a screen or two: plain short sentences, no introduction, no background beyond those two things, nothing said twice. It says nothing the brief and the PRD list do not: no assumptions to answer (each PRD's review package holds those), no status (it would go stale) and no design. Use the look of `stakeholder-review-package`'s template without its feedback controls, and show the date it was prepared. Refresh it whenever a PRD's name, place in the order or what reaches production changes; an initiative that has no overview gets one at its first refresh.
+
 ### Step 6: Update the Initiative Brief So the Two Never Disagree
 
 - **Add the link line** under its H1: `Cut into PRDs by the [{Title} Initiative PRDs]({name}-initiative-prds.md).`
@@ -240,7 +251,7 @@ After this, the brief changes only when a decision changes, or when a re-cut mov
 
 State the cut in the response as a decision: a table of order, planned PRD, what reaches production, and one line on why the cut falls there. Name every part deferred because the brief said too little to size it, with the question that would settle it, so the user can settle it and re-run this skill. Then list the renames and removals from Step 3. Do not end the turn to ask whether the cut is acceptable.
 
-Stage the documents (brief, PRD list, PRD contracts, the coverage matrix when there is one, and on a re-cut the kept PRD's draft and any written PRD whose **Depends on:** line changed), validate and commit them per `pre-commit-validation`. Committing is the default, and the user's instructions override it; pushing waits for the user ("Who Commits").
+Stage the documents (brief, PRD list, PRD contracts, overview, the coverage matrix when there is one, and on a re-cut the kept PRD's draft and any written PRD whose **Depends on:** line changed), validate and commit them per `pre-commit-validation`. Committing is the default, and the user's instructions override it; pushing waits for the user ("Who Commits").
 
 Then give the copy-paste prompt for writing the first planned PRD, using `continuation-prompt`. Its chat name takes the planned PRD's short-name as the unit and the initiative's name as the project tag, and its lineage block names the initiative and the planned PRD:
 
@@ -261,9 +272,9 @@ The prompt names `prd-writing-standards` and `autonomous-prd-refinement`, points
 - **When a planned PRD is written**, the chat writing it sets its PRD-list row to `PRD written` and points the row's link at the PRD file (`prd-writing-standards` carries this rule). **When its refinement finishes**, the same chat deletes the entry's scope lines from the PRD contracts, keeping **Shared contracts it owns** and **Questions it answers** (`autonomous-prd-refinement`, Completion). The PRD now holds its own scope; a second copy would only drift.
 - **When a PRD's work reaches production**, its row becomes `in production YYYY-MM-DD`: set by the session that promoted it, or named as the user's one-line action when promotion happens outside a session (`implement-from-requirements` wrap-up).
 - **Which PRD comes next is the user's decision**, not an automatic continuation. When a PRD's track ends, at the test audit that closes it, that wrap-up says the PRD is complete and names the next PRD after it in the initiative's order that is not yet in production, which may already be written; it does not write that chat's prompt unless asked (`continuation-prompt`, "An initiative is not a track").
-- **Reordering, adding, or dropping a planned PRD is the user's call**, applied by re-running this skill to revise the PRD list, the PRD contracts and the coverage matrix, when there is one. Names never change on a reorder. A reorder keeps every PRD after the PRDs it depends on; moving one ahead of one it depends on means redoing the cut. Discoveries made while building never become planned PRDs on their own (the Materiality Gate in `implementation-lifecycle`); only the user adds one. The one exception is a **follow-on**: when stakeholder feedback asks for something new after a PRD's build has started, `assumptions-document-feedback` adds the follow-on's row and PRD contracts entry itself, placed right after the PRD it follows and ahead of any planned PRD whose criteria it changes, but never ahead of a PRD it depends on. A stakeholder's request is not a discovery, and only one follow-on per PRD is open at a time (`assumptions-document-feedback`, Step 1a).
-- **Re-cutting a planned PRD** that outgrew the band happens inside its initiative, while that PRD is being written: when the size check in `prd-writing-standards` trips, before or during drafting, re-run this skill on the initiative, never on the PRD alone. The entry is replaced in place by two or more planned PRDs, keeping the rest of the order; splitting existing scope is not adding a planned PRD. The one that keeps most of the scope keeps the name, the directory and its current status, and its draft, when one exists, is cut down to that scope. Acceptance criteria that move out of the draft go into the initiative brief, in the sections they belong to, as source material for the new entries, as Step 3 keeps a standalone draft's criteria. In the same change, update the PRD list rows, every **Depends on:** line that named the original (its dependents' included), the shared-contract lines, the Seams table, the question assignments and the coverage-matrix rows; Step 7's handoff prompt resumes writing the kept PRD. A PRD already written and refined is not re-cut this way: when `phase-split` finds it well past the band, whether to reopen it is the user's decision ("When to Use"); if the user reopens it, that is adding a planned PRD and moving scope to it (above and below).
-- **A written PRD that moves scope to or from a neighbor** updates both PRDs (or the neighbor's scope entry, while it is planned), their contract and seam lines, and the coverage matrix when there is one, in the same change.
+- **Reordering, adding, or dropping a planned PRD is the user's call**, applied by re-running this skill to revise the PRD list, the PRD contracts, the overview and the coverage matrix, when there is one. Names never change on a reorder. A reorder keeps every PRD after the PRDs it depends on; moving one ahead of one it depends on means redoing the cut. Discoveries made while building never become planned PRDs on their own (the Materiality Gate in `implementation-lifecycle`); only the user adds one. The one exception is a **follow-on**: when stakeholder feedback asks for something new after a PRD's build has started, `assumptions-document-feedback` adds the follow-on's row and PRD contracts entry itself, placed right after the PRD it follows and ahead of any planned PRD whose criteria it changes, but never ahead of a PRD it depends on. A stakeholder's request is not a discovery, and only one follow-on per PRD is open at a time (`assumptions-document-feedback`, Step 1a).
+- **Re-cutting a planned PRD** that outgrew the band happens inside its initiative, while that PRD is being written: when the size check in `prd-writing-standards` trips, before or during drafting, re-run this skill on the initiative, never on the PRD alone. The entry is replaced in place by two or more planned PRDs, keeping the rest of the order; splitting existing scope is not adding a planned PRD. The one that keeps most of the scope keeps the name, the directory and its current status, and its draft, when one exists, is cut down to that scope. Acceptance criteria that move out of the draft go into the initiative brief, in the sections they belong to, as source material for the new entries, as Step 3 keeps a standalone draft's criteria. In the same change, update the PRD list rows, the overview, every **Depends on:** line that named the original (its dependents' included), the shared-contract lines, the Seams table, the question assignments and the coverage-matrix rows; Step 7's handoff prompt resumes writing the kept PRD. A PRD already written and refined is not re-cut this way: when `phase-split` finds it well past the band, whether to reopen it is the user's decision ("When to Use"); if the user reopens it, that is adding a planned PRD and moving scope to it (above and below).
+- **A written PRD that moves scope to or from a neighbor** updates both PRDs (or the neighbor's scope entry, while it is planned), their contract and seam lines, the overview, and the coverage matrix when there is one, in the same change.
 
 ---
 
@@ -289,7 +300,7 @@ This section holds the concrete numbers, the only part of this skill that ages. 
 - Size every planned PRD against the calibration band and re-cut until all pass, with only the detail sizing needs; defer a part the brief says too little about to size, and name it in the declaration.
 - Name planned PRDs, never number them; name their future directories `{name}-{short-name}`, the short-name being the PRD's name in kebab case.
 - Keep the initiative brief whole; point into it by section heading; replace its ordered plan with a pointer to the PRD list.
-- Declare the cut, write the PRD list and the PRD contracts (and the coverage matrix when the input calls for one), and hand off with a prompt for writing the first planned PRD.
+- Declare the cut, write the PRD list, the PRD contracts and the overview (and the coverage matrix when the input calls for one), and hand off with a prompt for writing the first planned PRD.
 
 ### DO NOT
 
@@ -316,4 +327,5 @@ This section holds the concrete numbers, the only part of this skill that ages. 
 | `implementation-lifecycle` | Lists writing a planned PRD as requirements work with its own lineage, and supplies the Materiality Gate that keeps discoveries from becoming planned PRDs. |
 | `implement-from-requirements` | When it closes the last phase of a PRD in an initiative, it hands off to the closing audits and handles the `in production` status; the test audit that ends the track names the next PRD not yet in production (no prompt). |
 | `continuation-prompt` | Produces the handoff prompt for writing the first planned PRD. At the end of a PRD, treats the initiative's next PRD as the user's decision, not the next unit of the finished track. |
+| `stakeholder-review-package` | Each PRD's review package names the PRD's place in the initiative and links the overview. The overview borrows its template's look. |
 | `pre-commit-validation` | Validates the staged documents before any commit. |
