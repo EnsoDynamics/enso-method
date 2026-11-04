@@ -234,7 +234,10 @@ Each item: the topic, the quotes that raised it, and what would settle it.
 ## Reference Material
 Each mockup, screenshot, prototype, code directory and document brought in that the
 PRD's author should look at: where it is, and one line on what it shows or gives that
-nothing else kept does.
+nothing else kept does. Mark each one a stakeholder supplied or chose as showing what
+they want, and where it holds alternatives or versions, name the one chosen (the file,
+page, tab or option) and where the choice was made. The PRD's mockups start from it;
+the rest is context.
 
 ## Terms
 The stakeholders' names for things, other names the material uses for them, and each
