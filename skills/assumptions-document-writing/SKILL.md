@@ -56,7 +56,7 @@ For each question that comes up, **don't just list it as a question**. Instead:
 1. State your best-guess answer as an assumption
 2. Provide evidence for why you think this
 3. Assign a confidence level
-4. Assess the impact if you're wrong
+4. Rate its Impact
 
 ### Why This Matters
 
@@ -89,9 +89,46 @@ the three.
 
 | Kind | What would settle it | Where it goes |
 |---|---|---|
-| **Build choice** | Engineering judgment: several workable options, nothing unknown, no business preference between them | The Technical Design, as a decision with its reasoning and the alternative it beat. **Never an assumption.** |
+| **Build choice** | Engineering or project judgment: several workable options, nothing unknown, no business preference between them. This includes how the team checks and runs its work | The Technical Design, as a decision with its reasoning and the alternative it beat. **Never an assumption.** |
 | **Technical assumption** | A fact that exists somewhere (data, system behavior, a document, a ticket) that research could not reach | This document's **Technical Assumptions** section, naming what blocked the research and what would settle it |
 | **Business assumption** | Only business stakeholders: what the business wants, or a fact only they hold (when a campaign starts, which team owns a process) | This document's business sections, written for a stakeholder to answer |
+
+**The line is intent versus implementation.** A business question asks what we want and why: who it
+is for, what should happen, what counts as success, and what the business will accept on money, legal
+exposure and reputation, however technical the subject sounds. Much of it is opinion, and that is why
+only they can answer. A technical question takes the intent as given and asks how to deliver it or
+how to check we did. "How do we know we're done?" is two questions: did it deliver what was wanted
+(intent, theirs), and was it built properly (quality, the team's).
+
+**Sort by what kind of question it is, never by how much it matters.** Every business assumption in
+this document goes to the stakeholder review, because a stakeholder who doesn't see it there never
+sees it. So an entry's weight is no reason to leave it out: a small business decision below 95% is
+still a business assumption, and a consequential test-set size is still a build choice.
+
+**Business is a kind an entry qualifies for, not the one left over.** Anything that is neither pure
+engineering nor a fact can read as "what the business wants", and a sort that treats business as the
+remainder can keep every entry with no step skipped. Before keeping an entry as business, state what would be built differently if they chose otherwise. Entries that shouldn't be
+business questions usually fail one of these:
+
+- **It is about how we build or run the work, not what we want.** Test sizes, the checks that prove
+  the build works, what the build spends. These are build choices, even when they matter a great deal.
+  The same kind of number can fall on either side, so ask who would reject the work over it: a launch
+  bar a stakeholder will judge the result by, or a budget only they hold, is theirs; a bar or budget
+  the team sets for itself is not, and a call on that budget goes to the person running the work.
+- **It is already answered.** A ruling or the scope already says it, or it follows from a rule they
+  gave. Gate 1 removes it, even when common practice offers another answer.
+- **It has only one sensible answer.** Nobody in their seat would choose the alternative, or their
+  word has only one sensible reading. That is a 95% call, so write it up. An alternative counts when
+  something suggests they would want it: they asked for it, the requirements point at it, or common
+  practice offers it. One that can merely be imagined doesn't. A reading that narrows or departs from
+  what they said is theirs to check.
+- **Both answers build the same thing.** There is nothing to ask, so write it up. This wins over the
+  other tests, including when the question is about what counts as done.
+- **It is asked of the wrong person.** One stakeholder can't waive another's approval or speak for
+  their budget. Name the person who holds it; it is their question if it stays one.
+- **It is worded as a build question.** If it takes explaining how the system works before it makes
+  sense, restate it as what they would see, be responsible for or be exposed to. If that works, ask
+  the restated question. If nothing survives, it is a build choice.
 
 **A build choice declared as a decision is still declared.** The design records what was chosen,
 why, and what it beat, so a reader who disagrees sees exactly what was weighed. Moving a choice
@@ -101,14 +138,19 @@ something outside their domain, and the confirmations it collects are noise.
 **Behavior users can see is not business by default.** The trap is an entry about something
 visible, the order of a list nobody specified, where a label sits, which of two equivalent screens
 shows a count, that reads like product behavior and so feels like the business's call. The test is
-whether a business stakeholder, shown the options side by side, would care which one ships. If
-they would not, it is a build choice, however visible. If they might, it is a business assumption,
-however technical it sounds.
+whether a business stakeholder, shown the options side by side, would have any preference. With none,
+it is a build choice, however visible. With one, however small, it is a question of what they want,
+however technical it sounds, and how small it is plays no part.
 
 | Entry | Kind |
 |---|---|
-| The "Last updated" time sits under the list rather than above it | Build choice: visible, but no stakeholder would care which; the design picks one |
+| The "Last updated" time sits under the list rather than above it | Build choice: visible, but no stakeholder would have a preference; the design picks one |
+| A test sample holds at least 200 emails, kept from whoever builds the model | Build choice: how the team checks its work |
+| Every release passes the regression suite and a smoke test before it ships | Build choice: was it built properly |
+| The sponsor accepts the rollout once 50 sampled orders match the old system | Business assumption: what they will accept as done |
 | The billing export carries a tax region for every account; we could not read production to check | Technical assumption: a fact, blocked by access |
+| "Complete" in the sponsor's brief means every record has a status | Not a question when no other reading is sensible: write it up |
+| The sponsor said to delete everything when an account closes; we keep one invoice record | Business assumption: it departs from what they said |
 | Orders over $500 need a manager's approval before they ship | Business assumption: policy the business owns |
 | The spring promotion starts on 1 March | Business assumption: a fact only the business holds |
 
@@ -125,7 +167,16 @@ business assumptions.
 any design existed, was sorted with less information than the design stage has. Re-sort the whole
 register whenever a skill re-screens it (`autonomous-prd-refinement`, `autonomous-design-refinement`,
 and `stakeholder-review-package` before it builds a review). Re-sorting an existing entry runs this
-sort and Gate 1's lookup below; the other gates stay with new entries. What a re-sort moves:
+sort and Gate 1's lookup below; the other gates stay with new entries. A re-sort that keeps an entry
+as business says what their answer changes and rates its Impact ("Impact" below), and one that moves nothing is a reason
+to read the kept entries again, not evidence the register is clean. An entry holding two kinds, a fact
+and a policy say, is split and each part sorted; the part that stays a question keeps the ID, and each other part gets its own row as `ID (part)`. An entry
+a stakeholder has already answered goes through `assumptions-document-feedback`, including an answer
+with amendments or conditions. **Moving an entry changes where it lives, not what it says.** A re-sort never changes a
+proposed value, and a figure that looks wrong is raised with the person running the work. It may
+overrule the entry's earlier confidence when it finds only one sensible answer, and replace an
+alternative that fails the test above. A moved entry records an alternative only if one was actually
+weighed; never invent one. What a re-sort moves:
 
 - **To a build choice:** the decision goes into the Technical Design, and the entry leaves the body
   for the Validated Assumptions table with `Moved to design YYYY-MM-DD` in its date column and the
@@ -136,8 +187,14 @@ sort and Gate 1's lookup below; the other gates stay with new entries. What a re
 - **To a technical assumption:** the entry moves, under its original ID, into the Technical
   Assumptions section, rewritten to that section's format. One whose blocker cannot be named is
   researched first.
-- **Answered by the lookup:** as Gate 1 says, it was already decided or turned on a findable fact,
-  and it leaves the body with a pointer to where the answer lives.
+- **Answered by the lookup:** as Gate 1 says, it was already decided or turned on a findable fact, and
+  it leaves the body with a pointer to where the answer lives.
+- **With only one sensible answer, or both answers building the same thing:** the answer goes into the
+  PRD or Technical Design, and the entry leaves the body for the Validated Assumptions table with
+  `Written up YYYY-MM-DD` in its date column and where it lives in its notes. That marks the team's
+  call, so Gates 1 and 3 don't treat it as a stakeholder's ruling. A candidate with no ID yet is written
+  up and listed nowhere.
+- **Asked of the wrong person, or worded as a build question:** it stays business, with the entry saying whose it is or its wording restated.
 
 ---
 
@@ -197,6 +254,7 @@ Before assigning an ID, check the places an answer would already be sitting:
 - **Production data, if one query answers it** — read-only, and only where the project allows it
   (`engineering-principles`, "Production Data"): what values does the column actually carry today?
 - **Consumer code, if it constrains the choice** — hardcoded literals, joins, filters.
+- **How established products handle it, when the question is how a product should behave** — one or two searches. Common practice gives a proposal its reasoning. It settles a question only when it leaves one sensible answer, since what this business wants can still differ.
 
 **This is a lookup, not an investigation, and the distinction matters.** This skill loads late —
 when an entry is about to be written, usually after most of a session's work is done — and "raise
@@ -605,13 +663,15 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Assumption**: [State clearly in plain business English what we're doing and why. This should be specific enough to implement from.]
 
+**If they choose otherwise**: [What would be built differently, in terms they would notice]
+
 **Example**: [Required when the assumption governs how specific records are treated; otherwise optional. A real record with its identifier and system, pulled from the data — see "When to Include an Example"]
 
 **Confirm or Correct**:
 - [ ] Correct as stated
 - [ ] Wrong — correct answer: _______________
 
-**Confidence**: X% | **Impact if Wrong**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
+**Confidence**: X% | **Impact**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
 
 ---
 
@@ -621,6 +681,8 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Assumption**: [State what we're doing, noting a specific alternative exists]
 
+**If they choose otherwise**: [What would be built differently, in terms they would notice]
+
 **Example**: [Same rule as above — required when this governs how specific records are treated]
 
 **Confirm or Correct**:
@@ -628,7 +690,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 - [ ] Wrong — [specific alternative we've identified]
 - [ ] Wrong — different approach: _______________
 
-**Confidence**: X% | **Impact if Wrong**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
+**Confidence**: X% | **Impact**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
 
 ---
 
@@ -650,7 +712,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 - [ ] Correct as stated
 - [ ] Wrong — the fact is: _______________
 
-**Confidence**: X% | **Impact if Wrong**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
+**Confidence**: X% | **Impact**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
 
 ---
 
@@ -661,6 +723,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 | DATA-002 | [One-line summary] | YYYY-MM-DD | [Where detail was moved] |
 | AUTH-002 | [One-line summary] | YYYY-MM-DD | [Where detail was moved] |
 | WORK-003 | [One-line summary] | Moved to design YYYY-MM-DD | A build choice: Technical Design §[section] |
+| RULE-005 | [One-line summary] | Written up YYYY-MM-DD | The team's call, one sensible answer: PRD [criterion] |
 ```
 
 A technical assumption's IDs share the document's one ID sequence and use the same category
@@ -888,19 +951,18 @@ names one, or it names the gap. See "When to Include an Example."
 
 ### Be Selective About Edge Cases
 
-Consider edge cases, but don't include every one in the assumptions document. Too many assumptions leads to stakeholder fatigue—they'll start skimming or just approving everything without careful review.
+Consider edge cases, and sort them like anything else: a case is not a question just because it can happen.
 
 **Include edge cases that**:
-- Have meaningful business impact if we get them wrong
 - Require business judgment to decide how to handle
-- Could change scope or approach significantly
+- Could change scope or approach
 
 **Leave out edge cases that**:
-- Are minor technical scenarios we can handle ourselves
-- Have low impact if our guess is wrong
-- Are unlikely enough that we can address them if they come up
+- Are technical scenarios we can handle ourselves
+- A rule already given settles
+- Nothing suggests will ever occur
 
-The goal is a focused document where every assumption earns the stakeholder's attention—not a comprehensive list of everything that could possibly go wrong.
+How much a case matters is never the reason to leave it out. The goal is that every entry is a real business question, however many that turns out to be.
 
 ---
 
@@ -920,24 +982,22 @@ Don't fake confidence. Be honest about what you know vs. what you're guessing.
 
 ---
 
-## Impact Assessment
+## Impact
 
-**🔴 HIGH Impact**:
-- Changes to fundamental architecture or scope
-- Major features need to be added/removed
-- Significant rework required if wrong
-- Example: "If user roles don't exist in the target system, we need to build role provisioning first (major scope addition)"
+How much the answer changes what the product does for its users and the business. Impact never
+decides whether an entry is shown; it sets the order the stakeholder review asks in. It is not the
+cost of rework.
 
-**🟡 MEDIUM Impact**:
-- Requires refactoring but not re-architecture
-- Configuration changes or parameter additions
-- Can be adapted relatively easily
-- Example: "If a different discount calculation method is needed, we can make it configurable"
+**🔴 HIGH**: Changes the outcome across most of the product, or a wrong answer could cost significant
+money, create legal exposure or damage customer trust. A dollar figure alone doesn't make an entry High,
+though in a product about money many entries can rightly be High.
+- Example: "Orders over $500 need a manager's approval before they ship"
 
-**🟢 LOW Impact**:
-- Simple configuration or minor code changes
-- No architectural impact
-- Example: "If file naming is slightly different, update the glob pattern"
+**🟡 MEDIUM**: Changes how one workflow or screen behaves.
+- Example: "A freed place in a class goes to one person on the waiting list at a time"
+
+**🟢 LOW**: A detail inside a workflow.
+- Example: "The waiting list shows each person's position"
 
 ---
 
@@ -1067,6 +1127,8 @@ At the bottom of the document, maintain a concise list of validated assumptions.
 | AUTH-002 | SSO users must also have a local account as fallback | 2026-01-03 | Moved to PRD |
 | SCOPE-004 | Reporting dashboard is NOT in phase 1 | 2026-01-03 | Moved to the phase 2 document |
 ```
+
+A row dated `Moved to design` or `Written up` is not a stakeholder's validation: it records the team's call and where it lives.
 
 **Key points:**
 - **Preserve the original ID** — this is crucial for tracing back to historical feedback

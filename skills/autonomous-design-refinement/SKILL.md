@@ -171,7 +171,7 @@ Changed after pass 1: {labels of criteria added or changed since the pass-1 chec
 Completion: {date} · {criteria re-checked} · {result}
 
 ## Register re-sort
-Pass 1: {date} · {n} open entries · {d} moved to design · {s} settled by lookup · {t} moved to technical · {q} raised as Technical questions ({Q ids}) · {b} stay business
+Pass 1: {date} · {n} open entries · {d} moved to design · {w} written up · {s} settled by lookup · {t} moved to technical · {q} raised as Technical questions ({Q ids}) · {b} stay business
 
 ## Noticed, out of scope
 - {one line each — things investigation tripped over that fail the scope gate}
@@ -255,13 +255,14 @@ The orchestrator takes the top **Questions per pass** into this pass, marks the 
 
 **In pass 1 only, run the conflict check** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements") in a second subagent alongside discovery, against the whole PRD. Tell every readiness-check subagent this skill launches, each pass's discovery and the final verification, to skip its own. The check finds the criteria in the repo's other PRDs and change directories that this PRD changes. An intended change is folded in as a `Replaces:` line on the new criterion (`prd-writing-standards`) by a writer subagent, serialized with the other folds, with no question. An unintended one, where this PRD would break behavior someone asked for, enters the Questions table as a Business question and competes for a slot on impact like any other. Record the result under **Conflict check** in the state file. From then on, the orchestrator adds under **Changed after pass 1** the label of every criterion a writer or conformance subagent reports adding or changing.
 
-**In pass 1 only, re-sort the assumptions register** in one more subagent alongside discovery: every open entry, not only ones this run adds, by `assumptions-document-writing`'s "Sort Every Entry by What Would Settle It", with its Gate 1 lookup. Entries written before the design existed were sorted without it, and they are what fills a stakeholder review with questions no stakeholder needed. The subagent edits nothing; it returns each entry it would move, with its kind and one line of reason. The orchestrator then:
+**In pass 1 only, re-sort the assumptions register** in one more subagent alongside discovery: every open entry, not only ones this run adds, by `assumptions-document-writing`'s "Sort Every Entry by What Would Settle It", with its Gate 1 lookup. Entries written before the design existed were sorted without it, and they are what fills a stakeholder review with questions no stakeholder needed. Tell the subagent that business is not the kind left over and that an entry's importance plays no part: for each entry it keeps as business, it returns what would be built differently if they chose otherwise. The subagent edits nothing; it returns each entry it would move, with its kind and one line of reason. When it moves nothing, the orchestrator sends the kept entries to a second fresh subagent, which reads only each entry and those answers and says which it doubts; the orchestrator re-sorts each doubted entry itself. The orchestrator then:
 
 - **Build choice:** hands it to a writer, serialized with the other folds, who records the decision in the Technical Design with its reasoning and the alternative it beat, and moves the entry to the validated table as `Moved to design`.
-- **Fact the lookup settled:** the same writer folds the answer where it belongs and moves the entry out of the body, as Gate 1 says.
+- **Fact or prior ruling the lookup settled:** the same writer folds the answer where it belongs and moves the entry out of the body, as Gate 1 says.
+- **One sensible answer, or both answers building the same thing:** the same writer states it where it governs and moves the entry to the validated table as `Written up`.
 - **Fact with its blocker already named:** the same writer moves it, under its ID, to the register's Technical Assumptions section in that section's format.
 - **Fact not yet researched:** enters the Questions table as a Technical question, pointing at its entry, and competes for a slot like any other; its disposition (below) decides where it ends.
-- **Business:** stays, and is not a question for this run unless discovery finds evidence it is wrong.
+- **Business:** stays, and is not a question for this run unless discovery finds evidence it is wrong. The same writer adds its **If they choose otherwise** line from the subagent's answer, says whose it is if it was asked of the wrong person, restates a question worded for the build, and rates its **Impact**.
 
 Record the counts under **Register re-sort** in the state file.
 
@@ -283,7 +284,7 @@ Do not batch steps 3–4 for later. The pass's value is only as safe as the last
 - **Technical, confidence ≥ 90%:** fold into the Technical Design.
 - **Technical, confidence < 90%:** mark Deferred for another pass, with the improved answer and evidence in **Question notes**. Never park a technical question in the business sections of the assumptions document to make the counts look clean. If a technical question is deferred in two consecutive passes at unchanged confidence, investigation has hit its ceiling, and what ends it depends on its kind (`assumptions-document-writing`, "Sort Every Entry by What Would Settle It"). A **build choice** is recorded in the Technical Design as an explicit design decision with rationale, the alternative it beat and the evidence gap stated, and marked Resolved by decision: an engineer must choose, and the design is where that choice belongs. A **fact** whose source investigation could not reach is written as a technical assumption, naming the blocker and what would settle it, and marked Assumption.
 - **Business, ≥ 95%, whatever the impact:** fold the decision into the PRD.
-- **Business, < 95%:** write it as an assumption stating the best-supported implementable answer, following `assumptions-document-writing` — plain-language proposed answer in the business's own terms, why we believe it, confidence, impact, confirm-or-correct format. Technical detail the stakeholder cannot judge goes in the Technical Design, not the assumption. Proceed on that basis; stakeholder validation is asynchronous and is not a reason to pause. Use a Blocking Open Question only for the rare case that skill defines.
+- **Business, < 95%:** write it as an assumption stating the best-supported implementable answer, following `assumptions-document-writing` — plain-language proposed answer in the business's own terms, what their answer changes, why we believe it, confidence, Impact by that skill's definition rather than the question's own rating, confirm-or-correct format. Technical detail the stakeholder cannot judge goes in the Technical Design, not the assumption. Proceed on that basis; stakeholder validation is asynchronous and is not a reason to pause. Use a Blocking Open Question only for the rare case that skill defines.
 - **Blocked:** record what is needed. If three or more questions share one blocker, pause and report rather than continuing degraded. A blocked fact still blocked at completion becomes a technical assumption naming the blocker; a blocked question is never left only in the state file, which completion deletes.
 - **Reframed:** the investigation showed the question was wrong. Mark the original Dropped (reason: reframed) and add the reframed question as a new Pending row noting its origin; it competes for a slot in the next pass on its own merits.
 
@@ -370,7 +371,7 @@ Exploration scripts: {list, or none}
 Out of scope, noticed and not acted on: {list from the state file}
 
 Conflict check: {n earlier criteria replaced, q raised as questions | no earlier criteria changed | not run: reason}
-Register re-sort: {d} moved to design · {s} settled by lookup · {t} moved to technical · {q} raised as questions · {b} stay business
+Register re-sort: {d} moved to design · {w} written up · {s} settled by lookup · {t} moved to technical · {q} raised as questions · {b} stay business
 Final verification: {clean | N questions, listed below}
 
 Items below threshold (if any): {question — confidence — why}

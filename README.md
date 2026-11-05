@@ -236,7 +236,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `technical-design-writing-standards` — write or check a technical design
 - `review-technical-design` — a senior review of the drafted design that checks it against the real code and your house standards, fixes what it finds, and lists the sections worth your own reading
 - `assumptions-document-writing`, `assumptions-document-feedback` — declare business assumptions and fold in stakeholder answers; once a build has started, fixes go into its plan and new asks, apart from minor ones, into one follow-on PRD; every other PRD a change reaches is amended in the same round and given one fresh check
-- `stakeholder-review-package` — create a single HTML review package with business highlights, every open assumption, contextual mockups and downloadable feedback
+- `stakeholder-review-package` — create a single HTML review package with selected requirements, every open business assumption ordered by impact, contextual mockups and downloadable feedback
 
 **Refinement**
 - `autonomous-prd-refinement` — review-and-fix rounds on a drafted PRD, its assumptions and mockups, until no Medium or High finding is left

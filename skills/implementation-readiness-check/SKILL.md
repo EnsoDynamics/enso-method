@@ -99,14 +99,14 @@ This might answer your question entirely (raising confidence above 95%) or at le
 
 **Check the assumptions document first.** If your question is already captured in an assumptions document, do NOT include it here. That question has already been surfaced and is awaiting business validation—repeating it adds no value. The assumptions document represents a prior pass through this exact exercise. Trust that process.
 
-Don't ask questions that are purely stylistic or trivial.
+Don't ask questions nobody has a preference about.
 
 **4. Classify each question as Technical or Business**
 
 For each question, determine whether it is:
 
-- **Technical** — a question about *how* to implement something, where the team can make the call (architecture, integration approach, error handling strategy, data flow), including visible behavior a business stakeholder, shown the options, would not care about; or a question of fact (what the data holds, how a system behaves) that research settles. These get resolved by making a decision and folding it into the technical design or requirements docs.
-- **Business** — a question about *what* the system should do, where the answer depends on business rules, stakeholder intent, or user-facing behavior the business would care about. If these can't be resolved in the conversation, they need to be surfaced as stated assumptions in the assumptions document.
+- **Technical** — a question about *how* to implement something, where the team can make the call (architecture, integration approach, error handling strategy, data flow), including how the team runs and checks its work, and visible behavior a business stakeholder, shown the options, would have no preference about; or a question of fact (what the data holds, how a system behaves) that research settles. These get resolved by making a decision and folding it into the technical design or requirements docs.
+- **Business** — a question about *what* the system should do, where the answer depends on business rules, stakeholder intent, or user-facing behavior a stakeholder would have a preference about. If these can't be resolved in the conversation, they need to be surfaced as stated assumptions in the assumptions document.
 
 This classification helps the human triage quickly: technical items can often be decided on the spot, while business items may need stakeholder input.
 

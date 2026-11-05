@@ -18,7 +18,7 @@ class ReviewTests(unittest.TestCase):
         (self.root / 'class-bookings-prd.md').write_text('# Community classes\nAC-BOOK-01: Show availability.\n')
         (self.root / 'class-bookings-assumptions.md').write_text('# Assumptions\n### RULE-001. Cancellation\nA cancellation frees a place.\n### UI-001. Waiting list\nShow the queue position.\n## Validated Assumptions\n### RULE-002. Already settled\n')
         refs = [{'source': 'assumptions', 'label': 'Source'}]
-        self.data = {'title': 'Community classes', 'subtitle': 'Find a class.', 'scope': 'Bookings only.', 'date': '2026-01-15', 'assumptions_source': 'assumptions', 'sources': {k: {'path':p, 'url':'https://example.org/'+p, 'label':k} for k,p in [('prd','class-bookings-prd.md'), ('assumptions','class-bookings-assumptions.md')]}, 'sections': [{'id':'booking','title':'Book a class','intro':'Choose a place.','rules':[],'mockups':[],'decisions':[{'id':ident,'title':title,'proposal':['Proposed behavior.'],'evidence':'The brief leaves this open.','refs':refs} for ident,title in [('RULE-001','Cancel before the class?'),('UI-001','Show a queue position?')]]}]}
+        self.data = {'title': 'Community classes', 'subtitle': 'Find a class.', 'scope': 'Bookings only.', 'date': '2026-01-15', 'assumptions_source': 'assumptions', 'sources': {k: {'path':p, 'url':'https://example.org/'+p, 'label':k} for k,p in [('prd','class-bookings-prd.md'), ('assumptions','class-bookings-assumptions.md')]}, 'sections': [{'id':'booking','title':'Book a class','intro':'Choose a place.','rules':[],'mockups':[],'decisions':[{'id':ident,'title':title,'proposal':['Proposed behavior.'],'if_other':'We would build a different booking screen.','impact':'Medium','evidence':'The brief leaves this open.','refs':refs} for ident,title in [('RULE-001','Cancel before the class?'),('UI-001','Show a queue position?')]]}]}
         self.input = self.root / 'class-bookings-review.json'
         self.input.write_text(json.dumps(self.data))
 
@@ -156,6 +156,66 @@ class ReviewTests(unittest.TestCase):
 
     def test_no_technical_section_adds_no_note(self):
         self.assertNotIn('tracked separately', render(self.data, self.root, None))
+
+    def card(self, **changes):
+        self.data['sections'][0]['decisions'][0].update(changes)
+
+    def test_card_says_what_the_answer_changes(self):
+        self.assertIn('If you choose otherwise:', render(self.data, self.root, None))
+        del self.data['sections'][0]['decisions'][0]['if_other']
+        with self.assertRaisesRegex(ValueError, 'not a business question'):
+            validate(self.data, self.root)
+
+    def test_impact_is_required_and_shown(self):
+        self.assertIn('Impact: Medium', render(self.data, self.root, None))
+        for bad in (None, 'Huge', 'high'):
+            self.card(impact=bad)
+            with self.assertRaisesRegex(ValueError, 'needs impact'):
+                validate(self.data, self.root)
+
+    def test_shorthand_check_covers_every_field_shown_on_the_card(self):
+        self.card(attention='Follows PRD section 3')
+        with self.assertRaisesRegex(ValueError, 'build shorthand'):
+            validate(self.data, self.root)
+
+    def test_order_and_start_here_follow_impact_and_keep_written_order_within_a_level(self):
+        register = self.root / 'class-bookings-assumptions.md'
+        register.write_text(register.read_text().replace('## Validated Assumptions', '### RULE-003. Fees\nText.\n### RULE-004. Refunds\nText.\n## Validated Assumptions'))
+        first = self.data['sections'][0]
+        base = first['decisions'][0]
+        first['decisions'][0] = {**base, 'impact': 'Low', 'confidence': '40%'}
+        first['decisions'][1] = {**first['decisions'][1], 'impact': 'Medium', 'confidence': '90%'}
+        first['decisions'].append({**base, 'id': 'RULE-003', 'title': 'Charge a fee?', 'impact': 'Medium', 'confidence': '60%'})
+        self.data['sections'].append({**first, 'id': 'refunds', 'title': 'Refunds', 'decisions': [{**base, 'id': 'RULE-004', 'title': 'Refund late cancels?', 'impact': 'High', 'confidence': '80%'}]})
+        before = copy.deepcopy(self.data)
+        output = render(self.data, self.root, None)
+        self.assertEqual(self.data, before)
+        positions = [output.index(f'id="{ident}"') for ident in ('RULE-004', 'UI-001', 'RULE-003', 'RULE-001')]
+        self.assertEqual(positions, sorted(positions))
+        self.assertLess(output.index('id="refunds"'), output.index('id="booking"'))
+        start = output[output.index('class="start-here"'):output.index('</ol>')]
+        self.assertIn('Refund late cancels?', start)
+        self.assertNotIn('Charge a fee?', start)
+
+    def test_no_limit_on_questions_or_card_length(self):
+        register = self.root / 'class-bookings-assumptions.md'
+        decisions = self.data['sections'][0]['decisions']
+        extra = ''.join(f'### RULE-1{i:02}. Extra\nText.\n' for i in range(12))
+        register.write_text(register.read_text().replace('## Validated Assumptions', extra + '## Validated Assumptions'))
+        decisions.extend({**decisions[0], 'id': f'RULE-1{i:02}'} for i in range(12))
+        self.card(proposal=['word ' * 400], evidence='word ' * 400)
+        self.assertIn('14 open business assumptions', render(self.data, self.root, None))
+
+    def test_build_shorthand_and_unseen_ids_are_refused(self):
+        for text in ('The PRD says so.', 'Per the technical design.', 'As acceptance criteria state.', 'See AC-BOOK-01.'):
+            self.card(evidence=text)
+            with self.assertRaisesRegex(ValueError, 'build shorthand'):
+                validate(self.data, self.root)
+        self.card(evidence='Earlier you ruled on RULE-002.')
+        with self.assertRaisesRegex(ValueError, 'not in this review'):
+            validate(self.data, self.root)
+        self.card(evidence='The XL-100 kit and the other card, UI-001, are the examples. An AC-unit is not shorthand, and neither is order #48213.')
+        validate(self.data, self.root)
 
     def test_unrecognized_inventory_is_not_silently_empty(self):
         (self.root / 'class-bookings-assumptions.md').write_text('# Open questions\n- Should cancellations be free?\n')

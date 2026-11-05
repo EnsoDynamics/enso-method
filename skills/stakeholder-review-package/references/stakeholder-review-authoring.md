@@ -23,16 +23,18 @@ The renderer uses Python's standard library. Keep only the generated HTML beside
       "id": "RULE-001",
       "title": "How late can someone cancel?",
       "proposal": ["Residents may cancel until the class starts."],
+      "if_other": "A cutoff would hold a place you could not refill, and we would add it to the booking screen.",
       "attention": "Affects last-minute availability",
       "evidence": "The booking brief specifies cancellation but gives no cutoff.",
       "confidence": "70%",
+      "impact": "High",
       "refs": [{"source": "assumptions", "anchor": "rule-001-cancellation", "label": "RULE-001"}]
     }]
   }]
 }
 ```
 
-Fields shown above are required except `attention`, `confidence`, and citation `anchor`. `confidence`, when present in the source, is copied verbatim into a neutral badge at the top of the card, outside expandable evidence. Do not invent a score or treat it as approval. `attention` explains the consequence without labelling other decisions optional. Use several short `proposal` paragraphs when one ID contains several independently meaningful conditions. A plain-language title must not bury the choice behind an internal ID. Evidence can include existing source examples and contrary evidence; decisions that depend on that evidence must keep the needed detail in the visible proposal.
+Fields shown above are required except `attention`, `confidence` and citation `anchor`. `impact` is High, Medium or Low, from the register, and the renderer uses it to order sections and cards and to fill Start here, so authored order only breaks ties. The renderer refuses card text naming a PRD, technical design, acceptance criterion or `AC-` label, or a register ID that is not a card in this review. Source link labels are not card text. `confidence`, when present in the source, is copied verbatim into a neutral badge at the top of the card, outside expandable evidence. Do not invent a score or treat it as approval. `attention` explains the consequence without labelling other decisions optional. Use several short `proposal` paragraphs when one ID contains several independently meaningful conditions. A plain-language title must not bury the choice behind an internal ID. Evidence can include existing source examples and contrary evidence; decisions that depend on that evidence must keep the needed detail in the visible proposal.
 
 When no assumptions register exists and the PRD has no open assumptions, set `assumptions_source` to `null`, omit the absent register from `sources`, and supply `open_assumption_ids: []` with an `inventory_note` explaining the absence. Decisions must then be empty; selected PRD rules can still be reviewed. Do not use this form when a register exists or to suppress open questions. Recheck for a register when refreshing or preparing to share; hashes cover listed sources, not newly created files.
 

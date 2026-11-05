@@ -100,7 +100,7 @@ Feedback rounds are how entries turn into walls of text. Each round bolts on a c
 An item the stakeholder already ruled on, left in the body for another pass, has to earn the second read. **Give every such entry a first line, under the heading, saying what has changed since they answered** — and carry the same tag in the heading, in the form "The heading tag vocabulary" defines in `assumptions-document-writing`, so the state is visible while scanning. **Four tags, and no fifth:**
 
 - **nothing new since** — built or queued exactly as ruled, nothing found since. A tick is all it needs.
-- **we read your words** — their answer needed an interpretation (two sentences that disagreed, a "Wrong" box ticked over a restatement of the proposal, one word taken a particular way, a question or doubt read as pointing at a particular gap). Name the reading and ask them to check it.
+- **we read your words** — their answer needed an interpretation (two sentences that disagreed, a "Wrong" box ticked over a restatement of the proposal, one word taken a particular way, a question or doubt read as pointing at a particular gap). Name the reading and ask them to check it. When their words have only one sensible reading, apply it instead of sending them their own words back as a question.
 - **NEW SINCE YOUR ANSWER** — something was found or built afterwards. Say in the same line whether it *agrees* with their ruling, *contradicts* it, or *exposes a gap it does not cover*. This is the set that deserves their attention, and the tag is what gets it there.
 - **new question** — never put to them before, so there is nothing to re-read. Pairs with the `Added` marker rather than `Ruled`.
 
@@ -445,7 +445,7 @@ and PENDING is the safe default for unclassified accounts.
 - [ ] Correct — SUSPENDED for dormant non-qualifying accounts, PENDING for the remainder
 - [ ] Wrong — different approach: _______________
 
-**Confidence**: 85% | **Impact if Wrong**: 🟡 MEDIUM
+**Confidence**: 85% | **Impact**: 🟡 MEDIUM
 ```
 
 ## Example: Processing Pushback
@@ -556,11 +556,13 @@ the new fact or gap that surfaced when we applied it, and the one thing the assu
 above resolves that still needs confirmation. Cite or quote the answer here — this
 section doubles as the evidence trail for the correction.]
 
+**If they choose otherwise**: [What would be built differently]
+
 **Confirm or Correct**:
 - [ ] Correct — [restatement]
 - [ ] Wrong — [alternative]: _______________
 
-**Confidence**: X% | **Impact if Wrong**: 🔴/🟡/🟢
+**Confidence**: X% | **Impact**: 🔴/🟡/🟢
 ```
 
 When the correction fully closes the item (nothing left to confirm), none of this applies — the item is validated and moves to the validated table as one line: what was decided and where the detail now lives; the superseded wording stays in version control.

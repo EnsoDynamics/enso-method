@@ -106,7 +106,7 @@ This is the most important step. Categorize the change:
 → **Below 95% confidence:** investigate to raise confidence (read code, query the database, test the API, check existing patterns). If still under 95%, proceed with your best answer, at whatever confidence it has. Mention in the commit message *why* you chose this approach if the reasoning isn't obvious.
 → **No answer to put forward** (the evidence favors none of the options): stop and ask the user, naming the options and what would decide between them.
 
-**Business-logic change** — affects what the system *does*, what users experience in a way the business would care about, what business rule applies, what a stakeholder would consider correct. A business-logic question **cannot be self-confirmed** — no amount of investigation tells you what the business intends, which is exactly why the assumption mechanism exists for these and rarely for technical ones.
+**Business-logic change** — affects what the system *does*, what users experience in a way a stakeholder would have a preference about, what business rule applies, what a stakeholder would consider correct. A business-logic question **cannot be self-confirmed** — no amount of investigation tells you what the business intends, which is exactly why the assumption mechanism exists for these and rarely for technical ones.
 
 → **At ≥95% confidence:** proceed. No assumption entry and no stakeholder FYI (`implementation-lifecycle`, Confidence Thresholds); the commit message records the choice.
 
@@ -115,11 +115,11 @@ This is the most important step. Categorize the change:
 
 Whatever the confidence, a decision that still needs a stakeholder's answer belongs in the **assumptions document** and nowhere else. Do not disposition it onto a review page, report or dashboard — that is disclosure, not filing, and it does not get answered (see `implementation-lifecycle`, "A Decision Needs an Assumption Entry, Always"). Recording it on such a surface in addition is fine.
 
-Rule of thumb: *if a business stakeholder, shown the options, would care which one ships, it's business. If only an engineer would care, it's technical.*
+Rule of thumb: *if it is about what we want and why, it's business. If it takes the intent as given and asks how to deliver it or check it, it's technical* (`assumptions-document-writing`, "Sort Every Entry by What Would Settle It").
 
 The most common mistake is over-classifying things as business — writing assumption docs for purely technical decisions (library choice, file layout, formatting), or for visible behavior the business would have no preference about. Don't do that: a build choice is recorded in the Technical Design. Business assumptions are for things stakeholders can meaningfully validate; a fact investigation could not reach, with the blocker named, is a technical assumption in the register's Technical Assumptions section (`assumptions-document-writing`, "Sort Every Entry by What Would Settle It").
 
-The reverse mistake is also real: classifying a business decision as technical and just changing it. That erodes the validation process. When in doubt whether the business would care, err toward business.
+The reverse mistake is also real: classifying a business decision as technical and just changing it. That erodes the validation process. When in doubt, run it through that sort's list of how an entry fails to be a business question: one that survives the list is business.
 
 ### Phase 4: Record the Change, Then Implement
 

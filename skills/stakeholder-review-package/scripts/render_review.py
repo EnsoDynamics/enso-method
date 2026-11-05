@@ -51,6 +51,11 @@ ID_HEADING = r'^#{2,6}\s+([A-Z][A-Z0-9]*-\d{3})[.\s:]'
 # Any level-2 heading naming technical assumptions ("## Technical Assumptions (build team)", "## 🔧 Technical assumption"),
 # never "## Non-technical assumptions". A missed variant would put build-team questions in a business review.
 TECHNICAL_SECTION = r'^##\s+[^\n]*?(?<!non-)(?<!non )\btechnical\s+assumptions?\b[^\n]*$.*?(?=^##\s|\Z)'
+REGISTER_ROW = r'^\|\s*([A-Z][A-Z0-9]*-\d{3})\s*\|'
+ANY_ID = r'\b[A-Z][A-Z0-9]*-\d{3}\b'
+# Shorthand a stakeholder has no way to look up. Project vocabulary is the cold read's job (SKILL.md).
+IMPACT_RANK = {'High': 0, 'Medium': 1, 'Low': 2}
+BUILD_SHORTHAND = r'\bPRDs?\b|\b(?i:technical design)\b|\b(?i:acceptance criteri(?:a|on))\b|\bAC-[A-Z]+-\d+\b'
 
 
 def register_regions(text):
@@ -59,6 +64,23 @@ def register_regions(text):
     technical = ''.join(re.findall(TECHNICAL_SECTION, active, re.M | re.S | re.I))
     business = re.sub(TECHNICAL_SECTION, '', active, flags=re.M | re.S | re.I)
     return business, technical
+
+
+def validate_card(item, review_ids, register_ids):
+    """Refuse a card its stakeholder could not read: in build shorthand, citing what they cannot see, or silent on what the answer changes."""
+    ident = item['id']
+    if not item.get('if_other'):
+        raise ValueError(f'{ident} needs if_other: a card that cannot say what the answer changes is not a business question')
+    if item.get('impact') not in IMPACT_RANK:
+        raise ValueError(f'{ident} needs impact: High, Medium or Low')
+    text = ' '.join([item['title'], *item['proposal'], item['evidence'], item['if_other'], item.get('attention', '')])
+    shorthand = re.search(BUILD_SHORTHAND, text)
+    if shorthand:
+        raise ValueError(f'{ident} uses build shorthand a stakeholder cannot look up: "{shorthand[0]}"')
+    # Only the register's own IDs: a product code in an example can have the same shape.
+    unseen = sorted((set(re.findall(ANY_ID, text)) & register_ids) - review_ids)
+    if unseen:
+        raise ValueError(f'{ident} cites IDs that are not in this review: {unseen}. Say what was decided in plain words')
 
 
 def open_ids(text):
@@ -133,6 +155,11 @@ def validate(data, root):
         raise ValueError(f'Technical assumptions stay out of a business review: {sorted(technical & set(actual))}')
     if set(expected) != set(actual):
         raise ValueError(f'Assumption coverage differs: missing={sorted(set(expected)-set(actual))}, extra={sorted(set(actual)-set(expected))}')
+    review_ids = set(actual)
+    register_ids = set(re.findall(ID_HEADING, register, re.M) + re.findall(REGISTER_ROW, register, re.M))
+    for section in data['sections']:
+        for item in section['decisions']:
+            validate_card(item, review_ids, register_ids)
 
 
 def manifest(data, root, images=None):
@@ -155,6 +182,12 @@ def refs_markup(refs, sources):
     return '<span class="source-links">' + ' · '.join(links) + '</span>'
 
 
+def ordered_sections(data):
+    """Sections and their cards in the order a reader should take them; ties keep the authored order."""
+    cards = [{**section, 'decisions': sorted(section['decisions'], key=lambda item: IMPACT_RANK[item['impact']])} for section in data['sections']]
+    return sorted(cards, key=lambda s: IMPACT_RANK[s['decisions'][0]['impact']] if s['decisions'] else len(IMPACT_RANK))
+
+
 def render(data, root, images_dir):
     validate(data, root)
     image_hashes = {screen['id']: digest((images_dir / screen['file']).read_bytes())
@@ -164,7 +197,8 @@ def render(data, root, images_dir):
     sources = data['sources']
     navigation, sections = [], []
     decisions = []
-    for index, section in enumerate(data['sections'], 1):
+    ordered = ordered_sections(data)
+    for index, section in enumerate(ordered, 1):
         sid = section['id']
         navigation.append(f'<a href="#{sid}"><span class="nav-number">{index:02}</span><span>{esc(section["title"])}</span><span class="section-count" data-section="{sid}"></span></a>')
         rules = ''.join(f'<li>{esc(r["text"])} {refs_markup(r["refs"], sources)}</li>' for r in section['rules'])
@@ -182,9 +216,10 @@ def render(data, root, images_dir):
             proposal = ''.join(f'<p>{esc(p)}</p>' for p in item['proposal'])
             options = ''.join(f'<label><input type="radio" name="{ident}" value="{value}"><span>{label}</span></label>' for value, label in [('confirm', 'Confirm'), ('change', 'Change')])
             confidence = f'<span class="confidence">Confidence: {esc(item["confidence"])}</span>' if item.get('confidence') else ''
+            impact = f'<span class="confidence">Impact: {esc(item["impact"])}</span>'
             cards.append(f'''<article class="decision" id="{ident}" data-section="{sid}">
-<div class="decision-top"><span class="decision-id">{ident}</span>{confidence}{importance}<span class="answer-status">Unanswered</span><button type="button" class="clear-answer text-button" aria-label="Clear response to {ident}" hidden>Clear</button></div>
-<h3>{esc(item['title'])}</h3><div class="proposal">{proposal}</div>
+<div class="decision-top"><span class="decision-id">{ident}</span>{confidence}{impact}{importance}<span class="answer-status">Unanswered</span><button type="button" class="clear-answer text-button" aria-label="Clear response to {ident}" hidden>Clear</button></div>
+<h3>{esc(item['title'])}</h3><div class="proposal">{proposal}</div><p class="if-other"><strong>If you choose otherwise:</strong> {esc(item['if_other'])}</p>
 <details class="evidence"><summary>Why this is proposed</summary><p>{esc(item['evidence'])}</p>{refs_markup(item['refs'], sources)}</details>
 <fieldset><legend>Your response to {ident}</legend><div class="choices">{options}</div></fieldset>
 <label class="comment-label" for="comment-{ident}">Correction or comment <span>(optional for confirmation)</span></label>
@@ -199,8 +234,14 @@ def render(data, root, images_dir):
     technical_note = '' if not technical_count else (
         f' {technical_count} technical assumption{"s are" if technical_count != 1 else " is"} tracked separately for the build team.')
     source_links = ' · '.join(f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["label"])}</a>' for s in sources.values() if s.get('show', True))
-    payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in data['sections']], 'sources':sources}
-    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(len(decisions)), 'TECHNICAL_NOTE':esc(technical_note), 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
+    all_cards = [item for section in ordered for item in section['decisions']]
+    start_here = ''
+    if all_cards:
+        top = min(IMPACT_RANK[item['impact']] for item in all_cards)
+        links = ''.join(f'<li><a href="#{item["id"]}">{esc(item["title"])}</a></li>' for item in all_cards if IMPACT_RANK[item['impact']] == top)
+        start_here = f'<div class="start-here"><strong>Start here</strong><ol>{links}</ol></div>'
+    payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in ordered], 'sources':sources}
+    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(len(decisions)), 'TECHNICAL_NOTE':esc(technical_note), 'START_HERE':start_here, 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
     output = TEMPLATE.read_text()
     # One pass: authored text must never become another template substitution.
     return re.sub(r'@@([A-Z_]+)@@', lambda m: replacements[m[1]], output)
