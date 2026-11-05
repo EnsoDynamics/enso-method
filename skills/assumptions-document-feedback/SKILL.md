@@ -272,6 +272,7 @@ After processing all feedback, review every gap, ambiguity, or new question that
 **Is this a business question or an implementation detail?**
 - **Business question** (needs stakeholder validation) → Create a new assumption with its own `CATEGORY-NNN` ID. **Load and follow the `assumptions-document-writing` skill** for how to write it — that skill defines the ID system, format, and the filter for what belongs in an assumptions document. Never embed sub-assumptions inside another assumption — each assumption is a standalone, trackable item.
 - **Implementation detail** (engineering team can decide) → Put it in the Technical Design (or the phase document that will build it). It doesn't belong in the assumptions document.
+- **A question of fact** (what the data holds, how a system behaves) → research it (Step 7). One research cannot reach, with the blocker named, is a technical assumption in the register's Technical Assumptions section (`assumptions-document-writing`, "Sort Every Entry by What Would Settle It").
 
 **For new business-question assumptions**, make your best assumption and route by confidence:
    - **≥95%**: Fold directly into requirements (PRD/Technical Design). This is a decision, not an assumption.

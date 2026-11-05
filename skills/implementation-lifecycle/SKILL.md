@@ -91,7 +91,7 @@ Confidence levels drive what action to take. These thresholds appear across mult
 
 | Question type | Proceed on your own | Declare a formal assumption | Stop and ask |
 |---|---|---|---|
-| **Technical** | Proceed on your best answer at whatever confidence, noting the reasoning in the commit message where it isn't obvious | Rarely — only when the choice is one a business stakeholder could meaningfully validate | Only when no answer can be put forward, after investigation |
+| **Technical** | A build choice: proceed on your best answer at whatever confidence, recording it in the Technical Design (or the commit message for a small one) with its reasoning. A fact: investigate until it is settled, at 90% or more | Only for a fact the build relies on that investigation could not reach, with the blocker named: a technical assumption in the register's Technical Assumptions section (`assumptions-document-writing`, "Sort Every Entry by What Would Settle It") | Only when no answer can be put forward, after investigation |
 | **Business** | 95%+, whatever the impact | Below 95% — a formal entry via `assumptions-document-writing` at its honest confidence, for asynchronous stakeholder validation | Only when no answer can be put forward |
 
 Both tiers share one stop: no answer the evidence favors. Anything short of that proceeds.
@@ -100,7 +100,7 @@ Both tiers share one stop: no answer the evidence favors. Anything short of that
 
 Not all uncertainty is the same. How you handle it depends on what kind of question it is.
 
-**Technical questions** — about data characteristics, API behavior, field values, system constraints. These can almost always be self-resolved through investigation: query the database, test the API, read the code, write an exploration script or a temporary program. **Keep doing homework until the question is answered — more investigation nearly always gets there.** The safety rule for that probing: investigate in dev and sandbox environments; read production only read-only, only when nothing else can answer the question, and only where the project allows it (`engineering-principles`, "Production Data"); never write to production. Technical questions should rarely become formal assumptions — if you're about to add a technical assumption, ask yourself: "Could I answer this with a database query, an API call, or a quick throwaway script?" If yes, do that instead. And if a technical assumption does get declared, it's still yours to confirm: further investigation can usually verify it after the fact, so do that rather than leaving it hanging.
+**Technical questions** — about data characteristics, API behavior, field values, system constraints. These can almost always be self-resolved through investigation: query the database, test the API, read the code, write an exploration script or a temporary program. **Keep doing homework until the question is answered — more investigation nearly always gets there.** The safety rule for that probing: investigate in dev and sandbox environments; read production only read-only, only when nothing else can answer the question, and only where the project allows it (`engineering-principles`, "Production Data"); never write to production. Technical questions should rarely become formal assumptions — if you're about to add a technical assumption, ask yourself: "Could I answer this with a database query, an API call, or a quick throwaway script?" If yes, do that instead. A choice between workable ways to build it is never an assumption: decide it and record it in the Technical Design with its reasoning. What remains is a fact the investigation could not reach, because of missing access, data not loaded yet, or behavior only production shows; declare it as a technical assumption naming that blocker, never as a business one. It's still yours to confirm: retry it whenever the blocker may have cleared rather than leaving it hanging.
 
 **Business logic questions** — about what the business wants, how users expect things to work, what the correct policy is. **These cannot be self-confirmed — no amount of investigation tells you what the business intends.** They are what the assumption mechanism exists for: propose the best answer, declare it, proceed, and route it to a stakeholder for validation. But check first: sometimes what looks like a business decision actually depends on a technical fact you can verify. Resolve the technical fact first — the business decision often becomes obvious once you know the data.
 
@@ -132,9 +132,10 @@ Question arises
     │
     ├─ After investigation, can I put forward a best answer?
     │   ├─ Yes, at any confidence → Pick it. If it's a BUSINESS question, declare an
-    │   │        assumption (use the assumptions-document-writing skill); technical
-    │   │        ones rarely need one — just proceed and note the reasoning in the
-    │   │        commit message. Implement. Do NOT present options to the user.
+    │   │        assumption (use the assumptions-document-writing skill). A build
+    │   │        choice needs none — record it in the design or commit message. A
+    │   │        fact investigation could not reach is a TECHNICAL assumption,
+    │   │        naming its blocker. Implement. Do NOT present options to the user.
     │   └─ No — the evidence favors no option → Stop. Ask the user, naming the
     │            options and what would decide between them.
     │

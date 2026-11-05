@@ -47,9 +47,31 @@ def load_authoring(path):
     raise ValueError('Authoring input must be a review HTML file or temporary JSON file')
 
 
-def open_ids(text):
+ID_HEADING = r'^#{2,6}\s+([A-Z][A-Z0-9]*-\d{3})[.\s:]'
+# Any level-2 heading naming technical assumptions ("## Technical Assumptions (build team)", "## 🔧 Technical assumption"),
+# never "## Non-technical assumptions". A missed variant would put build-team questions in a business review.
+TECHNICAL_SECTION = r'^##\s+[^\n]*?(?<!non-)(?<!non )\btechnical\s+assumptions?\b[^\n]*$.*?(?=^##\s|\Z)'
+
+
+def register_regions(text):
+    """Split a register's open entries into (business, technical); the validated table is neither."""
     active = re.split(r'^##\s+Validated Assumptions\s*$', text, flags=re.M | re.I)[0]
-    return re.findall(r'^#{2,6}\s+([A-Z][A-Z0-9]*-\d{3})[.\s:]', active, re.M)
+    technical = ''.join(re.findall(TECHNICAL_SECTION, active, re.M | re.S | re.I))
+    business = re.sub(TECHNICAL_SECTION, '', active, flags=re.M | re.S | re.I)
+    return business, technical
+
+
+def open_ids(text):
+    return re.findall(ID_HEADING, register_regions(text)[0], re.M)
+
+
+def technical_ids(text):
+    return re.findall(ID_HEADING, register_regions(text)[1], re.M)
+
+
+def register_text(data, root):
+    source = data['assumptions_source']
+    return '' if source is None else (root / data['sources'][source]['path']).read_text()
 
 
 def validate(data, root):
@@ -62,9 +84,10 @@ def validate(data, root):
             raise ValueError('Sources need HTTPS URLs')
         (root / path).read_bytes()
     assumptions_source = data['assumptions_source']
-    register = '' if assumptions_source is None else (root / sources[assumptions_source]['path']).read_text()
-    active = re.split(r'^##\s+Validated Assumptions\s*$', register, flags=re.M | re.I)[0]
-    if re.search(r'^#{2,6}\s+Blocking\s*:', active, re.M | re.I):
+    register = register_text(data, root)
+    business, technical_text = register_regions(register)
+    technical = set(technical_ids(register))
+    if re.search(r'^#{2,6}\s+Blocking\s*:', business + technical_text, re.M | re.I):
         raise ValueError('Unanswered blocking question: resolve it in the assumptions source before creating a Confirm/Change review; do not invent a proposal or omit it')
     expected = open_ids(register)
     if 'open_assumption_ids' in data:
@@ -75,6 +98,8 @@ def validate(data, root):
         raise ValueError('No open IDs parsed; check register format and supply an explicit inventory')
     if assumptions_source is None and expected:
         raise ValueError('A review without an assumptions source requires an explicit empty inventory')
+    if technical & set(expected):
+        raise ValueError(f'Technical assumptions stay out of a business review: {sorted(technical & set(expected))}')
     actual, section_ids, screen_ids = [], [], []
     for section in data['sections']:
         sid = section['id']
@@ -104,6 +129,8 @@ def validate(data, root):
     for values in (expected, actual, section_ids, screen_ids):
         if len(values) != len(set(values)):
             raise ValueError('Duplicate IDs are not allowed')
+    if technical & set(actual):
+        raise ValueError(f'Technical assumptions stay out of a business review: {sorted(technical & set(actual))}')
     if set(expected) != set(actual):
         raise ValueError(f'Assumption coverage differs: missing={sorted(set(expected)-set(actual))}, extra={sorted(set(actual)-set(expected))}')
 
@@ -168,9 +195,12 @@ def render(data, root, images_dir):
 <div class="workflow-layout"><div class="context"><h3 class="column-heading">Key acceptance criteria &amp; mockups</h3><div class="context-content"><ul class="rules">{rules}</ul>{screens}</div>
 <div class="workflow-feedback"><label for="note-{sid}">Feedback on acceptance criteria or mockups</label><p id="note-help-{sid}">What should work or look differently in this section?</p><textarea id="note-{sid}" rows="3" aria-describedby="note-help-{sid}" placeholder="Optional — describe the acceptance criterion or screen and your suggested change"></textarea></div></div>
 <div class="decisions"><h3 class="column-heading">Assumptions to confirm</h3>{''.join(cards)}</div></div></section>''')
+    technical_count = len(technical_ids(register_text(data, root)))
+    technical_note = '' if not technical_count else (
+        f' {technical_count} technical assumption{"s are" if technical_count != 1 else " is"} tracked separately for the build team.')
     source_links = ' · '.join(f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["label"])}</a>' for s in sources.values() if s.get('show', True))
     payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in data['sections']], 'sources':sources}
-    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(len(decisions)), 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
+    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(len(decisions)), 'TECHNICAL_NOTE':esc(technical_note), 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
     output = TEMPLATE.read_text()
     # One pass: authored text must never become another template substitution.
     return re.sub(r'@@([A-Z_]+)@@', lambda m: replacements[m[1]], output)

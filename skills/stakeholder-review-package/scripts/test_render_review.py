@@ -129,6 +129,34 @@ class ReviewTests(unittest.TestCase):
             with self.subTest(mode=mode), self.assertRaises(ValueError):
                 validate(data, self.root)
 
+    def test_technical_assumptions_stay_out_and_are_counted(self):
+        register = self.root / 'class-bookings-assumptions.md'
+        register.write_text(register.read_text().replace('## Validated Assumptions',
+            '## Technical Assumptions\n### DATA-001. Venue feed has capacity\nBlocked by: no feed access.\n### DATA-002. Feed updates hourly\nBlocked by: no feed access.\n## Validated Assumptions'))
+        output = render(self.data, self.root, None)
+        self.assertNotIn('id="DATA-001"', output)
+        self.assertIn('2 open business assumptions', output)
+        self.assertIn('2 technical assumptions are tracked separately for the build team.', output)
+        decisions = self.data['sections'][0]['decisions']
+        decisions.append({**decisions[0], 'id': 'DATA-001'})
+        with self.assertRaisesRegex(ValueError, 'Technical assumptions stay out'):
+            validate(self.data, self.root)
+
+    def test_technical_heading_variants_and_blockers(self):
+        register = self.root / 'class-bookings-assumptions.md'
+        base = register.read_text()
+        for heading in ('## Technical Assumptions (build team)', '## technical assumption', '## 🔧 Technical Assumptions'):
+            register.write_text(base.replace('## Validated Assumptions', heading + '\n### DATA-001. Feed has capacity\n## Validated Assumptions'))
+            self.assertIn('1 technical assumption is tracked', render(self.data, self.root, None), heading)
+        register.write_text(base.replace('# Assumptions\n', '# Assumptions\n## Non-technical assumptions\n'))
+        self.assertNotIn('tracked separately', render(self.data, self.root, None))
+        register.write_text(base.replace('## Validated Assumptions', '## Technical Assumptions\n### Blocking: Which feed?\n## Validated Assumptions'))
+        with self.assertRaisesRegex(ValueError, 'Unanswered blocking question'):
+            validate(self.data, self.root)
+
+    def test_no_technical_section_adds_no_note(self):
+        self.assertNotIn('tracked separately', render(self.data, self.root, None))
+
     def test_unrecognized_inventory_is_not_silently_empty(self):
         (self.root / 'class-bookings-assumptions.md').write_text('# Open questions\n- Should cancellations be free?\n')
         with self.assertRaises(ValueError): validate(self.data, self.root)

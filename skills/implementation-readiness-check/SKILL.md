@@ -105,8 +105,8 @@ Don't ask questions that are purely stylistic or trivial.
 
 For each question, determine whether it is:
 
-- **Technical** — a question about *how* to implement something, where the team can make the call (architecture, integration approach, error handling strategy, data flow). These get resolved by making a decision and folding it into the technical design or requirements docs.
-- **Business** — a question about *what* the system should do, where the answer depends on business rules, stakeholder intent, or user-facing behavior. If these can't be resolved in the conversation, they need to be surfaced as stated assumptions in the assumptions document.
+- **Technical** — a question about *how* to implement something, where the team can make the call (architecture, integration approach, error handling strategy, data flow), including visible behavior a business stakeholder, shown the options, would not care about; or a question of fact (what the data holds, how a system behaves) that research settles. These get resolved by making a decision and folding it into the technical design or requirements docs.
+- **Business** — a question about *what* the system should do, where the answer depends on business rules, stakeholder intent, or user-facing behavior the business would care about. If these can't be resolved in the conversation, they need to be surfaced as stated assumptions in the assumptions document.
 
 This classification helps the human triage quickly: technical items can often be decided on the spot, while business items may need stakeholder input.
 

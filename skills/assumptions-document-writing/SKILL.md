@@ -1,11 +1,11 @@
 ---
 name: assumptions-document-writing
-description: Standards for writing business assumptions documents — specific implementable statements, plain English, confidence levels, and stakeholder validation format. Use to draft a register or add a new entry. A stakeholder's answer to an assumption entry, however it arrives (a returned review, an email, a ruling given in chat), goes through assumptions-document-feedback instead, which applies these format rules.
+description: Standards for writing assumptions documents — every entry sorted by what would settle it (a build choice goes to the technical design, a fact research could not reach is a labelled technical assumption, only what the business wants is a business assumption), specific implementable statements, plain English, confidence levels, and stakeholder validation format. Use to draft a register, add a new entry, or re-sort the entries a register already holds. A stakeholder's answer to an assumption entry, however it arrives (a returned review, an email, a ruling given in chat), goes through assumptions-document-feedback instead, which applies these format rules.
 ---
 
 # Assumptions Document Writing Standards
 
-Guidelines for writing business assumptions documents.
+Guidelines for writing assumptions documents.
 
 **Related skill**: `assumptions-document-feedback` records stakeholder responses to assumptions: any answer, correction or ruling on an assumption entry, whether it arrives as a returned review, an email, meeting notes or a line in chat, and even when it is one ruling recorded in passing during a build. Load that skill, not this one, to record it; it sends you back here for the format rules.
 
@@ -13,7 +13,9 @@ Guidelines for writing business assumptions documents.
 
 ## Purpose
 
-Assumptions documents are for **getting business questions answered by stakeholders**, not for documenting our technical approach or implementation details. The goal is to move forward with development while getting validation on key business assumptions we're making.
+Assumptions documents are for **declaring what we are building on without knowing it**, so the people who can settle it can check it, not for documenting our technical approach or implementation details. The goal is to move forward with development while getting validation on the assumptions we're making.
+
+Most entries are **business assumptions**, answered by business stakeholders. A few may be **technical assumptions**: facts the build relies on that research could not reach, answered by the build team. Both are declared; they live in one document, in separately labelled sections, and only the business ones go to business stakeholders. "Sort Every Entry by What Would Settle It" below defines the two and the third kind, the build choice, which is never an assumption.
 
 **Design for busy stakeholders**: These documents should be quick to scan and easy to respond to. Every element should earn its place—if it doesn't help stakeholders understand and validate, remove it.
 
@@ -62,7 +64,7 @@ Without this mindset, you'll write assumptions that seem comprehensive but miss 
 
 ### The "95% Confidence" Rule
 
-When doing this implementation readiness review, ask yourself: "If I'm 95%+ confident in my answer, do I even need to include this?"
+For a business question, when doing this implementation readiness review, ask yourself: "If I'm 95%+ confident in my answer, do I even need to include this?"
 
 - **Below 95% confidence**: Include it — stakeholders should validate
 - **95%+ confidence**: Leave it out, whatever the impact — proceed, and adjust if it turns out wrong
@@ -79,6 +81,66 @@ See the template below for the format.
 
 ---
 
+## Sort Every Entry by What Would Settle It
+
+Every uncertainty that reaches this document is one of three kinds. Sort it by **what would
+settle it**, not by its topic: a question about a screen, a field or a data source can be any of
+the three.
+
+| Kind | What would settle it | Where it goes |
+|---|---|---|
+| **Build choice** | Engineering judgment: several workable options, nothing unknown, no business preference between them | The Technical Design, as a decision with its reasoning and the alternative it beat. **Never an assumption.** |
+| **Technical assumption** | A fact that exists somewhere (data, system behavior, a document, a ticket) that research could not reach | This document's **Technical Assumptions** section, naming what blocked the research and what would settle it |
+| **Business assumption** | Only business stakeholders: what the business wants, or a fact only they hold (when a campaign starts, which team owns a process) | This document's business sections, written for a stakeholder to answer |
+
+**A build choice declared as a decision is still declared.** The design records what was chosen,
+why, and what it beat, so a reader who disagrees sees exactly what was weighed. Moving a choice
+there is not hiding it; asking a business stakeholder to bless it is asking them to judge
+something outside their domain, and the confirmations it collects are noise.
+
+**Behavior users can see is not business by default.** The trap is an entry about something
+visible, the order of a list nobody specified, where a label sits, which of two equivalent screens
+shows a count, that reads like product behavior and so feels like the business's call. The test is
+whether a business stakeholder, shown the options side by side, would care which one ships. If
+they would not, it is a build choice, however visible. If they might, it is a business assumption,
+however technical it sounds.
+
+| Entry | Kind |
+|---|---|
+| The "Last updated" time sits under the list rather than above it | Build choice: visible, but no stakeholder would care which; the design picks one |
+| The billing export carries a tax region for every account; we could not read production to check | Technical assumption: a fact, blocked by access |
+| Orders over $500 need a manager's approval before they ship | Business assumption: policy the business owns |
+| The spring promotion starts on 1 March | Business assumption: a fact only the business holds |
+
+**A technical assumption names its blocker or it is not one.** Research settles facts; a technical
+assumption is the residue it could not reach: no credentials or read access, data not loaded yet,
+behavior observable only in production, no document or ticket that states it. If you cannot name
+what blocked the research, research it, or recognize it as a build choice. A technical assumption
+is still built on, exactly like a business one, and is retried whenever its blocker may have cleared.
+A fact investigation settles at 90% or more is written into the Technical Design as found, the
+threshold `autonomous-design-refinement` closes technical questions at; the 95% rule above is for
+business assumptions.
+
+**The sort runs on every open entry, not only new ones.** An entry written at the PRD draft, before
+any design existed, was sorted with less information than the design stage has. Re-sort the whole
+register whenever a skill re-screens it (`autonomous-prd-refinement`, `autonomous-design-refinement`,
+and `stakeholder-review-package` before it builds a review). Re-sorting an existing entry runs this
+sort and Gate 1's lookup below; the other gates stay with new entries. What a re-sort moves:
+
+- **To a build choice:** the decision goes into the Technical Design, and the entry leaves the body
+  for the Validated Assumptions table with `Moved to design YYYY-MM-DD` in its date column and the
+  design section in its notes. The ID stays traceable; nothing is renumbered. When no design exists
+  yet (PRD refinement), the row says `Left to the design YYYY-MM-DD` and its notes give the choice
+  and the alternative it beat; `technical-design-writing-standards` records each such row as a
+  decision and changes it to `Moved to design`.
+- **To a technical assumption:** the entry moves, under its original ID, into the Technical
+  Assumptions section, rewritten to that section's format. One whose blocker cannot be named is
+  researched first.
+- **Answered by the lookup:** as Gate 1 says, it was already decided or turned on a findable fact,
+  and it leaves the body with a pointer to where the answer lives.
+
+---
+
 ## Before You Write an Entry: Four Gates
 
 The rest of this skill governs form and which kinds of item belong. These four checks catch a
@@ -88,7 +150,8 @@ question, asks one that is already answered, quietly narrows a requirement, or p
 opposite of a ruling the stakeholder already gave. Format is not a quality gate. Run these four checks on
 every candidate entry, at the moment of writing, before it gets an ID. They apply when you are the
 one surfacing a new assumption; reformatting or rewriting an entry that already has an ID is form
-work only and skips them.
+work only and skips them, except that re-sorting the register runs Gate 1 on every open entry
+("Sort Every Entry by What Would Settle It").
 
 **Why the moment of writing.** Until you write the entry's title, the uncertainty is a vague
 unease. Writing the title — *the question this assumption answers* — turns it into a specific,
@@ -106,7 +169,7 @@ Before looking anything up, spend a few minutes on the chain, not the entry:
 - **Would the stakeholder recognize the question?** If it only makes sense given how you chose to
   build it, it is a question about your approach, not about what the business intends. Find the
   business question underneath and ask that one — or notice there is none, and decide the
-  technical fork yourself.
+  technical fork yourself, recording it in the Technical Design.
 - **Does the question disappear under a different reading?** Re-read the requirement it hangs on.
   If a plainer reading makes the question moot, the assumption you need — if any — is about that
   reading, not the downstream detail.
@@ -129,6 +192,8 @@ Before assigning an ID, check the places an answer would already be sitting:
   the PRD directory keeps as evidence. A ruling in their own words beats any inference.
 - **The PRD, the Technical Design, and any field-mapping or data-dictionary document the project
   maintains** — a ruling is often already recorded as a requirement.
+- **The project's issue tracker**, when it has one: a field, a rule or a data fix often has a ticket
+  saying where it lives and who populated it.
 - **Production data, if one query answers it** — read-only, and only where the project allows it
   (`engineering-principles`, "Production Data"): what values does the column actually carry today?
 - **Consumer code, if it constrains the choice** — hardcoded literals, joins, filters.
@@ -152,8 +217,9 @@ facts, not on what the business intends. Either way the entry is removed, not de
 decided question, build against the ruling and cite where it lives; for a technical one, note the
 reasoning in the commit message where it isn't obvious. If the lookup narrowed the question, or
 found partial or conflicting evidence, that goes into the entry's evidence and sets its
-confidence. Only the residue no lookup can settle — what the business *wants* — is a business
-question, and only that gets an ID. Expect the lookup to resolve candidates more often than not:
+confidence. Only the residue no lookup can settle gets an ID: what the business *wants* is a
+business question, and a fact the lookup and the investigation before it could not reach, with the
+blocker named, is a technical assumption. Expect the lookup to resolve candidates more often than not:
 when an "assumption" turns out not to need one, it is usually because the answer was findable, not
 because it was constructible.
 
@@ -353,6 +419,11 @@ A business stakeholder reading "LOWER(TRIM(legacy.email))" will have no idea wha
 
 **Why**: Business stakeholders can verify examples against their knowledge. They can't verify technical syntax.
 
+**Use the business's names for things, not the build's.** An entry written in the system's own
+vocabulary (its state names, internal flags, the labels its code uses) reads as a technical
+question even when it is a business one, and gets skimmed or bounced back as "not mine to answer".
+Rewrite it until the stakeholder would recognize it as their question.
+
 Where the assumption governs how specific records are treated, the example is not just a
 translation aid — it is required, and it must name a real record the stakeholder can open. See
 "When to Include an Example" below.
@@ -361,9 +432,13 @@ translation aid — it is required, and it must name a real record the stakehold
 
 ### 3. Focus on Business Questions, Not Technical Details
 
+This principle governs the business sections. A fact the build relies on that research could not
+reach goes in the Technical Assumptions section instead ("Sort Every Entry by What Would Settle It");
+everything else below stays out of the document entirely.
+
 **INCLUDE**:
 - Business rules and compliance requirements
-- Data availability and sources
+- Data the business must supply, and which source it treats as authoritative when two disagree
 - Approval processes and stakeholder responsibilities
 - Business logic validation (who will sign off that the imported totals match?)
 
@@ -477,7 +552,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 ## Document Structure Template
 
 ```markdown
-# [Feature Name] - Business Assumptions
+# [Feature Name] - Assumptions
 
 <!-- ⚠️ EDITING THIS FILE? LOAD THE RIGHT SKILL FIRST ⚠️
      Recording a stakeholder's answer to an assumption below, however it
@@ -500,7 +575,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 **Last Updated**: YYYY-MM-DD
 **Status**: DRAFT - Pending business validation
 
-**Document Purpose**: This document lists the business assumptions we're making to proceed with [feature]. We're not waiting for answers—we're proceeding with these assumptions and need stakeholders to validate or correct any that are wrong.
+**Document Purpose**: This document lists the assumptions we're making to proceed with [feature]. We're not waiting for answers—we're proceeding with these assumptions and need stakeholders to validate or correct any that are wrong. Every numbered entry before the Technical Assumptions section is a business assumption.
 
 **Technical details** are documented in the [Technical Design Document](link).
 
@@ -553,13 +628,39 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 ---
 
+## Technical Assumptions
+
+> Facts the build relies on that research could not reach. Answered by the build team, not business stakeholders; the stakeholder review package leaves this section out. Include the section only when it has an entry.
+
+### DATA-004. [The factual question, stated compactly]
+
+**Assumption**: [The fact we are building on, specific enough to implement from]
+
+**Evidence**: [What research did find, and what it points to]
+
+**Blocked by**: [What research could not reach: no read access to …, the data is not loaded until …, the behavior is observable only in production, no document or ticket states it]
+
+**Would settle it**: [The check that would answer it, and what it needs: a read-only query on …, a production read role, the vendor's written confirmation]
+
+**Confirm or Correct**:
+- [ ] Correct as stated
+- [ ] Wrong — the fact is: _______________
+
+**Confidence**: X% | **Impact if Wrong**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
+
+---
+
 ## Validated Assumptions
 
 | ID | Assumption | Validated | Notes |
 |----|------------|-----------|-------|
 | DATA-002 | [One-line summary] | YYYY-MM-DD | [Where detail was moved] |
 | AUTH-002 | [One-line summary] | YYYY-MM-DD | [Where detail was moved] |
+| WORK-003 | [One-line summary] | Moved to design YYYY-MM-DD | A build choice: Technical Design §[section] |
 ```
+
+A technical assumption's IDs share the document's one ID sequence and use the same category
+prefixes; its section, not its prefix, marks it technical.
 
 ### When to Include an Example
 
@@ -605,7 +706,7 @@ record is an assertion, not evidence):
 
 ## Common Pitfalls and How to Avoid Them
 
-Before producing an assumptions document, review it for these common mistakes — and re-run the Four Gates above on every entry added this session. Catching these saves stakeholders time and keeps the document focused on what actually needs their input.
+Before producing an assumptions document, review it for these common mistakes — re-run the Four Gates above on every entry added this session, and the sort ("Sort Every Entry by What Would Settle It") on every open entry. Catching these saves stakeholders time and keeps the document focused on what actually needs their input.
 
 ### Don't Restate the Framework: No Per-Entry Defaults, No Priority Rankings
 
@@ -646,7 +747,7 @@ If the technical team can make a decision without business input, it doesn't bel
 - "We match records using the email field, case-insensitive" (if the business owns that matching logic)
 - Data mappings between systems that reflect business decisions
 
-**The test**: Can the engineering team make this call on their own? If yes, remove it. If we need someone who understands the business rules to validate, keep it.
+**The test**: what would settle it ("Sort Every Entry by What Would Settle It")? A choice the engineering team can make goes to the Technical Design as a decision, including a choice about behavior users can see when the business would have no preference between the options. A fact research can reach gets researched. Only what the business wants, or a fact only it holds, stays here as a business assumption.
 
 ---
 
@@ -708,7 +809,8 @@ When cleaning up an assumptions document, **never delete content that has value*
 |--------------|-------------|
 | Technical implementation details | Technical Design Document |
 | Requirements we've decided on | PRD (acceptance criteria) |
-| Technical blockers awaiting action | Surfaced to the user now; the blocked work goes in the governing PRD or phase document, and any design fact it revealed goes in the Technical Design (`implementation-lifecycle`) |
+| Technical blockers awaiting action | Surfaced to the user now; the blocked work goes in the governing PRD or phase document, and any design fact it revealed goes in the Technical Design (`implementation-lifecycle`). A fact the build proceeds on while it waits is a technical assumption in this document's Technical Assumptions section |
+| A build choice written as an assumption | Technical Design, as a decision with its reasoning and the alternative it beat; the ID goes to the validated table as `Moved to design` |
 | Edge cases and error handling | Technical Design Document |
 | Background research/context | Technical Design Document (Overview), only as much as a decision needs |
 | Superseded entry text, prior update records | Nowhere — version control holds them (see "Editing an Existing Document") |
@@ -913,7 +1015,7 @@ is worth its space; a heading that has grown a clause per round is not.
 
 ### When an answered item may sit in the body at all, and what it owes the reader
 
-The Lifecycle section says the body holds only what still needs stakeholder attention, and
+The Lifecycle section says the body holds only what still needs attention, and
 that is still the rule. **Three things put an answered item back in the body, and nothing
 else does:**
 
@@ -942,7 +1044,7 @@ When an assumption is validated:
 1. **Move the finding** to the PRD (business decisions) or Technical Design Doc (technical decisions)
 2. **Move it to the "Validated Assumptions" section** at the bottom of the document as a one-line summary
 
-The main body of the document should only show items that still need stakeholder attention. The validated assumptions section provides a concise historical record without cluttering the document.
+The main body of the document should only show items that still need attention: a stakeholder's for business entries, the build team's for technical ones. The validated assumptions section provides a concise historical record without cluttering the document.
 
 **Every body entry must be an answerable assumption** — Principle 4's admission test. An entry that can't carry an **Assumption** statement, a Confirm-or-Correct block, and a confidence level is a tracker, not an assumption. Disposition it to the validated table with a pointer to where the work now lives (the PRD or phase document a build will read, or the action item handed to the user) instead of leaving it in the body with nothing for the stakeholder to act on.
 
