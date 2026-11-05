@@ -372,7 +372,11 @@ each item decides before reading a word of the body.
 ✅ `### DATA-005. Merge two sources for the pre-launch signup count, with the billing system winning where they disagree?` (the question, answerable from the heading)
 
 The body still leads with the **Assumption** — the proposed answer — per Principle 1. Only the
-title is phrased as the question.
+title is phrased as the question. The Assumption's first sentence answers that question in the
+title's own terms: **Yes** or **No** for a yes-or-no title, then what it agrees to ("Yes: merge
+both, and the billing system wins wherever they disagree."); the answer itself for an open one
+("Until the class starts."). Conditions and detail follow. Someone who reads only the title and
+that sentence knows what Confirm agrees to.
 
 ---
 
