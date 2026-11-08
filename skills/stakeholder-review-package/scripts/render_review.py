@@ -51,6 +51,9 @@ ID_HEADING = r'^#{2,6}\s+([A-Z][A-Z0-9]*-\d{3})[.\s:]'
 # Any level-2 heading naming technical assumptions ("## Technical Assumptions (build team)", "## 🔧 Technical assumption"),
 # never "## Non-technical assumptions". A missed variant would put build-team questions in a business review.
 TECHNICAL_SECTION = r'^##\s+[^\n]*?(?<!non-)(?<!non )\btechnical\s+assumptions?\b[^\n]*$.*?(?=^##\s|\Z)'
+# The business entries the project team decided; a stakeholder may still correct them.
+DECIDED_SECTION = r'^##\s+[^\n]*?\bdecided by the project team\b[^\n]*$.*?(?=^##\s|\Z)'
+DECIDED_INTRO = "These are business decisions, not technical ones. We made them ourselves because each follows from what you've told us or from the decisions above, or is easy to change later. The build proceeds on them. If you'd decide one differently, say so here."
 REGISTER_ROW = r'^\|\s*([A-Z][A-Z0-9]*-\d{3})\s*\|'
 ANY_ID = r'\b[A-Z][A-Z0-9]*-\d{3}\b'
 # Shorthand a stakeholder has no way to look up. Project vocabulary is the cold read's job (SKILL.md).
@@ -91,6 +94,15 @@ def technical_ids(text):
     return re.findall(ID_HEADING, register_regions(text)[1], re.M)
 
 
+def decided_ids(text):
+    return re.findall(ID_HEADING, ''.join(re.findall(DECIDED_SECTION, register_regions(text)[0], re.M | re.S | re.I)), re.M)
+
+
+def asked_card_words(data):
+    """Words an asked card shows with its evidence closed; SKILL.md sets the target."""
+    return [len(' '.join([item['title'], *item['proposal'], item['if_other']]).split()) for section in data['sections'] for item in section['decisions']]
+
+
 def register_text(data, root):
     source = data['assumptions_source']
     return '' if source is None else (root / data['sources'][source]['path']).read_text()
@@ -123,7 +135,8 @@ def validate(data, root):
     if technical & set(expected):
         raise ValueError(f'Technical assumptions stay out of a business review: {sorted(technical & set(expected))}')
     actual, section_ids, screen_ids = [], [], []
-    for section in data['sections']:
+    decided = data.get('decided', [])
+    for section in [*data['sections'], {'id': 'also-decided', 'rules': [], 'mockups': [], 'decisions': decided}]:
         sid = section['id']
         if not re.fullmatch('[a-z][a-z0-9-]*', sid):
             raise ValueError('Section IDs must be lowercase slugs')
@@ -155,11 +168,15 @@ def validate(data, root):
         raise ValueError(f'Technical assumptions stay out of a business review: {sorted(technical & set(actual))}')
     if set(expected) != set(actual):
         raise ValueError(f'Assumption coverage differs: missing={sorted(set(expected)-set(actual))}, extra={sorted(set(actual)-set(expected))}')
+    if assumptions_source is not None and 'open_assumption_ids' not in data and set(decided_ids(register)) != {item['id'] for item in decided}:
+        raise ValueError(f'The decided list differs from the register: register={sorted(decided_ids(register))}, review={sorted(item["id"] for item in decided)}')
     review_ids = set(actual)
     register_ids = set(re.findall(ID_HEADING, register, re.M) + re.findall(REGISTER_ROW, register, re.M))
-    for section in data['sections']:
-        for item in section['decisions']:
-            validate_card(item, review_ids, register_ids)
+    for item in [card for section in data['sections'] for card in section['decisions']] + decided:
+        validate_card(item, review_ids, register_ids)
+        unknown = sorted(set(item.get('depends_on', [])) - review_ids)
+        if unknown:
+            raise ValueError(f'{item["id"]} depends on IDs that are not in this review: {unknown}')
 
 
 def manifest(data, root, images=None):
@@ -172,13 +189,15 @@ def manifest(data, root, images=None):
     }
 
 
-def refs_markup(refs, sources):
+def refs_markup(refs, sources, quiet=False):
+    """Quiet links keep the criterion ID in a tooltip, off the text a reader skims."""
     links = []
-    for ref in refs:
+    for index, ref in enumerate(refs, 1):
         url = sources[ref['source']]['url']
         if ref.get('anchor'):
             url += '#' + quote(ref['anchor'], safe='-._~')
-        links.append(f'<a href="{esc(url)}" target="_blank" rel="noopener">{esc(ref["label"])}</a>')
+        text = ('Source' if index == 1 else str(index)) if quiet else ref['label']
+        links.append(f'<a href="{esc(url)}" title="{esc(ref["label"])}" target="_blank" rel="noopener">{esc(text)}</a>')
     return '<span class="source-links">' + ' · '.join(links) + '</span>'
 
 
@@ -201,13 +220,13 @@ def render(data, root, images_dir):
     for index, section in enumerate(ordered, 1):
         sid = section['id']
         navigation.append(f'<a href="#{sid}"><span class="nav-number">{index:02}</span><span>{esc(section["title"])}</span><span class="section-count" data-section="{sid}"></span></a>')
-        rules = ''.join(f'<li>{esc(r["text"])} {refs_markup(r["refs"], sources)}</li>' for r in section['rules'])
+        rules = ''.join(f'<li>{esc(r["text"])} {refs_markup(r["refs"], sources, quiet=True)}</li>' for r in section['rules'])
         gallery = []
         for screen in section['mockups']:
             image_path = images_dir / screen['file']
             mime = {'.png': 'image/png', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg', '.webp': 'image/webp'}[image_path.suffix.lower()]
             uri = f'data:{mime};base64,' + base64.b64encode(image_path.read_bytes()).decode()
-            gallery.append(f'<figure id="screen-{esc(screen["id"])}"><div class="screen-preview" tabindex="0" role="region" aria-label="{esc(screen["title"])} preview; scroll to see more" data-focus="{screen.get("focus", "top")}"><img src="{uri}" alt="{esc(screen["alt"])}" loading="lazy"></div><figcaption><strong>{esc(screen["title"])}</strong><p>{esc(screen["caption"])}</p>{refs_markup(screen["refs"], sources)} <button type="button" class="text-button enlarge enhanced" aria-label="Enlarge {esc(screen["title"])}">Enlarge</button></figcaption></figure>')
+            gallery.append(f'<figure id="screen-{esc(screen["id"])}"><div class="screen-preview" tabindex="0" role="region" aria-label="{esc(screen["title"])} preview; scroll to see more" data-focus="{screen.get("focus", "top")}"><img src="{uri}" alt="{esc(screen["alt"])}" loading="lazy"></div><figcaption><strong>{esc(screen["title"])}</strong><p>{esc(screen["caption"])}</p>{refs_markup(screen["refs"], sources, quiet=True)} <button type="button" class="text-button enlarge enhanced" aria-label="Enlarge {esc(screen["title"])}">Enlarge</button></figcaption></figure>')
         cards = []
         for item in section['decisions']:
             ident = item['id']
@@ -229,19 +248,38 @@ def render(data, root, images_dir):
         sections.append(f'''<section class="workflow" id="{sid}"><header class="section-heading"><span class="eyebrow">{index:02} / SECTION</span><h2>{esc(section['title'])}</h2><p>{esc(section['intro'])}</p></header>
 <div class="workflow-layout"><div class="context"><h3 class="column-heading">Key acceptance criteria &amp; mockups</h3><div class="context-content"><ul class="rules">{rules}</ul>{screens}</div>
 <div class="workflow-feedback"><label for="note-{sid}">Feedback on acceptance criteria or mockups</label><p id="note-help-{sid}">What should work or look differently in this section?</p><textarea id="note-{sid}" rows="3" aria-describedby="note-help-{sid}" placeholder="Optional — describe the acceptance criterion or screen and your suggested change"></textarea></div></div>
-<div class="decisions"><h3 class="column-heading">Assumptions to confirm</h3>{''.join(cards)}</div></div></section>''')
+<div class="decisions">{'<h3 class="column-heading">Assumptions to confirm</h3>' if cards else ''}{''.join(cards)}</div></div></section>''')
+    decided = sorted(data.get('decided', []), key=lambda item: IMPACT_RANK[item['impact']])
+    decided_cards = []
+    for item in decided:
+        ident = item['id']
+        decisions.append({**item, 'section': 'also-decided', 'decided': True})
+        options = ''.join(f'<label><input type="radio" name="{ident}" value="{value}"><span>{label}</span></label>' for value, label in [('confirm', 'Confirm'), ('change', 'Change')])
+        confidence = f'<span class="confidence">Confidence: {esc(item["confidence"])}</span>' if item.get('confidence') else ''
+        follows = ''
+        if item.get('depends_on'):
+            follows = '<p class="follows">Follows from your answer to ' + ', '.join(f'<a href="#{esc(d)}">{esc(d)}</a>' for d in item['depends_on']) + '</p>'
+        rest = ''.join(f'<p>{esc(p)}</p>' for p in item['proposal'][1:])
+        decided_cards.append(f'''<article class="decision decided" id="{ident}" data-section="also-decided">
+<div class="decision-top"><span class="decision-id">{ident}</span>{confidence}<span class="confidence">Impact: {esc(item["impact"])}</span><span class="answer-status">No reply needed</span><button type="button" class="clear-answer text-button" aria-label="Clear response to {ident}" hidden>Clear</button></div>
+<h3>{esc(item['title'])}</h3><div class="proposal"><p>{esc(item['proposal'][0])}</p></div>{follows}
+<details class="evidence"><summary>Details and optional reply</summary><div class="proposal">{rest}</div><p class="if-other"><strong>If you choose otherwise:</strong> {esc(item['if_other'])}</p><p>{esc(item['evidence'])}</p>{refs_markup(item['refs'], sources)}
+<fieldset><legend>Your response to {ident}</legend><div class="choices">{options}</div></fieldset>
+<label class="comment-label" for="comment-{ident}">Correction or comment <span>(optional for confirmation)</span></label>
+<textarea id="comment-{ident}" rows="2" placeholder="Describe the change, or what you’re unsure about."></textarea></details>
+</article>''')
+    if decided_cards:
+        navigation.append('<a href="#also-decided"><span class="nav-number">+</span><span>Also decided</span></a>')
+        sections.append(f'''<section class="workflow also-decided" id="also-decided"><header class="section-heading"><span class="eyebrow">OPTIONAL</span><h2>Also decided: no reply needed</h2><p>{esc(DECIDED_INTRO)}</p></header><div class="decided-list">{''.join(decided_cards)}</div></section>''')
     technical_count = len(technical_ids(register_text(data, root)))
     technical_note = '' if not technical_count else (
         f' {technical_count} technical assumption{"s are" if technical_count != 1 else " is"} tracked separately for the build team.')
+    asked_count = len(decisions) - len(decided)
+    decided_note = '' if not decided else (
+        f' {len(decided)} more {"are" if len(decided) != 1 else "is"} already decided and listed at the end; no reply needed.')
     source_links = ' · '.join(f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["label"])}</a>' for s in sources.values() if s.get('show', True))
-    all_cards = [item for section in ordered for item in section['decisions']]
-    start_here = ''
-    if all_cards:
-        top = min(IMPACT_RANK[item['impact']] for item in all_cards)
-        links = ''.join(f'<li><a href="#{item["id"]}">{esc(item["title"])}</a></li>' for item in all_cards if IMPACT_RANK[item['impact']] == top)
-        start_here = f'<div class="start-here"><strong>Start here</strong><ol>{links}</ol></div>'
     payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in ordered], 'sources':sources}
-    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(len(decisions)), 'TECHNICAL_NOTE':esc(technical_note), 'START_HERE':start_here, 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
+    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(asked_count), 'DECIDED_NOTE':esc(decided_note), 'TECHNICAL_NOTE':esc(technical_note), 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
     output = TEMPLATE.read_text()
     # One pass: authored text must never become another template substitution.
     return re.sub(r'@@([A-Z_]+)@@', lambda m: replacements[m[1]], output)
@@ -302,7 +340,8 @@ def main():
             parser.error('--images-dir is required when mockups are included')
         output = render(data, args.repo_root, args.images_dir)
         args.output.write_text(output)
-        print(f'Built {args.output.name}: {len(output.encode())} bytes; all open assumptions covered.')
+        words = asked_card_words(data)
+        print(f'Built {args.output.name}: {len(output.encode())} bytes; all open assumptions covered; asked cards average {sum(words) // max(len(words), 1)} visible words, longest {max(words, default=0)}.')
 
 
 if __name__ == '__main__':

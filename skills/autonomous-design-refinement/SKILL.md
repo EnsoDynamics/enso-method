@@ -262,7 +262,7 @@ The orchestrator takes the top **Questions per pass** into this pass, marks the 
 - **One sensible answer, or both answers building the same thing:** the same writer states it where it governs and moves the entry to the validated table as `Written up`.
 - **Fact with its blocker already named:** the same writer moves it, under its ID, to the register's Technical Assumptions section in that section's format.
 - **Fact not yet researched:** enters the Questions table as a Technical question, pointing at its entry, and competes for a slot like any other; its disposition (below) decides where it ends.
-- **Business:** stays, and is not a question for this run unless discovery finds evidence it is wrong. The same writer adds its **If they choose otherwise** line from the subagent's answer, says whose it is if it was asked of the wrong person, restates a question worded for the build, and rates its **Impact**.
+- **Business:** stays, and is not a question for this run unless discovery finds evidence it is wrong. The same writer adds its **If they choose otherwise** line from the subagent's answer, restates a question worded for the build, rates its **Impact**, and places it above or below the line.
 
 Record the counts under **Register re-sort** in the state file.
 
@@ -371,7 +371,7 @@ Exploration scripts: {list, or none}
 Out of scope, noticed and not acted on: {list from the state file}
 
 Conflict check: {n earlier criteria replaced, q raised as questions | no earlier criteria changed | not run: reason}
-Register re-sort: {d} moved to design · {w} written up · {s} settled by lookup · {t} moved to technical · {q} raised as questions · {b} stay business
+Register re-sort: {d} moved to design · {w} written up · {s} settled by lookup · {t} moved to technical · {q} raised as questions · {b} stay business, {p} of them below the line
 Final verification: {clean | N questions, listed below}
 
 Items below threshold (if any): {question — confidence — why}

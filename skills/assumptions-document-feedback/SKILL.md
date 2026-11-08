@@ -262,6 +262,14 @@ If feedback is genuinely ambiguous:
 #### No Response Items
 - Keep the existing assumption unchanged
 - These can be re-sent in follow-up if critical
+- An entry under **Decided by the Project Team** with no response stands as decided and is not re-sent
+
+#### Entries That Depend on an Answered One
+Once the answers are processed, re-read every open entry whose **Depends on** names one answered this round:
+- **Changed:** revise the dependent entry to fit the new answer, and move it above the line if it no longer meets the placement test in `assumptions-document-writing`.
+- **Confirmed:** raise its confidence if that answer was what it was unsure about; at ≥95%, fold it in as Principle 4 says.
+
+Name each one moved in the report.
 
 ### 3. Assume Forward for All Gaps
 

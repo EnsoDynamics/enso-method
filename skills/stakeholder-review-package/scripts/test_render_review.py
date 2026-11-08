@@ -7,7 +7,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
-from render_review import EmbeddedImages, digest, manifest, render, validate, load_authoring, authoring_digest, embedded_json
+from render_review import asked_card_words, EmbeddedImages, digest, manifest, render, validate, load_authoring, authoring_digest, embedded_json
 
 
 class ReviewTests(unittest.TestCase):
@@ -106,6 +106,64 @@ class ReviewTests(unittest.TestCase):
         self.assertNotIn('Charge a cancellation fee.', reply)
         self.assertIn(embedded_json(output, 'review-data')['version'], reply)
 
+    def with_decided(self):
+        """Move UI-001 under the register's project-team section."""
+        (self.root / 'class-bookings-assumptions.md').write_text('# Assumptions\n### RULE-001. Cancellation\nA cancellation frees a place.\n## Decided by the Project Team\n### UI-001. Waiting list\nShow the queue position.\n## Validated Assumptions\n')
+        section = self.data['sections'][0]
+        card = section['decisions'].pop()
+        card['proposal'] = ['Show the queue position.', 'Detail kept behind the click.']
+        card['depends_on'] = ['RULE-001']
+        self.data['decided'] = [card]
+
+    def test_decided_entries_close_the_review_and_stay_out_of_the_count(self):
+        self.with_decided()
+        output = render(self.data, self.root, None)
+        main = output[output.index('id="review-content"'):output.index('id="your-feedback"')]
+        self.assertLess(main.index('id="RULE-001"'), main.index('id="also-decided"'))
+        self.assertLess(main.index('id="also-decided"'), main.index('id="UI-001"'))
+        self.assertIn('business decisions, not technical ones', main)
+        self.assertIn('Follows from your answer to <a href="#RULE-001">RULE-001</a>', main)
+        self.assertLess(main.index('Show the queue position.'), main.index('<details class="evidence"><summary>Details'))
+        self.assertLess(main.index('<details class="evidence"><summary>Details'), main.index('Detail kept behind the click.'))
+        self.assertIn('name="UI-001"', main)
+        self.assertIn('0 of 1 answered', output)
+        self.assertIn('1 more is already decided', output)
+
+    def test_reply_lists_decided_entries_apart_and_silence_stands(self):
+        self.with_decided()
+        reply = self.export_feedback({'RULE-001': {'choice': '', 'comment': ''}, 'UI-001': {'choice': '', 'comment': ''}})
+        self.assertIn('No response given: RULE-001', reply)
+        self.assertNotIn('No response given: RULE-001, UI-001', reply)
+        self.assertIn('with no response stand as decided', reply)
+        reply = self.export_feedback({'RULE-001': {'choice': 'confirm', 'comment': ''}, 'UI-001': {'choice': 'change', 'comment': 'Hide the position.'}})
+        front = reply.split('WORDING REVIEWED — REFERENCE ONLY', 1)[0]
+        self.assertIn('Also decided (optional section)', front)
+        self.assertIn('UI-001 — Change\nHide the position.', front)
+
+    def test_decided_list_must_match_the_register(self):
+        self.with_decided()
+        self.data['sections'][0]['decisions'].append(self.data['decided'].pop())
+        with self.assertRaisesRegex(ValueError, 'decided list differs'):
+            validate(self.data, self.root)
+
+    def test_decided_entry_cannot_depend_on_something_unseen(self):
+        self.with_decided()
+        self.data['decided'][0]['depends_on'] = ['RULE-009']
+        with self.assertRaisesRegex(ValueError, 'depends on IDs'):
+            validate(self.data, self.root)
+
+    def test_card_word_count_covers_what_an_asked_card_shows(self):
+        self.with_decided()
+        card = self.data['sections'][0]['decisions'][0]
+        card.update(title='One two', proposal=['three four', 'five'], if_other='six', evidence='not counted at all')
+        self.assertEqual(asked_card_words(self.data), [6])
+
+    def test_rule_links_keep_the_criterion_id_off_the_text(self):
+        self.data['sections'][0]['rules'] = [{'text': 'A full class offers a waiting list.', 'refs': [{'source': 'prd', 'label': 'AC-BOOK-01'}]}]
+        output = render(self.data, self.root, None)
+        self.assertIn('title="AC-BOOK-01"', output)
+        self.assertNotIn('>AC-BOOK-01</a>', output)
+
     def test_section_only_feedback_needs_no_assumptions(self):
         (self.root / 'class-bookings-assumptions.md').unlink()
         self.data['assumptions_source'] = None
@@ -178,7 +236,7 @@ class ReviewTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'build shorthand'):
             validate(self.data, self.root)
 
-    def test_order_and_start_here_follow_impact_and_keep_written_order_within_a_level(self):
+    def test_order_follows_impact_and_keeps_written_order_within_a_level(self):
         register = self.root / 'class-bookings-assumptions.md'
         register.write_text(register.read_text().replace('## Validated Assumptions', '### RULE-003. Fees\nText.\n### RULE-004. Refunds\nText.\n## Validated Assumptions'))
         first = self.data['sections'][0]
@@ -193,9 +251,6 @@ class ReviewTests(unittest.TestCase):
         positions = [output.index(f'id="{ident}"') for ident in ('RULE-004', 'UI-001', 'RULE-003', 'RULE-001')]
         self.assertEqual(positions, sorted(positions))
         self.assertLess(output.index('id="refunds"'), output.index('id="booking"'))
-        start = output[output.index('class="start-here"'):output.index('</ol>')]
-        self.assertIn('Refund late cancels?', start)
-        self.assertNotIn('Charge a fee?', start)
 
     def test_no_limit_on_questions_or_card_length(self):
         register = self.root / 'class-bookings-assumptions.md'

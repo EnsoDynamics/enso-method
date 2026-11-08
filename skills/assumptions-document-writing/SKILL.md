@@ -36,9 +36,9 @@ Use general terms like "business validation", "stakeholder validation", or "busi
 **Exception**: It's fine to mention specific people when:
 - Referring to code they wrote: "[Name]'s reference code shows..."
 - Citing specific feedback they gave: "Per [Name]'s comment in the 2026-11-14 meeting..."
-- A question genuinely only they can answer: "Only [Name] knows the sandbox account IDs they used..."
+- A fact only they hold: "Only [Name] knows the sandbox account IDs they used..."
 
-But don't use their name just to mean "business stakeholder" in general.
+But don't use their name just to mean "business stakeholder" in general, and never to say who must answer, approve or agree: the review goes to business stakeholders, whoever they turn out to be.
 
 ## Implementation Readiness Mindset
 
@@ -124,8 +124,10 @@ business questions usually fail one of these:
   what they said is theirs to check.
 - **Both answers build the same thing.** There is nothing to ask, so write it up. This wins over the
   other tests, including when the question is about what counts as done.
-- **It is asked of the wrong person.** One stakeholder can't waive another's approval or speak for
-  their budget. Name the person who holds it; it is their question if it stays one.
+- **It asks what happens if the build falls short.** "What if the model never reaches its accuracy
+  bar?" is project risk: the team plans for it in the design and reports it if it happens. Changing
+  how we deliver what they asked for is not departing from it. Ask only what outcome they want, and
+  if that is already clear, nothing is left to ask.
 - **It is worded as a build question.** If it takes explaining how the system works before it makes
   sense, restate it as what they would see, be responsible for or be exposed to. If that works, ask
   the restated question. If nothing survives, it is a build choice.
@@ -168,7 +170,7 @@ any design existed, was sorted with less information than the design stage has. 
 register whenever a skill re-screens it (`autonomous-prd-refinement`, `autonomous-design-refinement`,
 and `stakeholder-review-package` before it builds a review). Re-sorting an existing entry runs this
 sort and Gate 1's lookup below; the other gates stay with new entries. A re-sort that keeps an entry
-as business says what their answer changes and rates its Impact ("Impact" below), and one that moves nothing is a reason
+as business says what their answer changes, rates its Impact ("Impact" below) and places it above or below the line, and one that moves nothing is a reason
 to read the kept entries again, not evidence the register is clean. An entry holding two kinds, a fact
 and a policy say, is split and each part sorted; the part that stays a question keeps the ID, and each other part gets its own row as `ID (part)`. An entry
 a stakeholder has already answered goes through `assumptions-document-feedback`, including an answer
@@ -194,7 +196,22 @@ weighed; never invent one. What a re-sort moves:
   `Written up YYYY-MM-DD` in its date column and where it lives in its notes. That marks the team's
   call, so Gates 1 and 3 don't treat it as a stakeholder's ruling. A candidate with no ID yet is written
   up and listed nowhere.
-- **Asked of the wrong person, or worded as a build question:** it stays business, with the entry saying whose it is or its wording restated.
+- **Worded as a build question:** it stays business, with its wording restated.
+
+**Then place each business assumption above or below the line.** Above it, stakeholders are asked.
+Below it, in the **Decided by the Project Team** section, the team makes the call and a stakeholder
+can still correct it. An entry goes below when either of these holds:
+
+- It is our reading of something a stakeholder has said, or follows from an entry above the line.
+- A wrong guess is easy to correct after release.
+
+It stays above if it sets money, decides someone's authority, changes strategy or departs from what
+a stakeholder asked for, or if other entries' answers hang on it. Confidence plays no
+part: the claim below the line is that proceeding is safe, not that we are sure. These entries stay
+business assumptions, keep every field and stay in the stakeholder review.
+
+An entry whose answer rests on another names it on its own line, `**Depends on**: RULE-001,
+DATA-002`, so `assumptions-document-feedback` can re-examine it when that answer changes.
 
 ---
 
@@ -606,6 +623,7 @@ The reviewer skims. Within the existing entry format — which this rule does no
 - **Bold the decision-carrying numbers and terms** in each entry, so the gist reads from the bold alone.
 - **Cap paragraphs at 2-3 lines.** A long rationale becomes two short paragraphs or a compact table, never a wall of text.
 - **Front-load the proposed answer's operative words** ("Default every legacy-era account to read-only...") rather than building up to them.
+- **Cut any sentence whose removal wouldn't change the stakeholder's answer,** such as where the work stands or an estimate we can't give yet.
 
 This shapes prose only. It never removes evidence, examples, or context a stakeholder needs to validate — Principle 5 still wins.
 
@@ -663,6 +681,8 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Assumption**: [State clearly in plain business English what we're doing and why. This should be specific enough to implement from.]
 
+**Depends on**: [IDs of the entries its answer rests on; omit when it rests on none]
+
 **If they choose otherwise**: [What would be built differently, in terms they would notice]
 
 **Example**: [Required when the assumption governs how specific records are treated; otherwise optional. A real record with its identifier and system, pulled from the data — see "When to Include an Example"]
@@ -689,6 +709,26 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 - [ ] Correct — [concise restatement of assumption]
 - [ ] Wrong — [specific alternative we've identified]
 - [ ] Wrong — different approach: _______________
+
+**Confidence**: X% | **Impact**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
+
+---
+
+## Decided by the Project Team
+
+> Business decisions, not technical ones, that the team made because each follows from what stakeholders have said or from the entries above, or is easy to change later. The stakeholder review shows them in an optional closing section. Include the section only when it has an entry.
+
+### RULE-003. [The question, stated compactly]
+
+**Assumption**: [Same format as any business entry]
+
+**Depends on**: [IDs of the entries its answer rests on; omit when it rests on none]
+
+**If they choose otherwise**: [What would be built differently, in terms they would notice]
+
+**Confirm or Correct**:
+- [ ] Correct as stated
+- [ ] Wrong — correct answer: _______________
 
 **Confidence**: X% | **Impact**: 🔴 HIGH / 🟡 MEDIUM / 🟢 LOW
 
@@ -986,7 +1026,8 @@ Don't fake confidence. Be honest about what you know vs. what you're guessing.
 
 How much the answer changes what the product does for its users and the business. Impact never
 decides whether an entry is shown; it sets the order the stakeholder review asks in. It is not the
-cost of rework.
+cost of rework. An entry that others name under **Depends on** rates one level higher than its own
+effect alone would, because its answer can change theirs.
 
 **🔴 HIGH**: Changes the outcome across most of the product, or a wrong answer could cost significant
 money, create legal exposure or damage customer trust. A dollar figure alone doesn't make an entry High,
