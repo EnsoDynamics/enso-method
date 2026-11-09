@@ -6,7 +6,7 @@ The renderer uses Python's standard library. Keep only the generated HTML beside
 {
   "title": "Community class bookings",
   "subtitle": "Let residents reserve a place and manage a booking.",
-  "scope": "This release covers booking and cancellation. Payment is outside this release.",
+  "scope": "Residents book classes by phone today. This release adds online booking and cancellation. Payment is outside this release.",
   "date": "2026-01-15",
   "assumptions_source": "assumptions",
   "sources": {

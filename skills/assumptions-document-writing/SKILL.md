@@ -1,6 +1,6 @@
 ---
 name: assumptions-document-writing
-description: Standards for writing assumptions documents — every entry sorted by what would settle it (a build choice goes to the technical design, a fact research could not reach is a labelled technical assumption, only what the business wants is a business assumption), specific implementable statements, plain English, confidence levels, and stakeholder validation format. Use to draft a register, add a new entry, or re-sort the entries a register already holds. A stakeholder's answer to an assumption entry, however it arrives (a returned review, an email, a ruling given in chat), goes through assumptions-document-feedback instead, which applies these format rules.
+description: Standards for writing assumptions documents — every entry sorted by what would settle it (a build choice goes to the technical design, a fact research could not reach is a labelled technical assumption, only what the business wants is a business assumption), specific implementable statements, plain English, confidence levels, and stakeholder validation format. Use to draft a register, add a new entry, re-sort the entries a register already holds, or make a change an agent came up with. A stakeholder's answer to an assumption entry, however it arrives (a returned review, an email, a ruling given in chat), goes through assumptions-document-feedback instead, which applies these format rules.
 ---
 
 # Assumptions Document Writing Standards
@@ -91,7 +91,7 @@ the three.
 |---|---|---|
 | **Build choice** | Engineering or project judgment: several workable options, nothing unknown, no business preference between them. This includes how the team checks and runs its work | The Technical Design, as a decision with its reasoning and the alternative it beat. **Never an assumption.** |
 | **Technical assumption** | A fact that exists somewhere (data, system behavior, a document, a ticket) that research could not reach | This document's **Technical Assumptions** section, naming what blocked the research and what would settle it |
-| **Business assumption** | Only business stakeholders: what the business wants, or a fact only they hold (when a campaign starts, which team owns a process) | This document's business sections, written for a stakeholder to answer |
+| **Business assumption** | Only business stakeholders: what the business wants, or a fact only they hold (when a campaign starts, which regions a rule covers) | This document's business sections, written for a stakeholder to answer |
 
 **The line is intent versus implementation.** A business question asks what we want and why: who it
 is for, what should happen, what counts as success, and what the business will accept on money, legal
@@ -107,7 +107,7 @@ still a business assumption, and a consequential test-set size is still a build 
 
 **Business is a kind an entry qualifies for, not the one left over.** Anything that is neither pure
 engineering nor a fact can read as "what the business wants", and a sort that treats business as the
-remainder can keep every entry with no step skipped. Before keeping an entry as business, state what would be built differently if they chose otherwise. Entries that shouldn't be
+remainder can keep every entry with no step skipped. This document is about what we are building. Before keeping an entry as business, state what would be built differently if they chose otherwise. How people will use the product once it is built, including who does what and how long it takes them, is not a difference in the product: if that is all that changes, the entry is written up as how the business will use it. A bar the result must meet to count as done is a difference. Entries that shouldn't be
 business questions usually fail one of these:
 
 - **It is about how we build or run the work, not what we want.** Test sizes, the checks that prove
@@ -123,14 +123,33 @@ business questions usually fail one of these:
   practice offers it. One that can merely be imagined doesn't. A reading that narrows or departs from
   what they said is theirs to check.
 - **Both answers build the same thing.** There is nothing to ask, so write it up. This wins over the
-  other tests, including when the question is about what counts as done.
+  other tests.
 - **It asks what happens if the build falls short.** "What if the model never reaches its accuracy
   bar?" is project risk: the team plans for it in the design and reports it if it happens. Changing
   how we deliver what they asked for is not departing from it. Ask only what outcome they want, and
   if that is already clear, nothing is left to ask.
 - **It is worded as a build question.** If it takes explaining how the system works before it makes
-  sense, restate it as what they would see, be responsible for or be exposed to. If that works, ask
+  sense, restate it as what the product would show, record or decide, or what they would be exposed to. If that works, ask
   the restated question. If nothing survives, it is a build choice.
+- **It reads as how the product will be used, though its answer changes the build.** Worded around who
+  will do something or how a team will work, it leaves the reader unsure why they are being asked.
+  Restate the title and the assumption around the difference: what the product shows, records or
+  decides under each answer.
+- **It assumes a person will do far more work than anyone would volunteer for.** We choose what to
+  assume, so before proposing that someone check thousands of records by hand, or that one approval
+  cover more than they could check, look for the lighter version the need allows: a sample, exceptions
+  only, the system doing the first pass. Propose the heavy version only when the stakeholders' words
+  and the need truly call for it, and show the total for each answer either way. A lighter version
+  that changes what the product lists, samples or records is a difference in the product, so the entry
+  stays. On a re-sort, an entry with no total and no recorded reason it could not be sized goes back to
+  be sized: remove its `**Researched**` line so research picks it up, and leave its proposed value
+  alone. Reopen any ruling the lighter version departs from (Gate 3): the size is evidence they did not have.
+- **It treats a sign-off as something to build.** A sign-off is part of the build when the product has
+  that functionality: it already has that approval, or the stakeholders' words call for an approval
+  screen, action or record in it. Then it is a question like any other. With no such functionality,
+  "the owner approves the method" is how the business will use the product, and saying someone approves
+  does not call for functionality. Write the entry up and add no approval step, record or acceptance
+  criterion for it.
 
 **A build choice declared as a decision is still declared.** The design records what was chosen,
 why, and what it beat, so a reader who disagrees sees exactly what was weighed. Moving a choice
@@ -153,7 +172,7 @@ however technical it sounds, and how small it is plays no part.
 | The billing export carries a tax region for every account; we could not read production to check | Technical assumption: a fact, blocked by access |
 | "Complete" in the sponsor's brief means every record has a status | Not a question when no other reading is sensible: write it up |
 | The sponsor said to delete everything when an account closes; we keep one invoice record | Business assumption: it departs from what they said |
-| Orders over $500 need a manager's approval before they ship | Business assumption: policy the business owns |
+| The product holds orders over $500 until a manager approves them in it | Business assumption: policy the business owns, carried out by the product |
 | The spring promotion starts on 1 March | Business assumption: a fact only the business holds |
 
 **A technical assumption names its blocker or it is not one.** Research settles facts; a technical
@@ -172,9 +191,9 @@ and `stakeholder-review-package` before it builds a review). Re-sorting an exist
 sort and Gate 1's lookup below; the other gates stay with new entries. A re-sort that keeps an entry
 as business says what their answer changes, rates its Impact ("Impact" below) and places it above or below the line, and one that moves nothing is a reason
 to read the kept entries again, not evidence the register is clean. An entry holding two kinds, a fact
-and a policy say, is split and each part sorted; the part that stays a question keeps the ID, and each other part gets its own row as `ID (part)`. An entry
-a stakeholder has already answered goes through `assumptions-document-feedback`, including an answer
-with amendments or conditions. **Moving an entry changes where it lives, not what it says.** A re-sort never changes a
+and a policy say, is split and each part sorted; the part that stays a question keeps the ID, and each other part gets its own row as `ID (part)`. An answer
+someone gives this session goes through `assumptions-document-feedback`, including one with amendments
+or conditions; an answer the re-sort finds already recorded is handled by the lookup. **Moving an entry changes where it lives, not what it says.** A re-sort never changes a
 proposed value, and a figure that looks wrong is raised with the person running the work. It may
 overrule the entry's earlier confidence when it finds only one sensible answer, and replace an
 alternative that fails the test above. A moved entry records an alternative only if one was actually
@@ -200,7 +219,11 @@ it moves. Deleting a weak entry leaves the question open and undisclosed. What a
   `Written up YYYY-MM-DD` in its date column and where it lives in its notes. That marks the team's
   call, so Gates 1 and 3 don't treat it as a stakeholder's ruling. A candidate with no ID yet is written
   up and listed nowhere.
-- **Worded as a build question:** it stays business, with its wording restated.
+- **Only how the business will use the product:** the entry leaves the body for the Validated
+  Assumptions table with `Written up YYYY-MM-DD` in its date column, its notes saying how the business
+  will use it. It adds no requirement or acceptance criterion.
+- **Worded as a build question, or as how the product will be used when its answer changes the build:**
+  it stays business, with its wording restated.
 
 **Then place each business assumption above or below the line.** Above it, stakeholders are asked.
 Below it, in the **Decided by the Project Team** section, the team makes the call and a stakeholder
@@ -221,7 +244,7 @@ Anything the stakeholders have said about what should reach them applies too. Bu
 never moves an entry: if every question above earns its place, a long list stands.
 
 An entry whose answer rests on another names it on its own line, `**Depends on**: RULE-001,
-DATA-002`, so `assumptions-document-feedback` can re-examine it when that answer changes. An entry that
+DATA-002`, so whoever changes that answer re-examines it. An entry that
 has been researched says so on its own line, `**Researched**: YYYY-MM-DD; {avenues tried}`, so a later
 pass knows what is left to try. The stakeholder review leaves that line out.
 
@@ -459,6 +482,8 @@ each item decides before reading a word of the body.
 
 ✅ `### DATA-005. Merge two sources for the pre-launch signup count, with the billing system winning where they disagree?` (the question, answerable from the heading)
 
+A title that borrows a stakeholder's phrase quotes all of it or says what it would mean in practice.
+
 The body still leads with the **Assumption** — the proposed answer — per Principle 1. Only the
 title is phrased as the question. The Assumption's first sentence answers that question in the
 title's own terms: **Yes** or **No** for a yes-or-no title, then what it agrees to ("Yes: merge
@@ -531,8 +556,8 @@ everything else below stays out of the document entirely.
 **INCLUDE**:
 - Business rules and compliance requirements
 - Data the business must supply, and which source it treats as authoritative when two disagree
-- Approval processes and stakeholder responsibilities
-- Business logic validation (who will sign off that the imported totals match?)
+- Approvals the product itself carries out: what it holds, who can release it, what it records
+- What the result must achieve to count as done (the imported totals match the ledger to the cent)
 
 **EXCLUDE**:
 - Technical implementation details (API rate limiting, data volume, Python environment)
@@ -544,7 +569,7 @@ everything else below stays out of the document entirely.
 > "We'll process files in batches of 1000 records to avoid memory issues"
 
 ✅ **Right - Business Assumption**:
-> "The operations team will provide files to us and we'll place them on the server"
+> "Imported orders with no tax region wait in a review list instead of being rejected"
 
 ---
 
@@ -696,7 +721,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Depends on**: [IDs of the entries its answer rests on; omit when it rests on none]
 
-**If they choose otherwise**: [What would be built differently, in terms they would notice]
+**If they choose otherwise**: [What the product would do differently: what it shows, records or decides, or what it must achieve to count as done]
 
 **Example**: [Required when the assumption governs how specific records are treated; otherwise optional. A real record with its identifier and system, pulled from the data — see "When to Include an Example"]
 
@@ -714,7 +739,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Assumption**: [State what we're doing, noting a specific alternative exists]
 
-**If they choose otherwise**: [What would be built differently, in terms they would notice]
+**If they choose otherwise**: [What the product would do differently: what it shows, records or decides, or what it must achieve to count as done]
 
 **Example**: [Same rule as above — required when this governs how specific records are treated]
 
@@ -737,7 +762,7 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Depends on**: [IDs of the entries its answer rests on; omit when it rests on none]
 
-**If they choose otherwise**: [What would be built differently, in terms they would notice]
+**If they choose otherwise**: [What the product would do differently: what it shows, records or decides, or what it must achieve to count as done]
 
 **Confirm or Correct**:
 - [ ] Correct as stated
@@ -953,9 +978,9 @@ The assumption statement should be immediately clear to a business stakeholder. 
 > "Files will be auto-discovered by glob pattern in the input directory with configurable path parameters and processed in lexicographic order with atomic file locking..."
 
 **After** (assumption clear):
-> **Assumption**: The operations team will provide files to us and we'll handle placing them on the server. Files will be auto-discovered by filename pattern.
+> **Assumption**: Files placed in the shared folder are picked up automatically by filename pattern, and a file matching no pattern is listed for review.
 
-The technical details (glob patterns, file locking) are implementation—stakeholders don't need to see them. The business assumption (who provides files, where we place them) is what needs validation.
+The technical details (glob patterns, file locking) are implementation—stakeholders don't need to see them. The business assumption (which files are picked up, what happens to one that matches nothing) is what needs validation.
 
 ---
 
@@ -1071,7 +1096,7 @@ The test at the end of an edit is not "does my change read well" — it is "is t
 still in a shape this skill describes".
 
 **Recording a stakeholder's answer to an assumption is not this skill's job.** An answer,
-correction or ruling on an entry, however it arrives and however small, goes through `assumptions-document-feedback`, which
+correction or ruling on an entry given to this session, however it arrives and however small, goes through `assumptions-document-feedback`, which
 decides what it changes here and in the PRD and plan. This section governs the shape that
 skill's edits leave the register in, as it does every other edit.
 

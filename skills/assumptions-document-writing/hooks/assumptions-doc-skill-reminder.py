@@ -51,12 +51,13 @@ def _is_assumptions_doc(file_path: str) -> bool:
 
 REMINDER = (
     "This file is an assumptions document. Pick the skill by what the edit does, and load "
-    "it with the Skill tool BEFORE editing: (a) recording a stakeholder's answer, "
-    "correction or ruling on an assumption entry — however it arrives, including a "
+    "it with the Skill tool BEFORE editing: (a) recording an answer, correction or ruling "
+    "on an assumption entry given to this session — however it arrives, including a "
     "decision given in this chat — or "
-    "moving an answered item to the validated table: load `assumptions-document-feedback`, "
+    "moving the item it answered to the validated table: load `assumptions-document-feedback`, "
     "which owns what the answer changes here and in the PRD and plan; (b) drafting the "
-    "register, adding a new entry, rewording an entry or editing the header: load "
+    "register, adding a new entry, rewording an entry, editing the header, or recording "
+    "what research, a re-sort or an earlier ruling found in the repo settled: load "
     "`assumptions-document-writing`. Either way, read the writing skill's section "
     "'Editing an Existing Document', which governs the shape any edit leaves a register "
     "in. Five rules registers actually drift on, so check "

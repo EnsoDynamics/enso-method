@@ -81,13 +81,14 @@ If investigation is genuinely stuck (each avenue leads to more questions), step 
 
 An assumption exists because someone had a question and answered it as best they could. The job here is to answer it better. The answer may sit in a passage about another topic, or a long meeting that changed direction, where a quick lookup never finds it.
 
-Work from the question and the requirement it hangs on. The caller withholds the proposed answer until you have reported, because an investigator holding an answer finds support for it, so do not open the register's open entries or the criteria built on them.
+Work from the question and the requirement it hangs on. The caller withholds the proposed answer until you have reported, because an investigator holding an answer finds support for it, so do not open the register's open entries or the criteria built on them. Rulings are not withheld: the caller hands you the Validated table and the rest, which share a file with the open entries.
 
 Use whatever could move the answer:
 
-- **What the stakeholders said.** The requirements intake record, then what lies behind it: everything in `source-material/`, including what the record left out, any transcript or email archive the project keeps, and the initiative's other PRDs and validated assumptions. Search their terms and synonyms, read each hit in its surrounding exchange, and read their latest rulings in full, since a ruling on one topic often settles another. Weigh by `requirements-intake`, "Whose Words Count": text no stakeholder said or chose is context, and a later position replaces an earlier one. Look as hard for what contradicts the likeliest answer as for what supports it.
+- **What the stakeholders said.** The requirements intake record, then what lies behind it: everything in `source-material/`, including what the record left out, any transcript or email archive the project keeps, and the initiative's other PRDs and validated assumptions. Search their terms and synonyms, read each hit in its surrounding exchange, and read their latest rulings in full, since a ruling on one topic often settles another. Weigh by `requirements-intake`, "Whose Words Count": text no stakeholder said or chose is context, and a later position replaces an earlier one. Look as hard for what contradicts the likeliest answer as for what supports it. When their words say someone does something ("the owner approves the method"), report separately whether that describes how people work or asks the product to do it; a quote supports the second only when it asks for it in the product.
 - **How the market handles it.** Web research into how leading companies and products do this, whenever the stakeholders asked for that or the question is how a product should behave.
 - **What each answer would produce.** Read-only queries, API calls and throwaway scripts that run each option against real records, so the proposal can show a result a stakeholder can judge instead of a parameter they cannot.
+- **What each answer asks of a person.** When an answer gives someone work, size it for each option: how many items, minutes each (labelled an estimate if nobody measured it) and the total. We choose what to assume, so a total far beyond what anyone would reasonably be asked to do, or one approval covering more than they could check, counts against that answer: give the lighter version the need allows (a sample, exceptions only, the system doing the first pass) as the best-supported answer, and the heavy one only when the stakeholders' words and the need truly call for it.
 - **What the product does today,** in its code and screens.
 
 Finding nothing proves little in a large pile, so report what you searched and what you did not. In the report, omit the starting confidence, and add **Quotes for and against**, each with who said it and when, and an **Outcome**:
@@ -98,7 +99,7 @@ Finding nothing proves little in a large pile, so report what you searched and w
 | Settled | The evidence reaches 95% or more without a ruling: nobody in their seat would choose otherwise, or both answers build the same thing |
 | Not theirs | A build choice, or a fact (found, or blocked by what you name) |
 | Still theirs | Below 95%, and only they can say; give the best-supported answer |
-| Reframed | The question that matters is a different one, usually about what they would see or be responsible for; give it |
+| Reframed | The question that matters is a different one, usually about what the product would show, record or decide; give it |
 
 Every outcome carries its answer and evidence.
 

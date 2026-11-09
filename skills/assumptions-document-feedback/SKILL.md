@@ -24,10 +24,14 @@ The core philosophy: **Never block waiting for perfect answers.** Stakeholder fe
 Use this skill when:
 
 - You receive stakeholder feedback on an assumptions document (email, Slack, meeting notes)
-- A stakeholder, or the user speaking for one, rules on an assumption entry in the chat itself ("DATA-004 is right"), even a single ruling in the middle of a build. Recording it is this skill's work, not `assumptions-document-writing`'s. A ruling on other behavior, outside a feedback round on the assumptions, does not start this skill; it goes into the requirements as `using-the-enso-method` routes it ("Feedback goes into the requirements before the code")
+- A stakeholder or the user rules on an assumption entry in the chat itself ("DATA-004 is right"), even a single ruling in the middle of a build. Recording it is this skill's work, not `assumptions-document-writing`'s. A ruling on other behavior, outside a feedback round on the assumptions, does not start this skill; it goes into the requirements as `using-the-enso-method` routes it ("Feedback goes into the requirements before the code")
 - Feedback is a mix of clear answers, partial answers, and corrections
 - You need to update the assumptions document while maintaining its utility
 - A PRD directory holds a `{name}-pending-feedback-changes.md`: an earlier round left changes there (Step 4a), and this skill resumes it
+
+Whoever gives this session feedback on the assumptions, typed, pasted or pointed to, is treated as a business stakeholder and need not say where it came from.
+
+Never start this skill from something an agent produced or found on its own: a research outcome, a re-sort, a review finding, an agent's second thoughts, or stakeholder words it read in the repo (transcripts, source material, earlier rulings). Those go through `assumptions-document-writing`.
 
 ---
 
@@ -564,7 +568,7 @@ the new fact or gap that surfaced when we applied it, and the one thing the assu
 above resolves that still needs confirmation. Cite or quote the answer here — this
 section doubles as the evidence trail for the correction.]
 
-**If they choose otherwise**: [What would be built differently]
+**If they choose otherwise**: [What the product would do differently: what it shows, records or decides, or what it must achieve to count as done]
 
 **Confirm or Correct**:
 - [ ] Correct — [restatement]
