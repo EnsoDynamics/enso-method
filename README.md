@@ -239,7 +239,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `stakeholder-review-package` — create a single HTML review package with selected requirements, every open business assumption ordered by impact, contextual mockups and downloadable feedback
 
 **Refinement**
-- `autonomous-prd-refinement` — review-and-fix rounds on a drafted PRD, its assumptions and mockups, until no Medium or High finding is left
+- `autonomous-prd-refinement` — researches every open business assumption and runs review-and-fix rounds on a drafted PRD, its assumptions and mockups, until no Medium or High finding is left
 - `autonomous-design-refinement` — multi-pass refinement of the PRD, design and assumptions until they are ready to build
 - `implementation-readiness-check` — a human checkpoint before implementation: surfaces every open question for you to confirm
 - `investigate-question` — take one question to an answer with a confidence level

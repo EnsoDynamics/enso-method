@@ -1,6 +1,6 @@
 ---
 name: investigate-question
-description: Thorough deep-dive investigation of a single question — read code, query data, test APIs, and explore to answer the question or significantly refine a proposed answer with updated confidence.
+description: Thorough deep-dive investigation of a single question — read code, query data, test APIs, search stakeholders' raw material and the market, and explore to answer the question or significantly refine a proposed answer with updated confidence. Use for technical questions and for researching a business assumption.
 user-invocable: true
 ---
 
@@ -25,7 +25,6 @@ Use this skill when:
 **Do NOT use this skill when:**
 
 - A quick glance at the code or docs would answer the question — just look
-- The question is purely a business decision that no amount of technical investigation can resolve
 - You're doing a broad discovery pass across many questions — use `implementation-readiness-check` for that
 
 ---
@@ -55,7 +54,7 @@ Before diving in, determine what would constitute an answer. What specific fact,
 **Set expectations based on the question's nature:**
 
 - **Technical questions** (how does this code behave, what does this API return, what's in the data) can potentially be **fully resolved** through investigation. The goal is to get to 100% confidence if possible.
-- **Business questions** (what should the system do, what's the intended behavior, what's the business rule) have a ceiling. You can gather evidence and raise confidence significantly, but only a stakeholder can confirm business intent. If a business question can't be confirmed in the current conversation, it would need to be captured as a stated assumption via `assumptions-document-writing` (though that's a separate step the user would initiate, not something this skill does directly).
+- **Business questions** (what should the system do, what's the intended behavior, what's the business rule) have a ceiling, and "Researching a Business Assumption" below says how to reach it. Evidence that reaches 95% or more settles the intent with no stakeholder needed (`implementation-lifecycle`, "Confidence Thresholds"); below that, only a stakeholder can confirm it. If a business question can't be confirmed in the current conversation, it would need to be captured as a stated assumption via `assumptions-document-writing` (though that's a separate step the user would initiate, not something this skill does directly).
 
 ### 2. Investigate
 
@@ -77,6 +76,31 @@ If you need to write scripts, query databases, or connect to external systems, f
 If investigation is genuinely stuck (each avenue leads to more questions), step back and report what you've learned so far. A partial result with clear evidence is more valuable than exhaustive but inconclusive digging.
 
 **If investigation changes the question itself**, report that. Sometimes digging reveals the original question was the wrong question — e.g., "does the API paginate results?" becomes "the API was replaced with a webhook model 3 months ago." When this happens, report what you actually found, reframe the question, and let the human decide how to proceed.
+
+### Researching a Business Assumption
+
+An assumption exists because someone had a question and answered it as best they could. The job here is to answer it better. The answer may sit in a passage about another topic, or a long meeting that changed direction, where a quick lookup never finds it.
+
+Work from the question and the requirement it hangs on. The caller withholds the proposed answer until you have reported, because an investigator holding an answer finds support for it, so do not open the register's open entries or the criteria built on them.
+
+Use whatever could move the answer:
+
+- **What the stakeholders said.** The requirements intake record, then what lies behind it: everything in `source-material/`, including what the record left out, any transcript or email archive the project keeps, and the initiative's other PRDs and validated assumptions. Search their terms and synonyms, read each hit in its surrounding exchange, and read their latest rulings in full, since a ruling on one topic often settles another. Weigh by `requirements-intake`, "Whose Words Count": text no stakeholder said or chose is context, and a later position replaces an earlier one. Look as hard for what contradicts the likeliest answer as for what supports it.
+- **How the market handles it.** Web research into how leading companies and products do this, whenever the stakeholders asked for that or the question is how a product should behave.
+- **What each answer would produce.** Read-only queries, API calls and throwaway scripts that run each option against real records, so the proposal can show a result a stakeholder can judge instead of a parameter they cannot.
+- **What the product does today,** in its code and screens.
+
+Finding nothing proves little in a large pile, so report what you searched and what you did not. In the report, omit the starting confidence, and add **Quotes for and against**, each with who said it and when, and an **Outcome**:
+
+| Outcome | Meaning |
+|---|---|
+| Already answered | A stakeholder's ruling settles it; quote it |
+| Settled | The evidence reaches 95% or more without a ruling: nobody in their seat would choose otherwise, or both answers build the same thing |
+| Not theirs | A build choice, or a fact (found, or blocked by what you name) |
+| Still theirs | Below 95%, and only they can say; give the best-supported answer |
+| Reframed | The question that matters is a different one, usually about what they would see or be responsible for; give it |
+
+Every outcome carries its answer and evidence.
 
 ### 3. Report Findings
 

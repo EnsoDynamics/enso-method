@@ -178,7 +178,9 @@ with amendments or conditions. **Moving an entry changes where it lives, not wha
 proposed value, and a figure that looks wrong is raised with the person running the work. It may
 overrule the entry's earlier confidence when it finds only one sensible answer, and replace an
 alternative that fails the test above. A moved entry records an alternative only if one was actually
-weighed; never invent one. What a re-sort moves:
+weighed; never invent one. (Research is different: it may change a proposal, on cited evidence
+(`autonomous-prd-refinement`, "The Research Pass").) A question an entry raised stays on record wherever
+it moves. Deleting a weak entry leaves the question open and undisclosed. What a re-sort moves:
 
 - **To a build choice:** the decision goes into the Technical Design, and the entry leaves the body
   for the Validated Assumptions table with `Moved to design YYYY-MM-DD` in its date column and the
@@ -190,8 +192,10 @@ weighed; never invent one. What a re-sort moves:
   Assumptions section, rewritten to that section's format. One whose blocker cannot be named is
   researched first.
 - **Answered by the lookup:** as Gate 1 says, it was already decided or turned on a findable fact, and
-  it leaves the body with a pointer to where the answer lives.
-- **With only one sensible answer, or both answers building the same thing:** the answer goes into the
+  it leaves the body for the Validated Assumptions table with `Answered YYYY-MM-DD` in its date column,
+  its notes giving where the answer lives and quoting the ruling with who and when, or giving the fact
+  and its source.
+- **With only one sensible answer, both answers building the same thing, or research settling it at 95% or more:** the answer goes into the
   PRD or Technical Design, and the entry leaves the body for the Validated Assumptions table with
   `Written up YYYY-MM-DD` in its date column and where it lives in its notes. That marks the team's
   call, so Gates 1 and 3 don't treat it as a stakeholder's ruling. A candidate with no ID yet is written
@@ -210,8 +214,16 @@ a stakeholder asked for, or if other entries' answers hang on it. Confidence pla
 part: the claim below the line is that proceeding is safe, not that we are sure. These entries stay
 business assumptions, keep every field and stay in the stakeholder review.
 
+**Above the line is only what belongs there.** Each question costs a stakeholder's attention, so judge
+each test strictly: touching money or authority is not enough; the answer has to materially change what
+the business earns, spends or risks, or who may act. A small detail inside a money rule does not qualify.
+Anything the stakeholders have said about what should reach them applies too. But the length of the list
+never moves an entry: if every question above earns its place, a long list stands.
+
 An entry whose answer rests on another names it on its own line, `**Depends on**: RULE-001,
-DATA-002`, so `assumptions-document-feedback` can re-examine it when that answer changes.
+DATA-002`, so `assumptions-document-feedback` can re-examine it when that answer changes. An entry that
+has been researched says so on its own line, `**Researched**: YYYY-MM-DD; {avenues tried}`, so a later
+pass knows what is left to try. The stakeholder review leaves that line out.
 
 ---
 
@@ -277,10 +289,11 @@ Before assigning an ID, check the places an answer would already be sitting:
 when an entry is about to be written, usually after most of a session's work is done — and "raise
 confidence to 95%" read literally could mean an hour of exploration at exactly the wrong moment.
 That is not what this gate asks. Open-ended investigation — exploration scripts, API probing, deep
-analysis — is governed by `implementation-lifecycle`'s confidence table and has already had its
-turn. This gate asks only: **is the answer already written down somewhere you did not read?** A
+analysis — is governed by `implementation-lifecycle`'s confidence table and belongs to refinement's
+research. This gate asks only: **is the answer already written down somewhere you did not read?** A
 handful of targeted lookups, minutes rather than hours; if they find nothing, write the entry at
-the confidence you actually have.
+the confidence you actually have. This gate is the floor: refinement then researches every open entry
+in depth (`autonomous-prd-refinement`, "The Research Pass").
 
 The asymmetry is what makes the lookup mandatory even at the end of a long session. An
 already-answered question sent to a stakeholder costs a round-trip measured in days, spends their
@@ -1169,7 +1182,7 @@ At the bottom of the document, maintain a concise list of validated assumptions.
 | SCOPE-004 | Reporting dashboard is NOT in phase 1 | 2026-01-03 | Moved to the phase 2 document |
 ```
 
-A row dated `Moved to design` or `Written up` is not a stakeholder's validation: it records the team's call and where it lives.
+A row dated `Moved to design` or `Written up` is not a stakeholder's validation: it records the team's call and where it lives. A row dated `Answered` is a prior ruling only when its notes quote one, briefly, naming the meeting or message, never a file path.
 
 **Key points:**
 - **Preserve the original ID** — this is crucial for tracing back to historical feedback

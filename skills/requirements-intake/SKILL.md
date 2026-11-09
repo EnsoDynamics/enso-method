@@ -48,7 +48,7 @@ source-material/{name}/
       ...the code as received, its file names and layout unchanged
 ```
 
-`{name}` is a short kebab-case name for what is being built, never for the kind of source ("kickoff-transcripts"). When the PRD or initiative name is already known, use it, and keep the directory's name if the PRD is later named differently. Later skills read the record and reach what was received only through its citations.
+`{name}` is a short kebab-case name for what is being built, never for the kind of source ("kickoff-transcripts"). When the PRD or initiative name is already known, use it, and keep the directory's name if the PRD is later named differently. Later skills write from the record; only refinement's research into open assumptions and its check of the PRD against its sources go behind it, to what was received.
 
 ## The Rule That Governs Everything: Quote, Don't Summarize
 
@@ -145,7 +145,7 @@ Read every source in full and pull out every statement that could matter to what
 - **Whose words** it is, per "Whose Words Count".
 - **Tentative**, when the speaker hedged or someone pushed back.
 
-Watch for the statements that are easiest to miss. A ten-second "yes, that's a must" binds as firmly as a ten-minute discussion. Requirements arrive inside asides and as implications ("we don't have access to that system" is a constraint). Negative statements ("we definitely don't want X") are scope. A deferred decision ("let's figure that out later") is Unresolved.
+Watch for the statements that are easiest to miss. A ten-second "yes, that's a must" binds as firmly as a ten-minute discussion. Requirements arrive inside asides and as implications ("we don't have access to that system" is a constraint). Negative statements ("we definitely don't want X") are scope. A deferred decision ("let's figure that out later") is Unresolved. An instruction about working with them ("only bring me X", "see what others do first") goes under How They Want to Be Asked.
 
 **Large material.** When the sources together fit comfortably in one context, with room left to work (as a rule of thumb, half of it or less), read them all in one. When they do not, extraction is split: one subagent per source or group of sources, each given the list of people and returning verbatim quotes with their locations and kinds, and nothing else: no summaries, no conclusions. A single source too large for one subagent is split into overlapping parts by time or section. Steps 5 to 8 always run in one context, over every extraction together: deciding the latest position, what conflicts and what was decided needs all of it in view at once. Never assemble the record from pieces written separately.
 
@@ -230,6 +230,10 @@ would settle it.
 
 ## Unresolved
 Each item: the topic, the quotes that raised it, and what would settle it.
+
+## How They Want to Be Asked
+What stakeholders said about which questions should reach them and how open questions
+should be researched before asking, quoted.
 
 ## Reference Material
 Each mockup, screenshot, prototype, code directory and document brought in that the
@@ -318,5 +322,5 @@ Tell the user in a few lines: how many sources were read and how many came in, h
 
 - `prd-writing-standards` and `initiative-breakdown` take the record as their input. When the record exists, they write from it, not from the raw material, and reach the sources only through it.
 - `autonomous-prd-refinement` and `assumptions-document-writing` read the record as the stakeholders' own words: a decision recorded there is not asked again.
-- `assumptions-document-writing` is where a conflicting or unresolved item becomes an assumption, once the PRD is written; `autonomous-design-refinement` researches it.
+- `assumptions-document-writing` is where a conflicting or unresolved item becomes an assumption, once the PRD is written; `autonomous-prd-refinement` researches it.
 - `using-the-enso-method` routes raw material here first.

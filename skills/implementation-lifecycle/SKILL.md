@@ -527,7 +527,7 @@ This skill provides the **framework context**. Other skills provide the **proced
 | `investigate-question` | Deep-dive investigation of specific questions surfaced during readiness checks or implementation |
 | `assumptions-document-writing` | When writing or updating assumptions — formatting standards. A stakeholder's answer to an assumption, however it arrives, including in chat, goes through `assumptions-document-feedback` instead |
 | `initiative-breakdown` | Before any PRD, when an idea is too big for one: cuts it into right-sized planned PRDs beside an initiative brief that stays whole |
-| `autonomous-prd-refinement` | After a PRD is drafted and before the user's recommended review: review-and-fix rounds until no Medium or High finding is left |
+| `autonomous-prd-refinement` | After a PRD is drafted and before the user's recommended review: research of each open business assumption and review-and-fix rounds until no Medium or High finding is left |
 | `review-technical-design` | After the technical design draft is committed and before `autonomous-design-refinement`: questions the design's approach, verifies its claims, revises it in place and commits the revision; skips itself for a design that follows an established pattern |
 | `autonomous-design-refinement` | Refining docs from draft to implementation-ready state |
 | `implement-from-requirements` | Default skill when starting from a fresh PRD |

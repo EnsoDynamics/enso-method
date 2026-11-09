@@ -1,6 +1,6 @@
 ---
 name: autonomous-prd-refinement
-description: Review-and-fix loop that takes a drafted PRD, with its assumptions and mockups, to a state with no Medium or High finding left, run after prd-writing-standards and before the user's recommended review and the technical design — full deliverable-review rounds until none finds a High, cheaper delta rounds over each round's fixes until none finds a Medium or High, then a final full round; mockups reviewed as design references, facts verified once, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
+description: Research-and-review loop that takes a drafted PRD, with its assumptions and mockups, to a state with no Medium or High finding left, run after prd-writing-standards and before the user's recommended review and the technical design — every open business assumption researched before each full round, full deliverable-review rounds until none finds a High, cheaper delta rounds over each round's fixes until none finds a Medium or High, then a final full round; mockups reviewed as design references, facts verified once, progress checkpointed to an on-disk state file so an interrupted run resumes instead of restarting.
 user-invocable: true
 ---
 
@@ -26,6 +26,7 @@ Interruptions are expected: the run can take hours and outlast a session. State 
 
 **This is an orchestrator skill.** It coordinates:
 - `deliverable-review`: one round at a time, full or delta, with its severity scale
+- `investigate-question`: one open business assumption at a time ("The Research Pass")
 - `prd-writing-standards`: applied to every fix to the PRD and its mockups
 - `assumptions-document-writing`: applied when a fix needs a business decision the sources do not settle
 
@@ -63,7 +64,8 @@ Use this skill when:
 
 | Parameter | Default | Description |
 |---|---|---|
-| Round cap | 12 | Full and delta rounds together. Reaching it stops the run and reports what is still open; it never ends the run silently |
+| Round cap | 12 | Full and delta rounds together; research passes do not count. Reaching it stops the run and reports what is still open; it never ends the run silently |
+| Concurrent research | 3 | At most three `investigate-question` subagents in flight in a research pass |
 | Reviewers per round | 1 | One review sub-agent, plus the extra visual reviewers `deliverable-review` launches when a round has more than about 20 images to look at |
 | Writers per round | 1 | One fix sub-agent at a time, never two, so two writers never edit the same document |
 
@@ -107,6 +109,26 @@ A finding that needs a business decision is settled by the 95% rule (`prd-writin
 **The orchestrator's rulings follow the same rule.** When it hands a writer a ruling to settle a finding, often the way to stop a passage flipping: at 95% or more from the material the writer writes it into the PRD, and below 95% on a business question the writer declares it as an assumption in that fix step. The state file records the ruling and the citation or assumption ID that settles it. It never stands in for an assumption, and no reviewer is told to treat a business decision as settled unless it has one or the other.
 
 **Say what settles each fix.** For every Medium or High it fixes, the writer names what settles the fix: the source material (cited), a rule the PRD already states, a decision settled at 95% or more from the material, or an assumption ID. A business decision below 95% is an assumption, as above, so the person signing off sees it as something to confirm rather than a rule to skim past. A consequence of a rule the PRD already states is not a new decision and gets no assumption of its own: too many entries get approved unread (`assumptions-document-writing`).
+
+---
+
+## The Research Pass
+
+Review rounds check what the documents say, not whether an assumption should exist or has the best available answer. So before each full round, research the register.
+
+**Which entries:** every open business entry with no `**Researched**` line, or changed since by anything but this pass, including any a fix just added. An entry whose outcome was Still theirs is researched again for an avenue that line does not list, unless the line records that its last pass found nothing new; then it is done.
+
+**For each entry, at most Concurrent research at once:**
+
+1. Run `investigate-question`, "Researching a Business Assumption", with the question, the requirement it hangs on with the proposed value removed, the source locations, the Facts table, the avenues already tried, and what the stakeholders have said about what they want asked and how questions should be researched. Withhold the proposed answer and evidence, and keep the investigator out of this register's open entries and the criteria built on them.
+2. A writer compares what was found with the entry, and the better-supported answer stands. A stakeholder's ruling is departed from only by Gate 3, and Gate 2 applies when a change would narrow a requirement to fit the data. A changed answer is carried into the PRD, the mockups and every entry naming it under `Depends on`, as Phase 3's fixes are.
+3. The writer applies the outcome through `assumptions-document-writing`: the entry moves as "Sort Every Entry by What Would Settle It" says, stays and takes what was found, or, if Reframed, keeps its ID and is restated. It places the entry above or below the line and sets its `**Researched**` line.
+
+**Research rewrites; it does not append.** Better evidence replaces weaker, and any sentence that would not change the stakeholder's answer comes out. Evidence quotes who said it and when, never a `source-material/` path. Research scripts are throwaway and stay out of the commit. A weak entry is researched and moved, never deleted.
+
+**Then read it as they would.** One fresh subagent, given only the register's business sections and what the stakeholders have said they want asked, marks each entry: mine to answer, "why are you asking me?", or can't follow. The first goes on. The second, with its reason, is sorted again. The third is restated in what they would see or be responsible for.
+
+**First pass only, check the PRD against its sources.** One subagent per stakeholder source the PRD was written from, at most Concurrent research at once, reports what the PRD dropped, narrowed or contradicted. Check each against the requirements intake record and later sources by `requirements-intake`'s "Whose Words Count" and latest-position rule; what survives is recorded Open in Findings, rated like any other, for the next fix step. Set **Source check** to done.
 
 ---
 
@@ -173,7 +195,7 @@ A PRD in an initiative is often refined while sessions for its neighbours are wr
 ```markdown
 # PRD Refinement State — {feature}
 
-Started: {date}   Round: {N}   Next round: {Full | Delta}   Delta rounds run: {yes | no}   Round cap: {12, or as the user raised it}   Status: {In progress | Paused: reason}
+Started: {date}   Round: {N}   Next round: {Full | Delta}   Delta rounds run: {yes | no}   Source check: {pending | done}   Round cap: {12, or as the user raised it}   Status: {In progress | Paused: reason}
 Branch: {branch}
 Delta base: {tree id of the documents as the last recorded review saw them}
 Last updated: {date time}
@@ -201,6 +223,10 @@ Open, rejected and handed-off findings, and the last round's fixed findings with
 |---|---|---|---|---|
 | R1-07 | 1 | Low | … | Rejected: the sample date matches the record it was drawn from (Facts) |
 | R2-03 | 2 | Medium | … | Fixed: {what changed, and where} |
+
+## Assumption research
+| ID | Last pass | Outcome | Confidence | Avenues tried | Untried |
+|---|---|---|---|---|---|
 
 ## Run totals
 Screens redrawn: {list}   Assumptions added or amended: {IDs}   Rejected Mediums and Highs: {IDs, one line each}   Handed off whole: {IDs} (a `Fixed; rest handed off` finding counts as fixed, never here)
@@ -232,6 +258,7 @@ The orchestrator stays thin: it reads the state file, launches one sub-agent at 
 | Step | Who | Returns to the orchestrator |
 |---|---|---|
 | Setup, re-orientation | Orchestrator, with one sub-agent on a fresh start | The intent, the decisions the sources settle, how the mockups render and the width their main users work at |
+| Research | `investigate-question` sub-agents, then one writer at a time | Per entry: outcome, confidence, avenues tried, where it landed |
 | Review | One `deliverable-review` sub-agent, full or delta, plus its visual fan-out when needed | Findings with severity, location and the consequence that sets the severity; facts it verified |
 | Fix | One writer sub-agent | Per finding: fixed (where), fixed with the rest handed off (to whom), rejected (why), or handed off whole (to whom); the propagation sweep's search terms and the copies it updated; mockups regenerated; files it created or edited; passages settled after flipping, and how; facts it verified; hand-offs it needs |
 | Continue or stop | Orchestrator | — |
@@ -243,6 +270,7 @@ Sub-agents return distilled results, not transcripts.
 If the session ends at any point:
 
 - A finished round's findings are in the state file. A review that was in flight is simply run again.
+- An entry not yet recorded under Assumption research is researched again, and a source check not marked done is run again.
 - A fix step that was in flight is recovered from the files: findings still Open in the state file are compared with the documents, and the writer finishes only what is not yet done.
 - **Next action** says where to pick up.
 
@@ -259,7 +287,7 @@ On a session-limit or context warning: finish the step in flight, update the sta
 **Pending feedback changes come first,** on a fresh start and on every resume. A `{name}-pending-feedback-changes.md` beside the PRD means a stakeholder round has changed what it must say: apply it with `assumptions-document-feedback`, which resumes from that file (its Step 4a, "Resuming"), commit that amendment on its own, then continue.
 
 1. **Check for a state file** beside the PRD. If one exists, read it and check Status first: a paused run waits for what its **Next action** names (a raised cap, an answer, access) until the user gives it. Otherwise confirm the documents still exist and continue from **Next action**.
-2. **If starting fresh**, find the documents listed under Required Inputs and create the state file. Have one sub-agent read the PRD and its source material and return the intent, the decisions the sources settle, how the mockups render and the width their main users work at, and write them into the state file. The orchestrator does not read the full documents itself.
+2. **If starting fresh**, find the documents listed under Required Inputs and create the state file. Have one sub-agent read the PRD and its source material and return the intent, the decisions the sources settle, what the stakeholders have said about what they want asked and how questions should be researched, how the mockups render and the width their main users work at, and write them into the state file. The orchestrator does not read the full documents itself.
 3. **Confirm the repo state:** the branch, and which files other sessions have uncommitted changes in. Record the branch.
 4. **Confirm access:** a way to render the mockups, and read access to the systems facts come from. A finding that needs access the run lacks (a screen that cannot be rendered, a fact that cannot be checked) pauses the run (`Paused: needs {access}`) instead of returning every round.
 
@@ -268,6 +296,8 @@ On a session-limit or context warning: finish the step in flight, update the sta
 The orchestrator plays `deliverable-review`'s main agent for its Steps 1–3: the state file's intent, decisions, mockup notes and Facts are Steps 1–2, and Phase 2 below is Step 3. Each full round's reviewer also answers Step 6's question, and Phase 3 takes the place of Steps 4, 5 and 7.
 
 ### Phase 2: Review
+
+**Before a full round, run The Research Pass** and record each entry under Assumption research, so the round reviews the researched register.
 
 1. **Snapshot the documents** through a temporary index, so the shared index is never touched: `GIT_INDEX_FILE={tmp} git read-tree HEAD`, then `GIT_INDEX_FILE={tmp} git add -- {paths}`, then `GIT_INDEX_FILE={tmp} git write-tree`. The paths are the in-repo files the run edits (the PRD, assumptions, mockup sources, the neighbouring documents it changes), plus any file a fix created; never source material kept outside the repo, and never the state file. `{tmp}` is an absolute path outside the repo, so no index file lands in the checkout. Hold the tree id; it becomes the **Delta base** only when this round's findings are recorded (step 4), so a review interrupted and run again still diffs against the old base.
 2. **For a delta round, take the diff:** `git diff {Delta base} {snapshot} -- {paths}`, which covers new files too. If the base tree is gone, run a full round instead.
@@ -320,6 +350,7 @@ Findings fixed across all rounds: High {h} · Medium {m} · Low {l}   Rejected: 
 Mockups: {s} screens, {k} redrawn during the run
 Acceptance criteria: {c} criteria, {w0} → {w1} words
 Assumptions added or amended: {IDs, or none}
+Assumptions researched: {n} ({a} already answered · {o} settled · {t} not theirs · {s} still theirs, {p} of them asked · {r} reframed)
 Facts verified: {n}
 
 Hand-offs to other sessions: {list, or none}
@@ -336,6 +367,7 @@ After the report, give the `continuation-prompt` for the technical design, unles
 
 ### DO
 
+- Research the open business assumptions before every full round
 - Fix every finding each round, Lows included, reject it with a reason, or hand it off when only another session can fix it
 - Sweep every copy of whatever a fix changed before the next round
 - Let only the Highs and Mediums a round fixed decide the next round, and end only on a full round
@@ -368,7 +400,8 @@ After the report, give the `continuation-prompt` for the technical design, unles
 |---|---|
 | `prd-writing-standards` | Writes the PRD this skill refines, and governs every fix to it and its mockups |
 | `deliverable-review` | Every round, full or delta; owns the severity scale, the visual review and the fix discipline |
-| `assumptions-document-writing` | When a fix needs a business decision the sources do not settle |
+| `assumptions-document-writing` | When a fix needs a business decision the sources do not settle, and when research moves or restates an entry |
+| `investigate-question` | Researches each open business assumption |
 | `initiative-breakdown` | Hands each planned PRD to `prd-writing-standards`; this skill refines it before the user's review |
 | `autonomous-design-refinement` | Runs later, once the technical design exists, and refines the PRD and design together |
 
@@ -398,7 +431,7 @@ State file:   (none, fresh run)
 - **Round 5, full:** 1 Medium, an unstated case on a normal path (a partial refund when part of an order has shipped), and 1 Low. Fixed. Back to delta rounds.
 - **Round 6, delta:** 1 Medium, again in refunds: the new partial-refund sentence leaves store credit unstated. The source material does not say whether store credit is refunded, so the fix is assumption RULE-010 at the best-supported answer. Refunds have now produced a Medium in two rounds running, so the next reviewer walks the refund cases.
 - **Round 7, delta:** the case walk covers 18 refund cases and finds every one settled. 1 Low, fixed.
-- **Round 8, full:** 3 Lows. Fixed. The run ends.
+- **Round 8, full:** the research pass first finds the stakeholders' answer on store credit in a meeting about another topic, so RULE-010 leaves the body as `Answered`. Then 3 Lows. Fixed. The run ends.
 
 ### Completion
 
