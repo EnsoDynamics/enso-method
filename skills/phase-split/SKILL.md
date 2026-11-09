@@ -1,12 +1,12 @@
 ---
 name: phase-split
-description: Decide whether a PRD, or any phase of one, is too large to implement in a single AI session and, if so, split it into independently shippable phases. Decides the cut itself and proceeds without stopping for confirmation. Produces one lightweight phase document per phase at every depth (phase 2, phase 2a, phase 2a1), all flat in the PRD directory, referencing the PRD and the single technical design without duplicating them. The planning step between requirements-ready and implementation — it does not write code.
+description: Decide whether a PRD, or any phase of one, is too large to implement in a single AI session and, if so, split it into independently verifiable phases. Decides the cut itself and proceeds without stopping for confirmation. Produces one lightweight phase document per phase at every depth (phase 2, phase 2a, phase 2a1), all flat in the PRD directory, referencing the PRD and the single technical design without duplicating them. The planning step between requirements-ready and implementation — it does not write code.
 user-invocable: true
 ---
 
 # Phase Split
 
-Take an implementation-ready PRD — or a single phase of one, at any depth — that is too large to build in one AI session and break it into ordered, independently shippable **phases** — each a defined subset of the PRD's acceptance criteria — then write a short phase document for each and hand off.
+Take an implementation-ready PRD — or a single phase of one, at any depth — that is too large to build in one AI session and break it into ordered, independently verifiable **phases** — each a defined subset of the PRD's acceptance criteria — then write a short phase document for each and hand off.
 
 This skill owns three things:
 
@@ -105,7 +105,7 @@ Rules the split record enforces:
 - **Every acceptance-criteria label on the parent appears in exactly one child**, by the same rule and with the same two exceptions as a fresh plan (Step 3, "Every criterion lands in exactly one phase").
 - **The children partition the parent's scope and add none.** Discoveries never become children (see the Materiality Gate in `implementation-lifecycle`).
 - **Only leaves are implemented.** `implement-from-requirements` is always pointed at a phase that has no `## Split into` table. Pointed at a split parent, it takes the first child not yet closed and says so.
-- **Closure is one line on the leaf.** When a leaf lands, the implement session's wrap-up writes `**Closed:** YYYY-MM-DD` under the leaf's title, in the feature commit. A leaf is closed only when its acceptance criteria are verified and no human action recorded in its phase doc is still outstanding; a leaf waiting only on such an action is "Awaiting a Human Action" (`implementation-lifecycle`), not closed. The line is the one completion marker a phase doc carries, and it is never written at creation; other work state (blocked work, owed items, pending human actions) goes in sections, per `implementation-lifecycle`. A split record's `## Split into` table may gain a `Status` column after creation for the same purpose. "First child not yet closed" means the first child without that line; when every child carries it the parent is complete — say so, and `continuation-prompt`'s end-of-track rule decides whether a prompt follows.
+- **Closure is one line on the leaf.** When a leaf lands, the implement session's wrap-up writes `**Closed:** YYYY-MM-DD` under the leaf's title, in the feature commit. A leaf is closed only when its acceptance criteria are verified. A leaf whose criteria depend on an outstanding human action is "Awaiting a Human Action" (`implementation-lifecycle`), not closed; a human action no criterion depends on stays recorded and does not hold the leaf open. The line is the one completion marker a phase doc carries, and it is never written at creation; other work state (blocked work, owed items, pending human actions) goes in sections, per `implementation-lifecycle`. A split record's `## Split into` table may gain a `Status` column after creation for the same purpose. "First child not yet closed" means the first child without that line; when every child carries it the parent is complete — say so, and `continuation-prompt`'s end-of-track rule decides whether a prompt follows.
 
 ### The cross-phase plan table
 
@@ -214,12 +214,13 @@ The declaration is a structured write-up the user can check at a glance. For eac
 
 A completion phase added after the plan closes also lists criteria it does not own, as `AC-RET-03 (completes it; owned by phase 2)`, or `AC-RET-03 (amended 2026-10-27; owned by phase 2)` in a feedback phase ("Completion Phases"). That is not a third exception: the owning phase still holds each one.
 
-**Number phases in the order they will actually be executed.** The default execution model is strictly sequential: phase 1 is implemented, tested, and verified working before phase 2 begins, and so on, one phase per session, in id order (children in their parent's slot). So the numbering is not merely *a* valid ordering — it is **the** order the work will proceed in, and it must be the order a sensible engineer would naturally proceed in. Run two checks before declaring the split:
+**Number phases in the order they will actually be executed.** The default execution model is strictly sequential: phase 1 is implemented, tested, and verified working before phase 2 begins, and so on, one phase per session, in id order (children in their parent's slot). So the numbering is not merely *a* valid ordering — it is **the** order the work will proceed in, and it must be the order a sensible engineer would naturally proceed in. Run three checks before declaring the split:
 
 1. **Dependencies point backward.** A phase may only depend on phases earlier in the sequence — if your draft has "Phases 4 and 7 must complete before Phase 3," the numbering is wrong; renumber so every dependency points backward.
 2. **Sequential walkthrough.** Mentally execute the plan in order. At each phase ask: with only the earlier phases built, does everything this phase needs already exist, and can it be built and verified right now? If at any step the honest answer is "I'd actually do X first," the numbering is wrong — fix the numbers, don't note it as an aside. The sequence must read as the natural way to build the system at every step, not just a dependency-valid sort.
+3. **No stops for a person.** At each phase ask: would it wait on anyone, or on a merge? A wait a person can clear before or after the build goes in the technical design's Delivery section, and a criterion that causes one is fixed in the PRD (`prd-writing-standards`, "Criteria Describe What Is Built"). The phase that finishes work Delivery names under Early merges gets an `**Early merge:**` line; the plan adds none of its own. A stop Delivery's Planned stops lists stays.
 
-**Name every dependency, and only real ones.** A phase depends on an earlier one when it needs something that phase builds (a data model, an interface, a deployed service, live configuration), changes the same code, or can only be verified once that phase is live. List exactly those, by id, with what is needed; write "None" when a phase needs nothing earlier, even late in the plan. Never write "all earlier phases", and never list a phase just because it comes first. The plan still runs in order, one phase at a time; the dependency list is what lets a person, or an agent they ask, see which phases could safely run at the same time. Running any at once is the user's call and never a planning input: never design or order the split around it, and someone following the numbers in order must always be doing the right thing.
+**Name every dependency, and only real ones.** A phase depends on an earlier one when it needs something that phase builds (a data model, an interface, a service an early merge deployed), changes the same code, or can only be verified once that phase's early merge has landed. List exactly those, by id, with what is needed; write "None" when a phase needs nothing earlier, even late in the plan. Never write "all earlier phases", and never list a phase just because it comes first. The plan still runs in order, one phase at a time; the dependency list is what lets a person, or an agent they ask, see which phases could safely run at the same time. Running any at once is the user's call and never a planning input: never design or order the split around it, and someone following the numbers in order must always be doing the right thing.
 
 When dependencies leave several orderings valid, pick the one that flows most logically — foundation before dependents, core workflow before variations and polish — and among equally logical orders, put the phase that delivers or de-risks the most first.
 
@@ -257,6 +258,7 @@ Each phase doc should contain:
 **Technical design:** [path to technical-design.md] — relevant sections: [heading(s)]
 **Parent phase:** [path to phase-2-{short-name}.md] — omit unless this phase is a child of a split record
 **Repositories:** [folder names, comma-separated] — omit when this phase changes only the PRD's repository
+**Early merge:** [target branch, and the criterion it serves] — omit unless this phase finishes work the technical design's Delivery section names for an early merge
 
 ## Summary
 [1-2 sentences on what this phase delivers — plain English, no undefined project shorthand.]
@@ -315,7 +317,7 @@ None.
 | [2a email channel](./phase-2a-email-channel.md) | Send stored notifications by email, retrying when the provider is down. | 1 (the notification records) |
 | [2b in-app channel](./phase-2b-in-app-channel.md) | Show the same notifications inside the app, marked read when opened. | 1 (the notification records); 2a (the retry queue) |
 
-Split 2026-09-12 when its build began: email has to be live and verified before in-app delivery reuses its retry queue. [One line; no narrative.]
+Split 2026-09-12 when its build began: email's retry queue has to be built and verified before in-app delivery reuses it. [One line; no narrative.]
 
 ## Acceptance criteria covered
 [The parent's labels, unchanged. Each appears in exactly one child, with Step 3's two exceptions.]
@@ -337,6 +339,8 @@ Add an `Owner` column to the `## Split into` table only when different people ru
 
 What happens after the documents are written depends on who invoked this skill. In every case, **do not implement inside this skill**, and the documents are staged and validated per `pre-commit-validation`. Invoked directly, that happens here, and they are committed by default, but pushed only under live user authorization ("Who Commits"); when they ride an implement session's changeset, they are committed at its wrap-up under that chain's default (`pre-commit-validation`, "Who Commits").
 
+**Name the technical design's "Before the build" items** (its Delivery section) to the user, as actions to finish before the first phase starts.
+
 **Called from an implement session** (`implement-from-requirements` sized the work at its Phase 2 and delegated here, or the phase being built turned out too large mid-implementation): return to that skill. **It continues in the same chat with the first phase of the new plan** — phase 1 when a whole PRD was split; the first child when a phase was re-split at sizing time; mid-implementation, the child that holds the work already in progress. The context that session loaded is exactly what that phase needs, and the phase is session-sized by construction, so a fresh chat would only re-read the same documents. The new phase docs ride in that session's changeset. This skill produces no prompt in this case; the implement session's wrap-up produces the next phase's prompt via `continuation-prompt`.
 
 **Invoked directly by the user** (`/phase-split` on a PRD, or on a phase the user already knows is too large): this chat's purpose was planning, so stop after the documents are written. Tell the user the phase docs are created and committed (or staged with the message, when the user said not to commit); push only under live user authorization; then provide a copy-paste prompt for the first leaf's chat using `continuation-prompt` (it owns the chat-name line, the lineage block with the PRD and phase by full title, the ordering, and the rule that the prompt points at the phase doc rather than restating it); the prompt is valid once that commit lands. Shape, abbreviated:
@@ -354,7 +358,7 @@ What happens after the documents are written depends on who invoked this skill. 
 > >   Phase 1 — Event pipeline
 > >   This chat: implements it.
 > >
-> > Use the `implement-from-requirements` skill. Implement `docs/prds/user-notifications/phase-1-event-pipeline.md`. The parent PRD is `docs/prds/user-notifications/user-notifications-prd.md` and the technical design is `docs/prds/user-notifications/technical-design.md`. Work in the shared checkout `<absolute path to the repo>`, on `develop` directly. First: read all three, then size the phase.
+> > Use the `implement-from-requirements` skill. Implement `docs/prds/user-notifications/phase-1-event-pipeline.md`. The parent PRD is `docs/prds/user-notifications/user-notifications-prd.md` and the technical design is `docs/prds/user-notifications/technical-design.md`. Work in the PRD's worktree `<org directory>/.worktrees/prd-user-notifications/<repo>`, on branch `prd/user-notifications`, creating it if this is the first phase (`implementation-lifecycle`, "One Branch for a Split PRD"). First: read all three, then size the phase.
 >
 > Valid now: the phase docs are committed (`a1b2c3d`).
 
@@ -367,15 +371,15 @@ The sizing test used throughout this skill — *can I hold the full design coher
 A phase sized for reliable single-session completion looks like:
 
 - **One coherent capability, end to end.** Something a reader can name in one sentence ("send stored notifications by email, retrying when the provider is down"), built through every layer it needs. That is the unit, not a file count: forty files of mechanical change are easier than three files of concurrency, and a count tells you neither.
-- **Every acceptance criterion machine-verifiable in the session** — a test, build, or script the session itself runs. Often 5 to 15 criteria. A criterion only a person can check is a phase-boundary smell: reliability tracks how much of the work the session can verify as it goes, more than how big the diff is.
+- **Every acceptance criterion machine-verifiable in the session** — a test, build, or script the session itself runs. Often 5 to 15 criteria. A criterion only a person can check does not belong in the PRD (`prd-writing-standards`, "Criteria Describe What Is Built"): reliability tracks how much of the work the session can verify as it goes, more than how big the diff is.
 - **The session holds the whole design in its context.** It decides, builds and verifies without leaning on compaction to remember what it decided.
 - **Measured anchor (September 2026, Opus 5.5 in Claude Code):** two phases of one production PRD each landed in a single implement chat at about 200 files and 20,000-26,000 added lines, about 60% of it tests, a dozen-plus criteria each. Both went live the same day after the session's own review passes, with a handful of follow-up fixes in the days after. Those chats split the build across several helper agents and integrated the results. That is two observed successes, not a measured limit or a dependable rate, and no phase this size has yet been seen to overrun. A session that does all of the building in its one context may carry less and has no measured anchor yet: size it by the capability test alone. A walkthrough well past the measured size, or one that holds a second, unrelated capability, is two phases.
 
 **Size for the dependable case.** A model completes much larger tasks some of the time than it completes reliably. Plan for the reliable case and treat anything beyond it as upside.
 
-**Cut at real seams, not at a size.** The boundaries worth a new session are where the work genuinely changes: a second, unrelated capability; a point where a person must approve a change to shared infrastructure or switch something on in production; a deployable that must be released and verified live before the next one builds on it; a point where what comes next depends on what the first part shows. Reaching a size limit is not a seam.
+**Cut at real seams, not at a size.** The boundaries worth a new session are where the work genuinely changes: a second, unrelated capability; an early merge the technical design's Delivery section names; a point where what comes next depends on what the first part shows. Reaching a size limit is not a seam.
 
-**Every phase has a fixed cost, so over-splitting is the failure to guard against.** Each phase pays to reload the PRD and design, run the review and test-hardening passes, run the full suite, wait on CI, merge and check it live: several hours per phase in the measured sessions, plus a design spread across more chats and more documents to keep in step. On real plans sized under the earlier, much smaller anchor, the failure was too many phases (one PRD reached 291 phase documents, and another put 25 criteria into 21 phases), not phases that overran. A phase that does turn out too large is split in the same chat by "Splitting a Phase Already in the Plan", keeping the work already built. So when a phase is borderline, keep it whole.
+**Every phase has a fixed cost, so over-splitting is the failure to guard against.** Each phase pays to reload the PRD and design, run the review and test-hardening passes, run the full suite: hours per phase in the measured sessions, plus a design spread across more chats and more documents to keep in step. On real plans sized under the earlier, much smaller anchor, the failure was too many phases (one PRD reached 291 phase documents, and another put 25 criteria into 21 phases), not phases that overran. A phase that does turn out too large is split in the same chat by "Splitting a Phase Already in the Plan", keeping the work already built. So when a phase is borderline, keep it whole.
 
 **Human review is a different limit.** Line-by-line human review finds far fewer defects past a few hundred lines per sitting. That limits how a phase's change is presented for review, not how much one session can build: when a team requires a person to read every line, present the phase as several smaller commits rather than cutting it into more sessions.
 
@@ -442,7 +446,7 @@ AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by ph
 - Confirm the work is genuinely too large for one AI session before splitting — don't manufacture phases.
 - Size by AI-session capacity, not human calendar time.
 - Use the word "phase," not "story" or "ticket."
-- Find seams where each phase is independently buildable, testable, and shippable.
+- Find seams where each phase is independently buildable and testable.
 - Size **every candidate phase individually** against the Session Capacity Calibration anchors: cut at a real seam until each fits a session, and merge neighbors that together still fit with no real seam between them — a borderline phase stays whole. Phase count is an output, not a target.
 - Map each phase to a defined subset of the PRD's acceptance criteria, referenced by label, so that every criterion (when splitting a phase, every label on the parent) lands in exactly one phase; Step 3 has the two exceptions.
 - Number phases in the order they will actually be executed — sequentially, each built and verified before the next starts. Dependencies may only point backward, and the sequence must survive the sequential walkthrough: the natural build order at every step, not just a dependency-valid one.

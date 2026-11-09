@@ -181,6 +181,7 @@ Order matters. Tools that auto-title a session summarize the first prompt, and A
 4. **Where to work.** Repos and the branch, with "stay here" made explicit. A commit or push restriction the user gave for this work ("don't push until I say so") is carried in their words, so the next chat's default doesn't override it (`pre-commit-validation`, "Who Commits"). If the work is on the shared branch directly, say so. A worktree a chat created for parallel isolation is never handed on: it removes its own at wrap-up, and the next chat creates its own. A worktree the user established for the work is named like any other checkout. Name any checkout to avoid and why. This is the machine-truth bin from Step 1.
    **Name the working directory by its full path written from the home directory, and say what kind of checkout it is**: the shared checkout (the directory the user opens in the editor, e.g. `~/devel/<org>/<repo>`), a worktree, or a private clone. Write `~`, never the expanded home directory: the next chat may run on another machine with the same layout under a different user name. "Work on develop in <repo>" names a branch, not a directory, and the reader must never have to infer which copy of the repo is meant. If this session worked somewhere else (a private clone it made because the shared checkout could not fast-forward, a worktree it created), that choice does not carry forward on its own. The prompt names the directory the next session should use and, where it differs from the shared checkout, how the work gets back to it.
    **Parallel or not.** Write the prompt for the shared checkout unless the next chat will run in parallel with others: the user or the calling chat says so, this chat is handing out more than one prompt at once, or another agent session is live in a repo the next chat will touch. `implementation-lifecycle`, "Parallel Sessions: Where to Work", defines live and the worktree mechanics. When it will run in parallel, add `Parallel: yes` on its own line under the lineage block, name the worktree the next chat creates (`<org directory>/.worktrees/<slug>/<repo>` on branch `wt/<slug>`, the slug being the chat name lowercased with hyphens), and name the area the chat owns. When the worktree is cut from a branch, name the base as `origin/<branch>` and have the next chat run `git fetch origin` first. A fetch touches no working tree, and a base that was never pushed then fails loudly instead of starting the chat from stale code on another machine. Never tell it to pull or reset the shared checkout to get there. The receiving chat runs the same check itself, so a prompt written for the shared checkout still isolates if it lands beside a live session. Do not infer parallel work from anything else, and never prescribe a clone unless the user asked for one.
+   **A phase or audit of a split PRD** names that PRD's worktree and branch (`implementation-lifecycle`, "One Branch for a Split PRD"), whether or not it runs in parallel.
 5. **Governing documents.** Path and section heading for each, and what the reader will find there. Point, never restate. If Step 1 wrote a new section, this is where it is cited.
 6. **State, as pointers.** What is closed (with dates, and with commit hashes only for commits already on the remote; cite an unpushed commit by its scope and date, because a rebase or amend before the push changes its hash after the prompt is pasted), what is owed, and where each is recorded. One line per item. A predecessor's findings appear as "read section X of doc Y", not as the findings themselves. Under Step 1's one-shot exception there is no doc Y, and the facts appear in the prompt as themselves.
 7. **Verification expected.** How the next session proves its work, if the governing doc does not already say. Usually one line naming the precedent to copy.
@@ -217,8 +218,8 @@ Use implement-from-requirements. Order Notifications phase 3a2: hold SMS
 notifications that fall inside a customer's quiet hours and send them when the
 window ends. Email is out; 3a1 already covers it.
 
-Work in the shared checkout ~/devel/<org>/notifications-service, on
-develop directly. Pull first. Tests need
+Work in the worktree ~/devel/<org>/.worktrees/prd-order-notifications/notifications-service,
+on prd/order-notifications. Merge origin/develop in first. Tests need
 Node 22 (`nvm use`); the default Node on this machine is older.
 
 Governing docs, all under docs/prds/order-notifications/:
@@ -227,7 +228,7 @@ Governing docs, all under docs/prds/order-notifications/:
   technical-design.md — "Scheduling" and "Delivery states".
   assumptions.md — NOTIF-007 (quiet hours default to
     9 pm–8 am local; open, not blocking).
-Predecessor closed and on develop: 3a1 (2026-03-18, a41c9e2). Build on it.
+Predecessor closed on this branch: 3a1 (2026-03-18, a41c9e2). Build on it.
 
 Prove it the way 3a1 was proved; the phase doc's "Proof standard" names the
 integration test to copy. Out of scope: per-customer quiet-hours settings (3b),
@@ -286,7 +287,7 @@ So: **the doc edits from Step 1 go into the commit this session is already makin
 - End the name with the fixed activity token, `impl` included
 - Point at doc sections by path and heading; cite dates for closed work, and commit hashes only once pushed
 - Name the working directory by its `~`-relative full path and its checkout kind (shared checkout, worktree, private clone); never carry this session's improvised location forward unstated
-- Default to the shared checkout; write `Parallel: yes`, a worktree and an owned area only on a stated or detected parallel signal
+- Default to the shared checkout, or a split PRD's own worktree for its phases and audits; write `Parallel: yes`, a worktree and an owned area only on a stated or detected parallel signal
 - End with the single first action
 - Label the prompt with what must land before it is valid, or say it is valid immediately when nothing does
 - Present one paste: the prompt, whose first line is the rename when the title hook is installed

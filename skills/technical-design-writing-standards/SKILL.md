@@ -123,6 +123,16 @@ If this feature needs to interact with other systems or services, describe those
 
 Don't name specific classes or describe internal structure—that's implementation.
 
+### Delivery
+
+What the build needs from people, and when its work reaches shared branches. People act before the build or after it. Start from the PRD's Out of Scope lines that name a part of this section. Leave out a part with nothing in it.
+
+- **Before the build:** each thing only a person can provide (access, a credential, a required approval, permission for an early merge below) and who provides it.
+- **Early merges:** a split PRD's build reaches the shared branch once, at the end (`implementation-lifecycle`, "One Branch for a Split PRD"). An early merge is valid only when a named criterion cannot be proved until earlier work is running somewhere only a merge can put it, and no local or sandbox stand-in can prove it instead. Examples: a service that the next one must be built against and that cannot be run locally; a quality score measured on data that exists only in the development environment. Each line gives the work to merge, the target branch, the criterion, why no stand-in works and, once given, the permission. Proving things in a shared environment out of habit, a walkthrough by a person, or a sequencing step this design itself created are not reasons; redesign the sequence instead.
+- **Expected build spend:** when building makes paid calls (model calls, scraping, other metered services), one estimated figure for the whole PRD and what it covers, each item tied to the criterion it serves, proved on samples rather than full volumes. It is an expectation, not a limit: nothing enforces it, nothing stops when it is reached and nobody is asked. A session that knows the work has gone well past the figure says so in its wrap-up and carries on. It does not govern limits the running application enforces (`prd-writing-standards`, "Criteria Describe What Is Built"). Spending that is running away (a loop with no end) is a bug, and stops the session as a critical finding (`implementation-lifecycle`, "The Critical Exception").
+- **Planned stops:** each criterion marked `Kept by the user's decision.` that makes the build wait, and on what.
+- **After the build:** the release steps, in order, once the PRD's audits have closed.
+
 ### Open Questions
 
 Document any decisions that still need to be made or areas of uncertainty.
@@ -219,6 +229,10 @@ A good technical design document:
 ## Integration Points
 
 [External systems and services this interacts with]
+
+## Delivery
+
+[Before the build, early merges, expected build spend, planned stops, after the build; only the parts that apply]
 
 ## Open Questions
 

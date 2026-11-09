@@ -53,10 +53,12 @@ The document the user or the handing-off skill points at fixes the criteria, exa
 | **Implemented** | Every required part exists and is reachable from the entry point the criterion is about: the route, command, scheduled job, screen, message handler or export a user or another system would use. |
 | **Partly implemented** | Some required part is missing or unreachable: logic nothing calls, a stub (a hardcoded value, a TODO, a not-implemented branch), a flag that is off everywhere, an error or boundary case the criterion names left unhandled, one of several required outcomes absent, or a value the requirements fix (a limit, an amount, a wording, a recipient) that the code gets wrong. |
 | **Not implemented** | No code does any part of it. |
-| **Waiting on a human action** | Built as far as code can take it; the rest is an entry in a `## Pending human actions` section (a switch flipped in production, a credential issued). Not a gap; named in the wrap-up. |
+| **Waiting on a human action** | Built as far as code can take it; the rest is an entry in a `## Pending human actions` section (a credential issued). Not a gap; named in the wrap-up. |
 | **Superseded** | A later PRD replaced it; the row shows the pointer. |
 | **Changed outside the requirements** | The code deliberately does something else a person could have chosen, and no document records the change. Shipped behavior stands (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"); named in the wrap-up for the user to record. |
 | **Not built yet** | Owned by a phase that has not closed. |
+
+**A flag the technical design's release steps turn on is not off everywhere:** judge the code behind it.
 
 **Partly implemented and Not implemented are gaps.** Only gaps lead to work.
 

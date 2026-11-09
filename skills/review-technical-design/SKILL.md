@@ -325,9 +325,14 @@ Rank findings by these, roughly in this order of severity:
    non-production stores rather than a fresh-database or exclusive-environment
    assumption. Scope tests like the services themselves; replacing a pipe in the
    basement shouldn't require reinspecting the attic windows. The work should
-   decompose into increments that ship independently, since a big-bang cutover
-   across several services accumulates integration risk — the phasing is part of
-   the design (`phase-split` cuts it later, but the design must make it possible).
+   decompose into increments that can be built and verified independently, since a
+   big-bang cutover across several services accumulates integration risk — the
+   phasing is part of the design (`phase-split` cuts it later, but the design must
+   make it possible). Check the Delivery section against its rules
+   (`technical-design-writing-standards`): remove an early merge that fails its test
+   and redesign the sequence that needed it, cut a paid build item no criterion
+   needs, and move any mid-build wait on a person that Planned stops does not list to
+   before or after the build.
 10. **Interface completeness.** Endpoints with request and response shapes *and*
     the error contract; data models; integration points; open questions. A design
     missing its error contract is not done.

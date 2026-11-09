@@ -58,6 +58,32 @@ Bad acceptance criteria:
 
 Precise is not the same as readable. See "Plain English for Readers Outside the Project" below for how the criteria and the sections around them get written so someone who wasn't part of the project can follow them.
 
+### Criteria Describe What Is Built
+A criterion says what is true of the finished product, and each one passes this test: **could an agent confirm it on the finished work, with no one else doing anything and no calendar time passing?**
+
+What fails the test is not a criterion, even when the source material asks for it. It goes where this table says. "Delivery" is the technical design's Delivery section, named part by part. The design does not exist yet, so for each ask headed there, one line in Out of Scope says what was asked for and which part it goes to, and the design picks it up from that line. A PRD with no technical design leaves it on that line. An ask headed for the guide gets the same line, so nobody thinks it was dropped.
+
+| The source asks for | Where it goes |
+|---|---|
+| Deploying it, or going live | Delivery, "After the build" |
+| Getting earlier work into a shared environment so later work can be proved there | Delivery, "Early merges". The technical design applies the test there and drops it if it fails. |
+| People trying it or walking through it, with no release depending on it | The end-user test guide (below) |
+| A named person's acceptance or sign-off that a release depends on | Delivery, "After the build" |
+| An approval the organization requires on record whatever the answer (legal, security, financial) | Delivery: "Before the build" when building depends on it, otherwise "After the build" |
+| Anything else a person or third party must do (issue access, train staff, run a data step) | Delivery: "Before the build" when building depends on it, otherwise "After the build" |
+| An answer the build depends on (a rule, a value, a wording) | `assumptions.md`, at the best-supported answer ("Every Decision Is Written Up or Declared"). The build proceeds on it. |
+| Waiting for real time to pass (a week of runs, the first month's report) | Rewrite as a criterion on the behavior: "The weekly report covers Sunday through Saturday", proved by a test with a controlled clock or recorded data. Watching the first real one goes in the end-user test guide. |
+| A business result after launch (support tickets fall by a fifth) | Business Context, as the goal. It is not a criterion. |
+| An expected cost for building it | Delivery, "Expected build spend" |
+| Proving it in a named environment | No line needed. The technical design chooses how it is tested. |
+
+A person using the product is fine; an event that has to happen to it is not. "An approver can reject a refund" is a criterion. "The finance lead has signed off the release" is not.
+
+- **When deployment is the product** (a pipeline, an installer, a release tool), criteria can say what it deploys, proved against a non-production target.
+- **When a quality bar can only be measured on data held in one environment,** the criterion states the bar and the data, not the environment. The technical design names the early merge if reaching that data needs one.
+- **When the running product enforces a limit** (a spending cap, a rate limit, an approval step), the limit is product behavior and can be a criterion, in whichever environment it runs.
+- **When the user says one of these must be a criterion for this PRD,** write it as asked with a `Kept by the user's decision.` line beneath it, and the technical design's Delivery section lists the stop it causes under Planned stops.
+
 ### Keep Criteria Readable as Cases Are Added
 A person signs a PRD off by reading it, and an agent builds from it. Write it as detailed as the build needs and no more, and keep it that way as review rounds add cases. A criterion that grows a clause for every case a reviewer raises ends up checked by nobody and misread by everyone, agents included.
 
@@ -127,6 +153,13 @@ Nobody is expected to remember every earlier PRD. The conflict check (`implement
 State what is explicitly excluded when doing so prevents genuine boundary confusion. Other sections—such as future considerations, dependencies, or readiness—are optional and should appear only when they help readers understand or decide the product requirements.
 
 Do not add sections as boilerplate, repeat the Summary or acceptance criteria in a closing recap, or place technical design decisions in the PRD.
+
+### The End-User Test Guide (Optional)
+A PRD may have a `{name}-end-user-test-guide.md` beside it: what the people who will use the feature can try once it is in production, by screen and task, in the product's own words. Write one when the source material asks for user testing or the user asks for a guide, at whatever point it is asked for.
+
+Nothing in it is a criterion, no phase, audit or review reads it, and nothing waits on it. Anyone can do any part, in any order; a finding becomes a bug report. It holds user steps only. Deployment and setup steps belong in the technical design's Delivery section.
+
+Write it for a person to skim: short numbered steps, each one action and what should then appear. Name the role to sign in with and a real record to start from, so that someone can also hand the guide to an agent with computer use if they choose. Mark any step that needs a person's own judgment.
 
 ### State the Outcome Without Inventing the Method
 A PRD can define the required product outcome even when the technical design has not chosen how to achieve it. Do not hide an undecided implementation method inside a file format, integration, or responsibility assigned to a particular actor.
@@ -334,6 +367,7 @@ docs/changes/       ← bounded deliveries; identical layout
     technical-design.md
     assumptions.md (if applicable)
     mockups/ (if applicable)
+    {name}-end-user-test-guide.md (if applicable)
     [phase documents, if the work is split into phases]
 ```
 
