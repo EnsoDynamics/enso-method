@@ -18,7 +18,7 @@ Every phase already ran `deliverable-review`. That is not enough on its own:
 
 At the end of a split PRD, this audit hands off to `test-audit` only when it finds no gaps. When either audit adds completion phases, `implement-from-requirements` builds them, then a fresh whole-PRD delivery audit checks the repairs. Repeat until no gaps remain. Building comes before proving, so the test audit never grades tests for behavior that isn't there yet.
 
-**A current clean delivery audit** found no gaps in the whole PRD and still covers the governing requirements and implementation as they stand. Read its outcome and compare relevant changes since its commit; the existence of a `delivery audit complete (whole PRD)` commit alone is not enough. Requirements or implementation changes, including small fixes made during a test audit, require a fresh delivery audit followed by test-audit's affected-row reassessment. Test-only and audit-record-only edits do not invalidate a clean delivery audit.
+**A current clean delivery audit** found no gaps in the whole PRD and still covers the governing requirements and implementation as they stand. Read its outcome and compare relevant changes since its commit; the existence of a `delivery audit complete (whole PRD)` commit alone is not enough. Requirements or implementation changes, including small fixes made during a test audit, require a fresh delivery audit followed by test-audit's affected-row reassessment. Test-only and audit-record-only edits, including the criterion amendments an audit makes in its own record commit, do not invalidate a clean delivery audit.
 
 ---
 
@@ -55,7 +55,7 @@ The document the user or the handing-off skill points at fixes the criteria, exa
 | **Not implemented** | No code does any part of it. |
 | **Waiting on a human action** | Built as far as code can take it; the rest is an entry in a `## Pending human actions` section (a credential issued). Not a gap; named in the wrap-up. |
 | **Superseded** | A later PRD replaced it; the row shows the pointer. |
-| **Changed outside the requirements** | The code deliberately does something else a person could have chosen, and no document records the change. Shipped behavior stands (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"); named in the wrap-up for the user to record. |
+| **Changed outside the requirements** | The code deliberately does something else a person could have chosen, and no document records the change, or the change overrides a stakeholder's ruling. Shipped behavior stands (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"); named in the wrap-up for the user to record. |
 | **Not built yet** | Owned by a phase that has not closed. |
 
 **A flag the technical design's release steps turn on is not off everywhere:** judge the code behind it.
@@ -91,7 +91,7 @@ For every Partly implemented or Not implemented record:
 
 1. **Read the code yourself** at the places the record names, and confirm the missing part really is missing or unreachable, and that the requirements really state it. A part found implemented after all, or one no requirement states, leaves the record; the row is Implemented only when no missing part is left.
 2. **Check its siblings while the code is open.** Gaps cluster. A part missing for one provider, channel, entry point or state is often missing for the others the criterion covers, and a missing part in one function is often missing in the functions beside it that do the same job. Read each sibling. One missing the same way is a confirmed gap too, when a criterion in scope requires it; one no criterion in scope requires is not a finding.
-3. **Run the conflict check** for the confirmed gaps (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one check covers every row). A later PRD changed the criterion: add the missing pointer pair and list the row as Superseded. The code deliberately does something else a person could have chosen: list it as Changed outside the requirements. Otherwise it is a gap.
+3. **Run the conflict check** for the confirmed gaps (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one check covers every row). A later PRD changed the criterion: add the missing pointer pair and list the row as Superseded. The code follows a decision the technical design states with its reason, departing from the criterion, and the PRD was never amended: amend the criterion to match with `prd-writing-standards`, running the conflict check for an amendment (both ways), and judge the row against the amended criterion. When that criterion records a stakeholder's ruling, list it as Changed outside the requirements instead; amending it would reopen that ruling (Gate 3 in `assumptions-document-writing`). The code deliberately does something else a person could have chosen: list it as Changed outside the requirements. Otherwise it is a gap.
 4. **A gap the requirements don't settle** (the criterion needs a value or rule nobody wrote down) is a business question. Write it to the assumptions document with `assumptions-document-writing`; the completion phase builds on the proposed answer, because an assumption is a green light.
 5. **A gap that is costing money, data or production correctness now** stops the audit: "Critical finding, stopping to surface."
 
@@ -108,7 +108,7 @@ With no gaps, go to Step 5. **Before every planned phase is closed** (a phase au
 ### Step 5: Record and hand off
 
 1. **Write the next chat's prompt** with `continuation-prompt`, before the commit so the edits it makes to the governing documents ride in it. Gaps: `implement-from-requirements` on the first completion phase (mid-PRD, the next open planned phase, as usual). No gaps: `test-audit` on the same scope. Either way a fresh chat: this one never builds what it found, and the build gets the implement chain's review and test hardening.
-2. **Commit** per `pre-commit-validation`: the completion phases or carried-forward sections, any plan-table rows, pointer pairs and assumption entries. The subject starts `delivery audit complete` and then names the scope in parentheses, so later sessions can find it and tell a whole-PRD audit from a narrower one: `docs(customer-returns): delivery audit complete (whole PRD), 2 criteria incomplete, Phase 7 of Customer Returns added`, or `docs(customer-returns): delivery audit complete (whole PRD), every criterion implemented`. A narrower audit reads `(phase 3)`. `(whole PRD)` is only for an audit run with every planned phase closed; one run on the whole PRD earlier names the phases it covered, `(phases 1 to 4)`, so it is never mistaken for the close-out audit. The `docs(...)` scope is the one this PRD's commits already use, usually its directory name. When the audit changed no file, commit it empty, `git commit --allow-empty --only -m "<message>"`, which commits nothing else and leaves another session's staged files staged. Put each Changed outside the requirements row in the body, one line each. The body also says how many rounds ran and how many new gaps each confirmed. Committed by default, never pushed by default (`pre-commit-validation`, "Who Commits").
+2. **Commit** per `pre-commit-validation`: the completion phases or carried-forward sections, any plan-table rows, pointer pairs, criterion amendments and assumption entries. The subject starts `delivery audit complete` and then names the scope in parentheses, so later sessions can find it and tell a whole-PRD audit from a narrower one: `docs(customer-returns): delivery audit complete (whole PRD), 2 criteria incomplete, Phase 7 of Customer Returns added`, or `docs(customer-returns): delivery audit complete (whole PRD), every criterion implemented`. A narrower audit reads `(phase 3)`. `(whole PRD)` is only for an audit run with every planned phase closed; one run on the whole PRD earlier names the phases it covered, `(phases 1 to 4)`, so it is never mistaken for the close-out audit. The `docs(...)` scope is the one this PRD's commits already use, usually its directory name. When the audit changed no file, commit it empty, `git commit --allow-empty --only -m "<message>"`, which commits nothing else and leaves another session's staged files staged. Put each Changed outside the requirements row and each criterion amendment in the body, one line each. The body also says how many rounds ran and how many new gaps each confirmed. Committed by default, never pushed by default (`pre-commit-validation`, "Who Commits").
 3. **Present the prompt** after the commit, with its hash.
 4. **Append DONE** to this session's marker, naming the terminal state.
 
@@ -116,7 +116,7 @@ With no gaps, go to Step 5. **Before every planned phase is closed** (a phase au
 
 ## What the Chat Shows
 
-Only what needs attention: no list of what was built, no account of how the audit ran. A headline with how many criteria have gaps; a table of just those, each with what's missing in one line; the user's actions (Changed outside the requirements and Waiting on a human action rows); one line if the fourth round still confirmed new gaps; then the commit and the next chat's prompt. With no gaps, the headline, the commit and the prompt are the whole report.
+Only what needs attention: no list of what was built, no account of how the audit ran. A headline with how many criteria have gaps; a table of just those, each with what's missing in one line; the user's actions (Changed outside the requirements and Waiting on a human action rows); each criterion amended to match the technical design, one line each; one line if the fourth round still confirmed new gaps; then the commit and the next chat's prompt. With no gaps, the headline, any user actions and amendments, the commit and the prompt are the whole report.
 
 ```markdown
 **Delivery audit, Customer Returns (whole PRD): 2 of 14 criteria aren't fully built.** Added phase 7 to build them.
@@ -127,6 +127,8 @@ Only what needs attention: no list of what was built, no account of how the audi
 | AC-RET-07 — The refund method is shown before confirming | Not implemented | Nothing shows it on the confirm screen |
 
 **Your action:** record AC-RET-09 in the PRD. The code emails the return label instead of showing it on screen, and no document says that was decided.
+
+**Amended to match the design:** AC-RET-05 now keeps the old export file name, as the technical design chose.
 
 **Next:** build phase 7 in a fresh chat with the prompt below; the test audit follows.
 ```
@@ -182,5 +184,6 @@ Report one record per criterion with these fields. Do not judge tests, style or 
 | `deliverable-review` | The per-session check this skill repeats across the finished whole. |
 | `implementation-lifecycle` | The conflict check and the shipped-behavior rule that decide whether a gap is a gap; the session discipline that keeps completion phases to existing scope. |
 | `assumptions-document-writing` | Where a gap the requirements don't settle goes. |
+| `prd-writing-standards` | How a criterion is amended to match a decision the technical design states. |
 | `continuation-prompt` | Writes the next chat's prompt: the first completion phase's build, or the test audit. |
 | `pre-commit-validation` | The commit boundary for the completion phases and the audit's record commit. |
