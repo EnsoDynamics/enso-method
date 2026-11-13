@@ -87,7 +87,7 @@ These limit the work a chat takes on, never what the audit finds: every criterio
 - **The audit chat closes at Step 4** unless To fix holds about three rows or fewer, none of them a delivery gap.
 - **A fixing chat takes one batch:** the rows it can build and verify in one session, sized the way `phase-split` sizes a phase, usually a group that shares test setup. It finishes work in progress before handing off: no check unrestored, no test half written.
 - **Most significant first,** so what is left is least important. Rows within a tier: high risk, then the most required parts uncovered, then rows sharing setup with others so one fix raises several. Red checks: high-risk criteria, then evidence the most other criteria rest on.
-- **Two short re-grades make a row stuck.** Each re-grade that leaves a worked row below the target adds `tried <date>: <what was done; what the re-grader still found>` to its To fix entry. At the second, mark it `stuck`, stop working it, and name it in the wrap-up; no chat works it again until the user says how (a different approach, a requirement clarified through the assumptions document, or acceptance).
+- **Two short re-grades make a row stuck.** Each re-grade that leaves a worked row below the target adds `tried <date>: <what was done; what the re-grader still found>` to its To fix entry. At the second, mark it `stuck`, stop working it, and name it in the wrap-up; no chat works it again until the user says how (a different approach, a requirement clarified through the assumptions document, or acceptance). A stuck row never stops the chat early: finish Step 6 (commit, record it as stuck in `test-audit.md`, hand off), and ask about it only in the wrap-up.
 
 ### Accepting Rows
 
