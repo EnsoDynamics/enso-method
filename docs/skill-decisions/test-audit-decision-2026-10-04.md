@@ -96,3 +96,16 @@ Whole-PRD test audits on large PRDs could run for many hours in one chat. Nothin
 - A chain of fixing chats regularly exceeds four for one PRD: the batching needs concrete anchors, like `phase-split`'s calibration.
 - Audits still run long with these bounds: measure where the time goes before adding a time rule (`wall-clock-awareness`).
 - Accepted rows are common on high-risk criteria: the offer's conditions are too loose.
+
+## Revised 2026-11-14: a newly found part doesn't count toward stuck
+
+A fixing chat's re-grade reads the whole criterion fresh, and that read sometimes names a required part the audit never listed. When that happens on a row's second re-grade, the row is stuck although the gap is real and the fix is one known test: say, a criterion that refunds every item in a return, where no test returns more than one item. No chat could write that test, and the user was asked whether to.
+
+**Options considered**
+
+1. **Have the re-grader check only the gaps To fix lists.** Rejected: it stops the target moving, but a newly named part is often a real gap. The fresh read is the point of the re-grade (the 2026-10-29 revision, option 3).
+2. **Chosen: only a part the chat worked and left uncovered counts toward stuck.** Stuck means the approach or the reading is wrong, and a part nobody had tried says nothing about either. A newly named part joins the row's To fix entry and is worked like any other.
+
+**Revisit when**
+
+- Re-grades keep naming new parts on the same row, chat after chat: the audit's part lists are too thin, and the checklist's steps need tightening.
