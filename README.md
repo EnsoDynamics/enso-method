@@ -250,7 +250,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `implement-from-requirements` — the default build from PRD and technical design
 - `implement-from-discovery` — implement a fix or change found mid-work or raised in a bug report, writing it into the requirements first
 - `phase-split` — size the work before implementation; split it into session-sized, shippable phases only when needed
-- `build-preflight` — optional last check before a long build: access for the whole plan, and every stop left in it, as commands and yes-or-no items
+- `build-preflight` — optional last check before a long build: access for the whole plan, and every stop left in it, as a short list of things to settle; it changes no file
 - `continuation-prompt` — the copy-paste prompt that starts the next chat
 
 **Quality and principles**

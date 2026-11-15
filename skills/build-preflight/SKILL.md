@@ -1,6 +1,6 @@
 ---
 name: build-preflight
-description: Last check before a PRD's build starts, while the user is still there — prove the access the whole plan needs and that it will outlive the run, confirm the machine can build and test the project, confirm what the design says a person provides first, and find every stop left in the plan. Reports "ready" in one line, or a short numbered list where every item is a command to run or a yes-or-no. Not a review — it never comments on the requirements, the design, the criteria, scope or cost. Use after phase-split and before the first implement-from-requirements session, when the user asks whether a build is ready to run unattended, or as the first step of an orchestrator's run.
+description: Last check before a PRD's build starts, while the user is still there — prove the access the whole plan needs and that it will outlive the run, confirm the machine can build and test the project, confirm what the design says a person provides first, and find every stop left in the plan. Reports "ready" in one line, or a short numbered list where every item is a command to run or one named thing to settle. It changes no file. Not a review — it never comments on the requirements, the design, the criteria, scope or cost. Use after phase-split and before the first implement-from-requirements session, when the user asks whether a build is ready to run unattended, or as the first step of an orchestrator's run.
 user-invocable: true
 ---
 
@@ -37,16 +37,16 @@ Run them in parallel where they don't depend on each other. The checks only read
 
 ## What Each Finding Becomes
 
-Every item is something the user can settle in one step. If you cannot phrase it as a command to run or a yes-or-no, it does not go in the report.
+Every item names one thing to settle before the build: a command to run, or what is missing and who provides it. No item is a question, because the preflight acts on no answer. A finding with nothing to settle does not go in the report.
 
 | Finding | The item |
 |---|---|
 | Access missing or expiring | The exact command to run, or the one thing to grant and who grants it |
-| The machine cannot build or test | The command that installs or fixes it. When the project is set up on another machine, name that machine: "run the build there: yes or no" |
+| The machine cannot build or test | The command that installs or fixes it. When the project is set up on another machine, name that machine and say to run the build there |
 | A "Before the build" line not done | The line, and who does it |
-| An attended phase, planned stop or early merge | No question. One line each under "The build will stop", so the user knows before walking away |
-| A stop Delivery does not list | "Phase 3 waits on a deploy the design does not list. Remove it: yes or no." On yes, correct the phase document by `phase-split`'s Step 3 checks and commit it as that skill does. On no, the stop stays and is listed under "The build will stop" |
-| An instruction-file rule that makes the build wait | "The repository's instructions say to ask before spending past the limit. Authorize it for this build: yes or no." Record the answer, in the user's words with the date, under "Before the build" in the technical design's Delivery section, where every phase's session reads it, and commit it with any phase correction |
+| An attended phase, planned stop or early merge | One line each under "The build will stop", so the user knows before walking away |
+| A stop Delivery does not list | One line under "The build will stop" that says the design does not list it |
+| An instruction-file rule that makes the build wait | The rule, the file it is in, and the phase where the build will stop on it: "The repository's instructions say to ask before spending past the limit, and phase 6 will pass it. Nothing in the requirements authorizes that." |
 
 ---
 
@@ -63,11 +63,13 @@ Under "ready": the number of phases, and one line for each stop the build will m
 
 Under "items need you": the numbered items, each one or two lines, the blocking ones first. Then the "The build will stop" lines, if any. When the user has settled the items, run the failed checks again and report again.
 
+**The preflight changes no file in the repository.** When the user, in this conversation, asks for a change that settles an item (an authorization, a raised limit, a stop taken out), that is requirements work and no longer the preflight. Make it everywhere the requirements carry it (the PRD, the technical design, the phase documents, the assumptions), through the skill that owns each document and with the care that skill asks for, never as one line added to make the item go away. Then run the checks again and report again.
+
 ```markdown
 Preflight: 2 items need you
 
 1. The cloud sign-in for the development account expires in 8 hours. Run `aws sso login --profile app-dev-longlived`.
-2. Phase 4 waits on a deploy the design does not list. Remove it: yes or no.
+2. The repository's instructions say to ask before spending past the limit, and phase 6 will pass it. Nothing in the requirements authorizes that.
 
 **The build will stop** at phase 1, which needs you at the vendor's console (marked Attended). Phases 2 to 9 run without you.
 ```
@@ -80,11 +82,11 @@ Preflight: 2 items need you
 
 - Check access for every phase, not only the first
 - Fix what a command fixes before reporting it
-- Phrase every item as a command to run or a yes-or-no
+- Phrase every item as a command to run, or as the one thing to settle and who settles it
 
 ### DO NOT
 
 - Comment on the requirements, the design, the criteria, scope, size or cost
 - Report an observation with no step attached
-- Change any file, except a phase document the user said yes to correcting and the Delivery line that records an authorization
+- Change any file in the repository, or ask a question whose answer would have you change one
 - Start the build

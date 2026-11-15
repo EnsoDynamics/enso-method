@@ -44,12 +44,12 @@ Over-engineering in the strict sense (permanent machinery for a rare, short-live
 | 13 | The audit loop does not settle | `delivery-audit` | A repair audit re-reads only what the repairs could have changed |
 | 14 | The end-user test guide becomes homework | `prd-writing-standards` | Only what the build could not prove |
 | | **The environment is not ready** | | |
-| 15 | Missing access, expiring sign-ins, the wrong machine | `build-preflight` | Commands and yes-or-no items, before the build |
-| 16 | House rules that force a stop | `build-preflight` | Named and settled once, before the build |
+| 15 | Missing access, expiring sign-ins, the wrong machine | `build-preflight` | Commands and named things to settle, before the build |
+| 16 | House rules that force a stop | `build-preflight` | Named before the build; settled in the requirements, not by the preflight |
 
 ## Options considered
 
-1. **One late review before the build that covers everything, criterion cost included.** Rejected. By then the user has finished the requirements, and a list of doubts about them with no sharp action attached sends them back into work they believed was done. The preflight is limited to what a command or a yes-or-no settles.
+1. **One late review before the build that covers everything, criterion cost included.** Rejected. By then the user has finished the requirements, and a list of doubts about them with no sharp action attached sends them back into work they believed was done. The preflight is limited to things with a step attached: a command, or one named thing to settle.
 2. **A fixed list of banned criteria.** Rejected. Whether a criterion earns its cost depends on the product. The method names three shapes that are nearly always wrong and requires the design to weigh the rest.
 3. **Hand the user the costly criteria to rule on.** Rejected. The method does not leave open questions. The agent narrows the criterion and declares an assumption, and the build proceeds on it.
 4. **A cap on audit loops in the skill.** Left to the orchestrator. A person running sessions by hand sees a loop and asks about it; an orchestrator needs a number, and can also say what to do when it is reached. The skill instead removes the causes: the design as a yardstick, polish as a gap, and whole-PRD re-reads after every repair.
@@ -78,9 +78,9 @@ Over-engineering in the strict sense (permanent machinery for a rare, short-live
 
 **The preflight**
 
-- **Every item is a command or a yes-or-no.** Anything else is too late to be useful at that point.
+- **Every item is a command or one named thing to settle.** Anything else is too late to be useful at that point. No item is a question (see the next point).
 - **The first line is fixed** (`Preflight: ready` or `Preflight: N items need you`) so an orchestrator can read it without parsing prose.
-- **It changes no file,** except a phase document whose unlisted stop the user agreed to remove, which goes through `phase-split` and its commit rule, and the Delivery line that records an authorization. The authorization is recorded in the design, not passed in a prompt, because a prompt reaches only the first phase.
+- **It changes no file** (revised 2026-11-15, the day after it shipped). It first made two edits on a yes: removing a stop the design does not list from a phase document, and recording an authorization for a house rule as one line in the design's Delivery section. Both went. A one-word yes minutes before a build is not the research a requirements change gets, an authorization can reach the PRD, the design and several phases, and "may change exactly these lines" is the kind of narrow permission an orchestrator has to build special cases around (pushing only after a preflight commit, staging by path). The choice was nothing or anything, and a check on settled requirements gets nothing. A stop the design does not list is a line under "The build will stop"; a house rule is an item with no question. When the user asks, in the same conversation, for a change that settles an item, that is requirements work through the skills that own the documents, wherever the change belongs. Asking "build with that stop: yes or no" was rejected (a no leaves the build nowhere to go), and so was labelling the phase (a judgment about the plan).
 - **It is optional.** The method works without it and without an orchestrator.
 
 ## Not addressed
@@ -93,4 +93,4 @@ Over-engineering in the strict sense (permanent machinery for a rare, short-live
 - Designs narrow criteria that stakeholders then ask to have back. The pricing test is too eager, or the assumption is not reaching them.
 - A repair audit misses a regression in a criterion it did not re-read. The test for "could have changed" needs tightening.
 - Users report screens that are plainly wrong after a clean audit. "Presentation is not a part" is hiding real gaps.
-- Preflight reports grow past a handful of items, or items appear that are not a command or a yes-or-no.
+- Preflight reports grow past a handful of items, or items appear with nothing to settle, or the preflight edits a file.
