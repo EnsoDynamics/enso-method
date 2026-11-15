@@ -187,8 +187,9 @@ agent (in Codex, pick skills from the `$` menu or type the full name, such as
    automatically unless you decline it; sharing and stakeholder feedback remain optional.
 3. **Plan the phases.** Run `/phase-split`. It sizes the work, writes phase documents when
    needed, and hands off without building. Work that fits one session stays whole.
-4. **Build.** Run `/implement-from-requirements` on the first planned phase, or the unsplit
-   PRD. It builds, reviews and tests the work, retaining its sizing check as a safeguard.
+4. **Build.** Before a long build, `/build-preflight` checks the access it needs and names
+   any point where it will stop. Run `/implement-from-requirements` on the first planned
+   phase, or the unsplit PRD. It builds, reviews and tests the work, retaining its sizing check as a safeguard.
    Each phase ends with the prompt for the next one's fresh session.
 5. **Close it out.** When the last phase closes, its prompt starts `/delivery-audit`, which
    checks every acceptance criterion was built and adds completion phases for any gaps. Build
@@ -249,6 +250,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `implement-from-requirements` — the default build from PRD and technical design
 - `implement-from-discovery` — implement a fix or change found mid-work or raised in a bug report, writing it into the requirements first
 - `phase-split` — size the work before implementation; split it into session-sized, shippable phases only when needed
+- `build-preflight` — optional last check before a long build: access for the whole plan, and every stop left in it, as commands and yes-or-no items
 - `continuation-prompt` — the copy-paste prompt that starts the next chat
 
 **Quality and principles**

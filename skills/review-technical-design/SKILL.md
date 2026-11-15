@@ -308,7 +308,9 @@ Rank findings by these, roughly in this order of severity:
    synchronous or config-driven approach makes unnecessary — and challenge false
    simplicity that ignores a limit and only works until the first real-world
    ceiling. What are we actually trying to accomplish, and what's the least
-   machinery that does it?
+   machinery that does it? Where a moving part exists for one criterion alone,
+   apply `technical-design-writing-standards`, "Price Each Criterion", and make
+   the change it calls for in the design and the PRD.
 8. **House standards and codebase conventions.** Evaluate the design against the
    house engineering standards named on the project's `Engineering standards:`
    line, if any, and against the conventions visible in the codebase: stack,
@@ -416,7 +418,8 @@ drop it.
   but Y would be simpler because Z — worth reopening?") — and the design keeps it.
   When verification shows the facts a decision rested on are false, the report says
   exactly that, and a business decision is reopened under its entry per
-  `assumptions-document-writing`.
+  `assumptions-document-writing`. A criterion whose cost is out of proportion is
+  not held by this rule: "Price Each Criterion" says what happens to it.
 - **Scope.** The revision never adds a requirement or designs behavior no acceptance
   criterion asks for. A gap in the PRD goes to the design's Open Questions; a
   business uncertainty also goes to the assumptions document per

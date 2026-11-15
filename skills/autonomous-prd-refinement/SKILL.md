@@ -139,6 +139,7 @@ Review rounds find cases, and every case found invites one more clause. Left alo
 - **A case a stated rule settles needs no clause of its own.** The fix sharpens that rule's wording rather than adding one. Reviewers rate such a case Low at most (`deliverable-review`, "Calibrating the edges"); the writer still fixes a finding at the rating it was given.
 - **A criterion a fix would grow is restated, split, or given a table of its cases,** never extended clause by clause.
 - **Each rule is stated once,** and every other place names it by label.
+- **A criterion a fix adds is marked and kept cheap.** It gets the `Added in refinement.` line unless it restates a stakeholder's decision, and it is never written in one of the three costly shapes (`prd-writing-standards`, "Keep Each Criterion Worth Its Cost"). An existing criterion in one of those shapes is narrowed in the same fix step; unless it carries that line, the narrowing is declared as a business assumption.
 - **Mockup notes stay short.** A note says what its state shows and which criteria it covers. Links between states are neither reviewed nor explained.
 - **Growth is tracked.** The Rounds table records the words in the acceptance criteria after each fix step, and every full round's reviewer gets those figures with the readability question (Phase 2). Criteria that grew with no new requirement behind them are where to look first.
 

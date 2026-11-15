@@ -76,6 +76,7 @@ What fails the test is not a criterion, even when the source material asks for i
 | A business result after launch (support tickets fall by a fifth) | Business Context, as the goal. It is not a criterion. |
 | An expected cost for building it | Delivery, "Expected build spend" |
 | Proving it in a named environment | No line needed. The technical design chooses how it is tested. |
+| Proof only a person can give (their own signed-in session, their eye on the result) | Rewrite as a criterion an agent can prove with a test sign-in or recorded data. What still needs the person goes in the end-user test guide. |
 
 A person using the product is fine; an event that has to happen to it is not. "An approver can reject a refund" is a criterion. "The finance lead has signed off the release" is not.
 
@@ -103,6 +104,15 @@ A person signs a PRD off by reading it, and an agent builds from it. Write it as
   | Opened, undamaged | Full price, as store credit |
   | Damaged by the customer | None; the item is sent back at no charge |
 ```
+
+### Keep Each Criterion Worth Its Cost
+The audits that close a PRD check every part of every criterion, so a criterion's wording decides how much gets built and proved. Three shapes cost far more than they return:
+
+- **A rule over everything.** "Every button and link is at least 44 pixels tall" makes every control on every screen a required part. Name the set it covers ("the buttons on the checkout screens"), or leave it out. Narrowing or leaving out something a stakeholder asked for is declared as an assumption.
+- **Polish as a requirement.** An exact size, spacing or wording is a criterion only when a stakeholder supplied the value or the text. Otherwise the mockup shows the intent and no criterion repeats it.
+- **One-time work written as a feature.** A migration, a backfill or a one-off check states the result it leaves behind, not the screens, reports and cases of the tool that produces it.
+
+**A criterion added after the first draft says so.** A criterion that a refinement round adds carries an `Added in refinement.` line beneath it, unless it restates a stakeholder's decision (`requirements-intake`, "Whose Words Count"). The technical design may narrow or drop such a criterion when building it costs more than it returns (`technical-design-writing-standards`, "Price Each Criterion"). The line is not decision history; conformance and cleanup passes keep it.
 
 ### Stable Acceptance-Criterion Labels
 When other documents (plans, technical designs, phase docs, status updates) will point back into a PRD, references must survive the PRD being edited and reordered. Section numbers and paragraph positions shift when content moves, so they are poor references.
@@ -158,6 +168,8 @@ Do not add sections as boilerplate, repeat the Summary or acceptance criteria in
 A PRD may have a `{name}-end-user-test-guide.md` beside it: what the people who will use the feature can try once it is in production, by screen and task, in the product's own words. Write one when the source material asks for user testing or the user asks for a guide, at whatever point it is asked for.
 
 Nothing in it is a criterion, no phase, audit or review reads it, and nothing waits on it. Anyone can do any part, in any order; a finding becomes a bug report. It holds user steps only. Deployment and setup steps belong in the technical design's Delivery section.
+
+Keep it short. A step belongs only when the build could not prove it, such as the first real weekly run; anything a test already proved stays out. A long guide means criteria were written that an agent could not confirm, and the fix is in the criteria.
 
 Write it for a person to skim: short numbered steps, each one action and what should then appear. Name the role to sign in with and a real record to start from, so that someone can also hand the guide to an agent with computer use if they choose. Mark any step that needs a person's own judgment.
 

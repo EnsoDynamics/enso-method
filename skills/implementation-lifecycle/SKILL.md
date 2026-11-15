@@ -65,6 +65,8 @@ The only time you stop and ask is when you cannot put forward an answer at all: 
 
 Stakeholders validate assumptions asynchronously. We correct course if they say we're wrong. But we don't wait.
 
+**A measured bar the build cannot reach is a business question, not a stop.** When a criterion sets a figure (an accuracy, a speed, a match rate) and the phase's work ends short of it, write an assumption that proposes the measured figure as the bar, with what was tried (`assumptions-document-writing`), amend the criterion to that figure with the assumption's ID, and carry on. When a stakeholder set the figure, reopen it under Gate 3 instead: their figure stays in the PRD, and the audits list the criterion as Changed outside the requirements, not as a gap.
+
 ### Docs Before Code
 
 Before changing code, align the documents:

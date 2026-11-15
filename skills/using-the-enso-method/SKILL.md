@@ -49,6 +49,7 @@ The method starts from the user's own material, however rough: notes, emails, me
 **2. Plan the phases, then build**
 
 - `phase-split`: follows stakeholder-package preparation or the user's opt-out. Size the work, write phase documents only when needed, and hand off without implementing.
+- `build-preflight`: optional, just before the build, while the user is still there. It proves the access the whole plan needs and names every stop left in it, as a short list of commands and yes-or-no items.
 - `implement-from-requirements`: builds the first planned phase, or the whole PRD when phase planning found it fits one session. Its sizing and automatic split remain a safeguard for a direct implementation request or work that outgrows its plan.
 - `continuation-prompt`: hands each next phase to a fresh session.
 

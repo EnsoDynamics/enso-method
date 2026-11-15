@@ -16,7 +16,7 @@ Every phase already ran `deliverable-review`. That is not enough on its own:
 
 **One reading misses parts, so the audit reads in rounds.** A reader who finds one missing part tends to stop there, and a criterion read as Implemented can still hide one. Every round sends every criterion to fresh assessors, and the assessment ends when a round confirms nothing new, or after four rounds. All the gaps go into one set of completion phases, so the build-and-audit cycle after them checks the repairs instead of finding the gaps one build at a time.
 
-At the end of a split PRD, this audit hands off to `test-audit` only when it finds no gaps. When either audit adds completion phases, `implement-from-requirements` builds them, then a fresh whole-PRD delivery audit checks the repairs. Repeat until no gaps remain. Building comes before proving, so the test audit never grades tests for behavior that isn't there yet.
+At the end of a split PRD, this audit hands off to `test-audit` only when it finds no gaps. When either audit adds completion phases, `implement-from-requirements` builds them, then a repair audit (see Scope) checks the repairs. Repeat until no gaps remain. Building comes before proving, so the test audit never grades tests for behavior that isn't there yet.
 
 **A current clean delivery audit** found no gaps in the whole PRD and still covers the governing requirements and implementation as they stand. Read its outcome and compare relevant changes since its commit; the existence of a `delivery audit complete (whole PRD)` commit alone is not enough. Requirements or implementation changes, including small fixes made during a test audit, require a fresh delivery audit followed by test-audit's affected-row reassessment. Test-only and audit-record-only edits, including the criterion amendments an audit makes in its own record commit, do not invalidate a clean delivery audit.
 
@@ -43,6 +43,7 @@ The document the user or the handing-off skill points at fixes the criteria, exa
 - **A criterion with a `Superseded by:` line is left out,** listed as superseded with its pointer. One with `Superseded in part by:` is checked on the part still in force (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion").
 - **Only closed phases are checked.** A criterion owned by a phase with no `**Closed:**` line is listed as Not built yet and left out, and so is one an open completion phase completes. Planned work that hasn't run is not a gap.
 - **A cross-cutting criterion** (one a phase document lists as also applying to its work) is checked across every closed phase that lists it.
+- **A repair audit re-reads only what the repairs could have changed.** When completion phases were built since a whole-PRD audit, the next audit checks the criteria those phases list and any other criterion whose behavior runs through a file changed since that audit's commit. To find those, one sub-agent takes `git diff --name-only <that audit's commit>..HEAD` and lists the criteria whose behavior those files carry. Every other criterion keeps the status that audit gave it. Its commit subject still reads `(whole PRD)`.
 
 ---
 
@@ -51,7 +52,7 @@ The document the user or the handing-off skill points at fixes the criteria, exa
 | Status | Meaning |
 |---|---|
 | **Implemented** | Every required part exists and is reachable from the entry point the criterion is about: the route, command, scheduled job, screen, message handler or export a user or another system would use. |
-| **Partly implemented** | Some required part is missing or unreachable: logic nothing calls, a stub (a hardcoded value, a TODO, a not-implemented branch), a flag that is off everywhere, an error or boundary case the criterion names left unhandled, one of several required outcomes absent, or a value the requirements fix (a limit, an amount, a wording, a recipient) that the code gets wrong. |
+| **Partly implemented** | Some required part is missing or unreachable: logic nothing calls, a stub (a hardcoded value, a TODO, a not-implemented branch), a flag that is off everywhere, an error or boundary case the criterion names left unhandled, one of several required outcomes absent, or a value the requirements fix (a limit, an amount, a quoted wording, a recipient) that the code gets wrong. |
 | **Not implemented** | No code does any part of it. |
 | **Waiting on a human action** | Built as far as code can take it; the rest is an entry in a `## Pending human actions` section (a credential issued). Not a gap; named in the wrap-up. |
 | **Superseded** | A later PRD replaced it; the row shows the pointer. |
@@ -61,6 +62,8 @@ The document the user or the handing-off skill points at fixes the criteria, exa
 **A flag the technical design's release steps turn on is not off everywhere:** judge the code behind it.
 
 **Partly implemented and Not implemented are gaps.** Only gaps lead to work.
+
+**Presentation is not a part.** Wording that says the same thing, a size, a spacing or a layout is a gap only when the criterion states it: it quotes the text or value, or names the layout ("side by side", "visible without scrolling"). Otherwise leave it out of the record: the user judges it by looking at the running product.
 
 The bar is delivered behavior, not proof. An Implemented criterion with no test passes here; `test-audit` grades its evidence. This audit reads and traces the code, which can miss a part that looks wired and fails when run. The test audit's new tests and red checks are the second net, and the test audit turns anything they find unbuilt into a completion phase of its own.
 
@@ -85,7 +88,7 @@ Launch general-purpose sub-agents in parallel, each with up to about four criter
 
 ### Step 3: Confirm every gap (main agent)
 
-A gap costs a whole build session, so a false one is expensive; a missed one costs a build session and another audit later. Before confirming anything, read every Implemented record against its criterion: each variant, entry point and case the criterion or technical design names needs its own traced file and function. Trace any the record skips yourself; one that turns out missing becomes a gap record.
+A gap costs a whole build session, so a false one is expensive; a missed one costs a build session and another audit later. Before confirming anything, read every Implemented record against its criterion: each variant, entry point and case the criterion names needs its own traced file and function. Trace any the record skips yourself; one that turns out missing becomes a gap record.
 
 For every Partly implemented or Not implemented record:
 
@@ -141,10 +144,10 @@ The sub-agent follows this. Read everything from disk; work from no one's memory
 
 For each criterion:
 
-1. **Required parts, from the requirements alone.** Read the criterion in the PRD, the assumption entries and technical-design sections it depends on, and in a phase audit the phase document. Before opening any code, write down each required part as behavior someone could observe, including every error or boundary case the criterion states. Where the criterion covers several of something (providers, channels, entry points, the states it names), each one is its own required part: a part checked for one variant and not another is half checked.
-2. **Find the entry points.** Where would a user or calling system get this behavior: a route, command, scheduled job, screen, message handler, export? The technical design usually names them; each one the criterion or design names needs its own trace.
+1. **Required parts, from the requirements alone.** Read the criterion in the PRD, the assumption entries it depends on, and in a phase audit the phase document. The technical design records how the team chose to build it, so it is never a source of required parts; use it only to find entry points and code. Before opening any code, write down each required part as behavior someone could observe, including every error or boundary case the criterion states. Where the criterion covers several of something (providers, channels, entry points, the states it names), each one is its own required part: a part checked for one variant and not another is half checked.
+2. **Find the entry points.** Where would a user or calling system get this behavior: a route, command, scheduled job, screen, message handler, export? The technical design usually says where they are; each one the criterion names needs its own trace.
 3. **Trace each part from its entry point to the code that does it.** Record the file and function for each part and the call path that reaches it. A part is built only when that path exists. Code nothing calls, a stub, or a branch behind a flag that is off everywhere is not built. **A missing part settles the status, not the record:** keep tracing every remaining part and list every one that is missing.
-4. **Check the values the requirements fix:** limits, amounts, wording, ordering, recipients, timing. The code must use the required value, not a near one.
+4. **Check the values the requirements fix:** limits, amounts, quoted wording, ordering, recipients, timing. The code must use the required value, not a near one.
 5. **Status** by "The Statuses". For Partly implemented and Not implemented, list each missing part in one line, with the file and function where it belongs.
 
 Report one record per criterion with these fields. Do not judge tests, style or structure, and run nothing that writes. Observations outside the criteria are not findings; leave them out. **Do not change anything.**

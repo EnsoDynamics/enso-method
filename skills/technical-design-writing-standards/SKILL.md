@@ -46,9 +46,21 @@ A system can be mixed; say which parts are which. `autonomous-design-refinement`
 3. **Write the sections in the example structure below, designing only the difference**: the new or changed interfaces, data models and decisions, each decision with its rationale. For an existing system, add a short **Existing Code** section that records decisions, not a description: the posture in one line; what is reused, named in a line each; what is switched off (Salvage); and, under Preserve, behavior the design must keep that the code alone would not tell you. Don't describe how the existing code works, anywhere in the design; the implementer reads the code, and a description only goes stale. Keep the section to about a dozen lines.
 4. **Keep to the PRD.** The design never adds a requirement, and behavior the PRD doesn't ask for is out of scope. Technical choices you can make, make, and record why. Each validated-table row in the assumptions document marked `Left to the design` is one of them: record it as a decision with its rationale and the alternative it beat, and change the row to `Moved to design YYYY-MM-DD` with this design's section. A gap in the PRD goes in Open Questions; a business uncertainty also goes in the assumptions document per `assumptions-document-writing`.
 5. **Check before handing it over.** Every acceptance criterion is covered by something in the design, nothing is designed that no criterion asks for, and it can be read in one sitting.
-6. **Commit the draft** as `docs({feature}): draft technical design`, with the assumptions document if it changed. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"). It keeps the review's changes one diff of their own.
+6. **Commit the draft** as `docs({feature}): draft technical design`, with the assumptions document if it changed, and the PRD if "Price Each Criterion" changed it. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"). It keeps the review's changes one diff of their own.
 7. **Run `review-technical-design` in a fresh context**: a subagent, or a new chat where subagents aren't available. Its architecture pass starts from a design it sketches before reading this one, which the session that wrote the draft can't do. It revises the design in place and commits the revision, and it skips itself for a design that follows an established pattern.
 8. **Then `autonomous-design-refinement`** refines the PRD and design together to implementation-ready. Relay the review's report first: its verdict, its questions for the user and its sections worth reading. The user's own read of the design comes next when the user wants one: recommended, never required, and when to carry on follows `using-the-enso-method`, "Routing Rules".
+
+### Price Each Criterion
+
+A design built to the letter of every criterion can cost far more than a criterion is worth. While designing, notice any criterion that needs machinery of its own: a service, table, job, compatibility layer or standing test rule that exists for that criterion alone. Weigh what it improves (how often the situation arises, for how long, for whom) against what it costs to build and to keep. Polish on a state that lasts minutes a few times a year does not earn permanent machinery.
+
+When the cost is out of proportion, design the simpler version and change the requirement to match in the same commit. Nobody is asked:
+
+- **The criterion carries `Added in refinement.`** Narrow or drop it in the PRD with `prd-writing-standards`; a dropped criterion's label is retired.
+- **Any other criterion.** Narrow it in the PRD and declare the narrowing as a business assumption (`assumptions-document-writing`), with what the fuller version would cost under "If they choose otherwise". The build proceeds on the narrower version.
+- **A criterion that restates a stakeholder's decision** (`requirements-intake`, "Whose Words Count"), or records a validated ruling, is not edited. Reopen it under Gate 3 in `assumptions-document-writing`: the design builds the simpler version and says why, and the PRD keeps their words until they revise them.
+
+The commit body names each criterion changed this way, one line each.
 
 ---
 
@@ -125,9 +137,10 @@ Don't name specific classes or describe internal structure—that's implementati
 
 ### Delivery
 
-What the build needs from people, and when its work reaches shared branches. People act before the build or after it. Start from the PRD's Out of Scope lines that name a part of this section. Leave out a part with nothing in it.
+What the build needs from people, and when its work reaches shared branches. People act before the build, after it, or in a phase planned as attended. Start from the PRD's Out of Scope lines that name a part of this section. Leave out a part with nothing in it.
 
 - **Before the build:** each thing only a person can provide (access, a credential, a required approval, permission for an early merge below) and who provides it.
+- **Hands-on work:** each build step that needs a person present, or a desktop application no agent can drive from a terminal (a console with no API, a point-and-click setup), with why no scripted way exists. `phase-split` puts it in the first phases so the rest of the build runs with nobody there.
 - **Early merges:** a split PRD's build reaches the shared branch once, at the end (`implementation-lifecycle`, "One Branch for a Split PRD"). An early merge is valid only when a named criterion cannot be proved until earlier work is running somewhere only a merge can put it, and no local or sandbox stand-in can prove it instead. Examples: a service that the next one must be built against and that cannot be run locally; a quality score measured on data that exists only in the development environment. Each line gives the work to merge, the target branch, the criterion, why no stand-in works and, once given, the permission. Proving things in a shared environment out of habit, a walkthrough by a person, or a sequencing step this design itself created are not reasons; redesign the sequence instead.
 - **Expected build spend:** when building makes paid calls (model calls, scraping, other metered services), one estimated figure for the whole PRD and what it covers, each item tied to the criterion it serves, proved on samples rather than full volumes. It is an expectation, not a limit: nothing enforces it, nothing stops when it is reached and nobody is asked. A session that knows the work has gone well past the figure says so in its wrap-up and carries on. It does not govern limits the running application enforces (`prd-writing-standards`, "Criteria Describe What Is Built"). Spending that is running away (a loop with no end) is a bug, and stops the session as a critical finding (`implementation-lifecycle`, "The Critical Exception").
 - **Planned stops:** each criterion marked `Kept by the user's decision.` that makes the build wait, and on what.
@@ -232,7 +245,7 @@ A good technical design document:
 
 ## Delivery
 
-[Before the build, early merges, expected build spend, planned stops, after the build; only the parts that apply]
+[Before the build, hands-on work, early merges, expected build spend, planned stops, after the build; only the parts that apply]
 
 ## Open Questions
 
