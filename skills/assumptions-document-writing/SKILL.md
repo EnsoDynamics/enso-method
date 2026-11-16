@@ -73,9 +73,9 @@ Declaring every near-certain item would bury the few that need a human under mor
 
 ### Blocking Open Questions (Rare Exception)
 
-If, after investigating, you cannot put forward an answer at all, carve the question out as a **Blocking Open Question** at the very top of the document, before any assumptions, and stop and ask — saying what would let you decide.
+If, after significant investigation, your best answer to a business question is still below 20% confidence, carve the question out as a **Blocking Open Question** at the very top of the document, before any assumptions, and stop and ask — naming that best answer and what would let you decide.
 
-**Use this sparingly.** If you can put forward any answer the evidence favors, at whatever confidence (30% included), state it as an assumption and proceed on it. A blocking question has one condition: the evidence favors none of the options over the others — in practice, a best answer under roughly 20%.
+**Use this sparingly.** If your best answer is at 20% or above (30% included), state it as an assumption and proceed on it. A blocking question has one condition: after significant investigation, the best answer is still below 20%. It is for business questions only; a technical question is investigated or decided, never asked.
 
 See the template below for the format.
 
@@ -707,9 +707,11 @@ This shapes prose only. It never removes evidence, examples, or context a stakeh
 
 **Question**: [Clear statement of what we need to know]
 
-**Why we can't assume**: [Brief explanation of why the evidence favors none of the options, and what would let us decide]
+**Best answer so far**: [The option we would pick if forced to, and what points to it]
 
-**Confidence**: X% (under ~20%) | **Blocks**: [the work that can't proceed until this is answered]
+**Why we can't assume**: [Brief explanation of why that answer is still below 20% after significant investigation, and what would let us decide]
+
+**Confidence**: X% (below 20%) | **Blocks**: [the work that can't proceed until this is answered]
 
 ---
 
@@ -1052,7 +1054,7 @@ Don't fake confidence. Be honest about what you know vs. what you're guessing.
 - **50-70%**: Reasonable assumption based on partial evidence
 - **30-50%**: Educated guess that needs validation
 - **<30%**: Low confidence, likely wrong
-- **Under ~20%, with no option favored**: still written into this document, with its honest confidence (5%, 10%), but as a Blocking Open Question at the top: the work it governs can't proceed until it is answered (see "Blocking Open Questions" above)
+- **Below 20% after significant investigation**: still written into this document, with its honest confidence (5%, 10%), but as a Blocking Open Question at the top: the work it governs can't proceed until it is answered (see "Blocking Open Questions" above)
 
 ❌ **Don't**: Set high confidence just because it "seems logical"
 

@@ -361,7 +361,7 @@ What happens after the documents are written depends on who invoked this skill. 
 > >   Phase 1 — Event pipeline
 > >   This chat: implements it.
 > >
-> > Use the `implement-from-requirements` skill. Implement `docs/prds/user-notifications/phase-1-event-pipeline.md`. The parent PRD is `docs/prds/user-notifications/user-notifications-prd.md` and the technical design is `docs/prds/user-notifications/technical-design.md`. Work in the PRD's worktree `<org directory>/.worktrees/prd-user-notifications/<repo>`, on branch `prd/user-notifications`, creating it if this is the first phase (`implementation-lifecycle`, "One Branch for a Split PRD"). First: read all three, then size the phase.
+> > Use the `implement-from-requirements` skill. Implement `docs/prds/user-notifications/phase-1-event-pipeline.md`. The parent PRD is `docs/prds/user-notifications/user-notifications-prd.md` and the technical design is `docs/prds/user-notifications/technical-design.md`. Work in the PRD's worktree `<org directory>/.worktrees/prd-user-notifications/<repo>`, on branch `prd/user-notifications`, creating it if this is the first phase (`engineering-principles`, "One Branch for a Split PRD"). First: read all three, then size the phase.
 >
 > Valid now: the phase docs are committed (`a1b2c3d`).
 
@@ -481,7 +481,7 @@ AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by ph
 
 | Skill | How This Skill Relates |
 |-------|-------------------------|
-| `implementation-lifecycle` | The methodology umbrella. Phase documents are one of its four entities: born here as thin overlays, they become the preferred landing place for follow-up work discovered in other phases. Its "never stop to ask a predictable question" rule is why Step 3 declares instead of asking. |
+| `implementation-lifecycle` | The session discipline every build runs under. Phase documents are born here as thin overlays; under its disposition rule they become the place work a later phase's criteria need is carried forward to. Its "never stop to ask a predictable question" rule is why Step 3 declares instead of asking. |
 | `implement-from-requirements` | The downstream consumer. Its Phase 2 sizing gate hands work here when it's too large (including a phase at any depth that turned out bigger than assumed); once the docs exist it continues with the first leaf in the same chat, and later leaves get one fresh chat each. It is always pointed at a leaf. |
 | `prd-writing-standards` | Owns the `docs/prds/` and `docs/changes/` directory convention that phase docs live in, the `AC-<AREA>-<NN>` labels phase docs reference, and the plain-English readability standard that phase Summaries and plan tables follow. |
 | `technical-design-writing-standards` | Defines the single technical design per PRD that phase docs point into by section heading — the design is never split or duplicated per phase. |

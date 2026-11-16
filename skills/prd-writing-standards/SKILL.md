@@ -133,10 +133,10 @@ Other documents then cite `AC-RETURNS-02`, not "the second bullet in the returns
 (The short bold phrase after each label—"Eligible items are clear"—is the criterion's plain-language title. See "Plain English for Readers Outside the Project" below for what makes a good one.)
 
 ### When Later Work Changes an Earlier Criterion
-A later PRD or change directory often changes behavior an earlier one defined: a longer return window, a status that now means something else, a step that no longer happens. The earlier PRD is not rewritten to match. It was true when it was built, and the later document now owns that behavior: **the latest-built document that defines a behavior is its source of truth** (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"). Two lines connect them:
+A later PRD or change directory often changes behavior an earlier one defined: a longer return window, a status that now means something else, a step that no longer happens. The earlier PRD is not rewritten to match. It was true when it was built, and the later document now owns that behavior: **the latest-built document that defines a behavior is its source of truth**. Two lines connect them:
 
 - **On the new criterion, written with the PRD:** a `Replaces:` line naming each earlier criterion it changes. It is part of the new PRD's content and changes freely while the PRD is drafted and refined. While writing, add one only where you already know the earlier criterion; don't search the repo for them, because the conflict check does that during design refinement or at build.
-- **On the earlier criterion, written when the new one is built:** a `Superseded by:` line naming the new criterion, in the same commit as the code that makes it true. Not before: a PRD that is never built, or waits months, must not mark behavior superseded while the code still does it.
+- **On the earlier criterion, written when the new one is built:** a `Superseded by:` line naming the new criterion, in the same commit as the code that makes it true. Not before: a PRD that is never built, or waits months, must not mark behavior superseded while the code still does it. The replacing criterion requires that edit to the earlier PRD, so it is in scope for its build.
 
 ```markdown
 - [ ] **AC-WINDOW-01 — Returns accepted for 60 days.** Customers can start a return up to 60 days after delivery.
@@ -157,7 +157,32 @@ The rules that keep the lines trustworthy:
 - **These lines are not decision history.** Conformance and cleanup passes keep them.
 - **Moving a directory** (a change that grew into a program) updates every path in these lines that points into it.
 
-Nobody is expected to remember every earlier PRD. The conflict check (`implementation-lifecycle`) finds the earlier criteria a new PRD changes, and turns each into a `Replaces:` line or a question.
+**Follow `Superseded by:` lines to the end of the chain before treating any criterion as current,** and amend the criterion found there. **A fully superseded criterion is no longer owed.** A build skips it, or builds only the part in force, and phase plans, test hardening, test audits and wrap-ups leave it out as they do retired labels, listing it as superseded.
+
+**When existing code differs from a criterion,** it is an observation (the Materiality Gate in `implementation-lifecycle`) unless this session's work needs that code changed. Only then do these rules decide which side is right. Not every change goes through this method: a teammate may have changed behavior on purpose with no requirements written at all, and the code may be right.
+
+- **A plain bug** is a malfunction nobody would choose: a crash, an error, corrupted or inconsistent output. Fix it; nothing below applies.
+- **A consistent contradiction** is a coherent alternative a person could have chosen: a different value, threshold, status or step, or a behavior that is gone. First, the conflict check: if a later-built criterion changed this one, that one owns the behavior; add the missing pointer pair.
+- **Otherwise, shipped behavior stands until a decision says otherwise.** Reverting it to match a document is a business question whose proposed answer is to keep it, decided by the usual thresholds (`implementation-lifecycle`, "Confidence Thresholds"): at 95% or more, amend the owning criterion to match ("code right, docs wrong"), or below that, an assumption entry proposing to keep it, and proceed. If that criterion records a stakeholder's ruling, it is a reopening at any confidence (Gate 3 in `assumptions-document-writing`). Evidence moves the confidence, never the default: `git log -S'<value>'` or `git log -L` on the code (look past commits that only reformat or move lines), a test, comment or config entry asserting the current behavior, a commit that set it after the criterion was written. Squashed, vague or missing history (imported code) lowers confidence; it never makes reverting the default.
+- **A later decision wins:** the user's direct request, or the ticket or report this session serves naming that behavior. Then revert, and name the reverted commit, when there is one, in the commit message.
+- **Building a criterion that would change existing behavior,** rather than add it, follows the same rule when the code's history shows that behavior was changed after the criterion was written: it is a conflict-check finding, intended or a business question.
+- Without pointers, tell which criterion was built later from `**Closed:**` lines, the git history of the code that implements each criterion, and what the code does now.
+
+**The conflict check.** Nobody remembers every earlier PRD, so finding the criteria that new work changes is a step, not the author's memory. One subagent reads the criteria being checked and every other criterion in the repo's PRD roots (`docs/prds/`, `docs/changes/`, or the repo's established equivalent), built or not. When the roots hold no other PRD or change directory, there is nothing to check. It skips retired labels and fully superseded criteria, which keeps the read small as the system grows; where there are many directories, it shortlists them by title and summary first, then reads the shortlisted criteria in full. It reports each criterion that the ones being checked change, narrow, contradict or remove, quoting both. A check for a criterion being amended also asks the reverse, whether a later-built criterion already changed it; a check before changing code to match a criterion asks only that. Each finding that decides what the session does is resolved one of two ways; any other finding is an observation for the Materiality Gate (`implementation-lifecycle`), not pointer work:
+
+- **The change is intended** (the new PRD says so, or plainly means it): a `Replaces:` or `Replaces in part:` line on the new criterion.
+- **It is not:** the new work would break behavior someone asked for. That is a business question, decided by the usual thresholds, never a silent pick: at 95% or more, either change the new criterion to keep the earlier behavior or accept the change with a `Replaces:` line; below 95%, an assumption. Overturning a criterion a stakeholder personally ruled on is a reopening at any confidence (Gate 3 in `assumptions-document-writing`).
+
+**If the check's subagent fails,** retry once, then run the check in the main chat. If that fails too, proceed: the risk is no worse than before the check existed, and the test tripwire (`engineering-principles`, "The test tripwire") still stands. Record `Conflict check skipped: <reason>` in the wrap-up and the commit body, never a `Conflict check:` line, so the next build runs its own.
+
+It runs at these points, and each skill carries its own step:
+
+| Where | What it checks |
+|---|---|
+| `autonomous-design-refinement`, pass 1 | The whole PRD, with findings resolved as questions in the run; at completion, again for criteria the run added or changed after pass 1 |
+| `implementation-readiness-check`, when run on its own | The whole PRD |
+| `implement-from-requirements`, after sizing and before building | The criteria this session builds, narrowed by the last recorded check; with none, the whole PRD, recorded for later phases |
+| `implement-from-discovery`, `delivery-audit`, `test-audit`, and anywhere else code is about to change to match a criterion | Amending: the criterion, both ways. Matching code to a criterion it consistently contradicts: only whether a later-built criterion changed it; the shipped-behavior rule above covers the rest. Skipped when a check in this session already covered it |
 
 ### Out of Scope and Other Optional Sections
 State what is explicitly excluded when doing so prevents genuine boundary confusion. Other sections—such as future considerations, dependencies, or readiness—are optional and should appear only when they help readers understand or decide the product requirements.

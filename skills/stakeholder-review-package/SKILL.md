@@ -19,7 +19,7 @@ Select requirements by business consequence: changed procedures, permissions, mo
 
 If no assumptions register exists, confirm the PRD has no open assumptions and use `assumptions_source: null`, `open_assumption_ids: []` and an `inventory_note` explaining the absence. Do not invent assumptions or create an empty register just for the renderer. If a register exists, include it; a missing named source is an error. Recheck for a register when refreshing or preparing to share.
 
-A genuine **Blocking Open Question** has no proposed answer to confirm. Surface it directly and resolve it through `assumptions-document-writing` before producing a complete Confirm/Change review. Never invent an ID or proposal to fit the form, or silently leave the question out. The renderer rejects the method’s `### Blocking: ...` entries even with an explicit inventory.
+A genuine **Blocking Open Question** has no answer strong enough to confirm: its best answer is below 20%. Surface it directly and resolve it through `assumptions-document-writing` before producing a complete Confirm/Change review. Never invent an ID or proposal to fit the form, or silently leave the question out. The renderer rejects the method’s `### Blocking: ...` entries even with an explicit inventory.
 
 ## Organize around the work
 

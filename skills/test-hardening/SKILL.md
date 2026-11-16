@@ -58,7 +58,7 @@ How the boundary applies in practice:
 - **The assessment may look broadly; the action may not.** The sub-agent examines all tests covering this session's work, but every fix the main agent makes must trace to an in-scope criterion. A discovery that doesn't is an observation, and the default disposition for an observation is **dismiss — silently, no wrap-up mention** (this is the Materiality Gate; `implementation-lifecycle` has the full treatment, but the rule stands on its own here).
 - **"Edge case" means an edge case *of a criterion*.** Boundary conditions and error paths of required behavior are in scope. An edge case of behavior no criterion requires is a new requirement being invented mid-hardening — out.
 - **Full-suite failures get triaged by cause, not adopted wholesale.** A test your change broke is a regression — material, fix it. A test that was already failing before this session's work is pre-existing debt — out of scope; mention it in one line so the user knows the suite wasn't fully green when you arrived, and move on. Never "fix" it here, and never write new tests around it.
-- **One exception, and only one.** A genuinely critical finding — money at risk, data loss, production breakage — stops the session and gets surfaced immediately regardless of scope. The boundary is for the immaterial; it is never a reason to unsee something dangerous.
+- **One exception, and only one.** A genuinely critical finding, as `implementation-lifecycle` defines it ("The Critical Exception": real money moving wrongly, production data lost, production down, a live secret or customer data exposed), is surfaced regardless of scope, as that section says. The boundary is for the immaterial; it is never a reason to unsee something dangerous.
 
 ---
 
@@ -83,7 +83,7 @@ Hardening raises the *quality of evidence*, never the test count for its own sak
 
 Anchor the pass on what the session was supposed to deliver:
 
-1. Identify the governing requirements — the phase doc's acceptance criteria, the PRD's acceptance criteria, or (for discovery-driven work) the stated intent of the fix. This list is the scope boundary for everything that follows. Leave out any criterion with a `Superseded by:` line; one with `Superseded in part by:` is in scope for the part still in force (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements").
+1. Identify the governing requirements — the phase doc's acceptance criteria, the PRD's acceptance criteria, or (for discovery-driven work) the stated intent of the fix. This list is the scope boundary for everything that follows. Leave out any criterion with a `Superseded by:` line; one with `Superseded in part by:` is in scope for the part still in force (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion").
 2. Run `git diff --stat` / `git status` to see what code changed this session.
 3. Identify the test suite, how it runs, and which tests relate to the changed code.
 
@@ -219,5 +219,5 @@ This skill is self-contained — the testing philosophy and scope boundary above
 | `test-audit` | The independent check once a phase or PRD is finished: it grades every criterion's evidence on the same four grades, across all the sessions that built it, and fills the gaps. This skill hardens one session's work; that one audits the finished whole. |
 | `deliverable-review` | The preceding step. It verifies the deliverable matches intent; this skill verifies the tests prove the requirements. Run it first — its fixes change code that tests must cover. |
 | `engineering-principles` | The testing evidence standard this skill enforces. This skill's rules are a self-contained restatement, deliberately aligned; test tooling and framework conventions come from the house engineering standards the project names, if any. |
-| `implementation-lifecycle` | The umbrella methodology — its Materiality Gate and No Loose Ends discipline are the general form of the scope boundary and wrap-up rules stated natively here. |
+| `implementation-lifecycle` | The session discipline — its Materiality Gate and No Loose Ends discipline are the general form of the scope boundary and wrap-up rules stated natively here. |
 | `pre-commit-validation` | Runs at the commit boundary after this skill — staging hygiene, secrets scan, diff sanity. |

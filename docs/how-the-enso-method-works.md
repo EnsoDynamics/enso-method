@@ -1,6 +1,6 @@
 # How the Enso Method Works
 
-*A human-readable overview of the method. The skills themselves are the full definition; `skills/implementation-lifecycle/SKILL.md` is the umbrella.*
+*A human-readable overview of the method. The skills themselves are the full definition; `skills/using-the-enso-method/SKILL.md` is the map.*
 
 ---
 
@@ -18,7 +18,7 @@ When the AI encounters uncertainty during implementation, it should:
 
 1. **Investigate first** — query databases, read code, check APIs, search documentation. Most questions can be self-resolved with a bit of research.
 2. **If still uncertain** — pick the best answer at whatever confidence it has and keep implementing; a business question also gets a formal assumption entry.
-3. **Only stop to ask when there is no answer to put forward** — the evidence favors none of the options, which is rare.
+3. **Only stop to ask a business question when the best answer is below 20% after significant investigation**, which is rare, and the ask still names that best answer.
 
 The assumption gets written into an assumptions document with a proposed answer, rationale, and confidence level. Stakeholders review assumptions asynchronously and correct any that are wrong. If a correction comes in, we re-implement — which is cheap with AI.
 
@@ -53,7 +53,7 @@ These documents colocate inside `docs/prds/{prd-name}/` (a program) or `docs/cha
 |-----------|--------|
 | **95%+** | Decide and proceed, whatever the impact. Nobody is asked and nothing is declared: listing every near-certain call would bury the few that need a person |
 | **Below 95%** | Proceed on the best answer, and document it as an assumption for stakeholder review, at its honest confidence |
-| **No answer to put forward** | Stop and ask — only when the evidence favors none of the options (in practice, a best answer under roughly 20%) |
+| **Best answer below 20% after significant investigation** (business questions only) | Stop and ask, naming that best answer and what would decide it |
 
 That is the gate for business questions. Technical questions proceed on the best answer, with the reasoning in the commit message; they rarely become assumptions. The below-95% business range is where the framework adds the most value. Without it, all of these become blocking questions. With it, they become documented decisions that keep implementation moving.
 
@@ -67,10 +67,10 @@ An AI session working under this framework will:
 - Distinguish technical questions (usually self-resolvable) from business questions (may need the assumption mechanism)
 - Never present the user with "Option A or B?" — instead, pick the better option and document why
 - Finish the build with a two-step quality chain: **deliverable review** (fresh-eyes check that the work matches intent) followed by **test hardening** (fresh-eyes check that the tests actually prove the acceptance criteria — real resources over mocks, assertions that would fail if the behavior were wrong). Both run automatically; neither waits to be asked for. Then the session commits the work, runs a **refactor pass** — a decline-biased judgment on whether the work left the code structurally worse, executing only small, structure-only tidies as their own commit; most sessions correctly end with "no refactor warranted" — and pushes when the push lands on a feature branch; a push to `develop` or `main` waits for the user's word, and the user can turn off the commit or the push. When the last phase of a split PRD closes, its build hands off to two closing audits, each in a fresh chat: a **delivery audit**, an independent check that every acceptance criterion was actually built, which adds completion phases (marked at the top as added by the audit, built like any other phase) for anything missing. After repairs, repeat the delivery audit until clean. Then a **test audit** independently grades every criterion's test evidence across all the phases and fills the gaps, missing evidence first; its implementation fixes also return through delivery audit.
-- Disposition every loose end instead of reporting it: dismiss it (the default for anything immaterial), deal with it now, file it into a document a future session will load, or ask a one-line question with a recommended default — never end with a list of FYIs and caveats. Items the work's continuation will handle surface only as a one-line count summary ("2 assumptions declared, 3 items filed to phase 4"); only what needs the user is named
+- Disposition every loose end instead of reporting it: dismiss it (the default for anything immaterial), deal with it now, file it into a document a future session will load, or surface one of the four defined stops (a critical finding, a blocker, an action only a person can take, a business question with no answer above 20%) — never end with a list of FYIs and caveats. Items the work's continuation will handle surface only as a one-line count summary ("2 assumptions declared, 3 items filed to phase 4"); only what needs the user is named
 - Never announce future work it could do right now ("I'll add that test," "next X should be updated") — it does the work, or files it somewhere concrete, before wrapping up
 - End every task in a clean terminal state: implemented, blocked and surfaced to the user (recorded in the PRD or phase document), awaiting a human action it has prepared and recorded, or intentionally left as-is with documentation
 
-The session discipline ("No Loose Ends") is defined in full inside `implementation-lifecycle`, the umbrella skill for the whole methodology. If a session drifts — FYIs piling up, predictable questions, promised-but-not-done work — telling it to re-read `implementation-lifecycle` restores the whole methodology in one step.
+The session discipline ("No Loose Ends") is defined in full inside `implementation-lifecycle`. If a session drifts — FYIs piling up, predictable questions, promised-but-not-done work — telling it to re-read `implementation-lifecycle` restores the discipline in one step.
 
 The result is fewer interruptions, faster implementation, and a clear paper trail of every decision made along the way.

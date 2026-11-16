@@ -56,7 +56,7 @@ The document the user or the handing-off skill points at fixes the criteria, exa
 | **Not implemented** | No code does any part of it. |
 | **Waiting on a human action** | Built as far as code can take it; the rest is an entry in a `## Pending human actions` section (a credential issued). Not a gap; named in the wrap-up. |
 | **Superseded** | A later PRD replaced it; the row shows the pointer. |
-| **Changed outside the requirements** | The code deliberately does something else a person could have chosen, and no document records the change, or the change overrides a stakeholder's ruling. Shipped behavior stands (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"); named in the wrap-up for the user to record. |
+| **Changed outside the requirements** | The code deliberately does something else a person could have chosen, and no document records the change, or the change overrides a stakeholder's ruling. Shipped behavior stands (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion"); named in the wrap-up for the user to record. |
 | **Not built yet** | Owned by a phase that has not closed. |
 
 **A flag the technical design's release steps turn on is not off everywhere:** judge the code behind it.
@@ -75,7 +75,7 @@ The assessment is review mode within the criteria in scope (`implementation-life
 
 ### Step 1: Scope and baseline
 
-1. Resolve the scope (above) and list the criteria by label. Open the first response with one lineage line: `Delivery audit of <PRD title>, <Phase id — title, or whole PRD>`. It is also the `serves:` line of this session's marker, whose START is written before the first edit (`implementation-lifecycle`, "Session Markers").
+1. Resolve the scope (above) and list the criteria by label. Open the first response with one lineage line: `Delivery audit of <PRD title>, <Phase id — title, or whole PRD>`. It is also the `serves:` line of this session's marker, whose START is written before the first edit (`engineering-principles`, "Session Markers").
 2. Note HEAD (`git rev-parse --short HEAD`). The audit checks the code at that commit; when files in scope have uncommitted changes, the report says so.
 
 ### Step 2: Fresh-eyes assessment (sub-agents)
@@ -94,7 +94,7 @@ For every Partly implemented or Not implemented record:
 
 1. **Read the code yourself** at the places the record names, and confirm the missing part really is missing or unreachable, and that the requirements really state it. A part found implemented after all, or one no requirement states, leaves the record; the row is Implemented only when no missing part is left.
 2. **Check its siblings while the code is open.** Gaps cluster. A part missing for one provider, channel, entry point or state is often missing for the others the criterion covers, and a missing part in one function is often missing in the functions beside it that do the same job. Read each sibling. One missing the same way is a confirmed gap too, when a criterion in scope requires it; one no criterion in scope requires is not a finding.
-3. **Run the conflict check** for the confirmed gaps (`implementation-lifecycle`, "When Later Work Changes Earlier Requirements"; one check covers every row). A later PRD changed the criterion: add the missing pointer pair and list the row as Superseded. The code follows a decision the technical design states with its reason, departing from the criterion, and the PRD was never amended: amend the criterion to match with `prd-writing-standards`, running the conflict check for an amendment (both ways), and judge the row against the amended criterion. When that criterion records a stakeholder's ruling, list it as Changed outside the requirements instead; amending it would reopen that ruling (Gate 3 in `assumptions-document-writing`). The code deliberately does something else a person could have chosen: list it as Changed outside the requirements. Otherwise it is a gap.
+3. **Run the conflict check** for the confirmed gaps (`prd-writing-standards`, "When Later Work Changes an Earlier Criterion"; one check covers every row). A later PRD changed the criterion: add the missing pointer pair and list the row as Superseded. The code follows a decision the technical design states with its reason, departing from the criterion, and the PRD was never amended: amend the criterion to match with `prd-writing-standards`, running the conflict check for an amendment (both ways), and judge the row against the amended criterion. When that criterion records a stakeholder's ruling, list it as Changed outside the requirements instead; amending it would reopen that ruling (Gate 3 in `assumptions-document-writing`). The code deliberately does something else a person could have chosen: list it as Changed outside the requirements. Otherwise it is a gap.
 4. **A gap the requirements don't settle** (the criterion needs a value or rule nobody wrote down) is a business question. Write it to the assumptions document with `assumptions-document-writing`; the completion phase builds on the proposed answer, because an assumption is a green light.
 5. **A gap that is costing money, data or production correctness now** stops the audit: "Critical finding, stopping to surface."
 
@@ -185,8 +185,8 @@ Report one record per criterion with these fields. Do not judge tests, style or 
 | `phase-split` | Owns the form of a completion phase ("Completion Phases"): its id, file name, marker line and template. Its rule that every criterion lands in exactly one phase is what lets this audit name the phase that owns each gap. |
 | `test-audit` | Runs after this skill. Same scope rules and the same rules for superseded and changed criteria; it grades whether the tests prove each criterion, and writes a completion phase of its own, in the same form, for a delivery gap it finds later. |
 | `deliverable-review` | The per-session check this skill repeats across the finished whole. |
-| `implementation-lifecycle` | The conflict check and the shipped-behavior rule that decide whether a gap is a gap; the session discipline that keeps completion phases to existing scope. |
+| `implementation-lifecycle` | The session discipline that keeps completion phases to existing scope. |
 | `assumptions-document-writing` | Where a gap the requirements don't settle goes. |
-| `prd-writing-standards` | How a criterion is amended to match a decision the technical design states. |
+| `prd-writing-standards` | How a criterion is amended to match a decision the technical design states; the conflict check and the shipped-behavior rule that decide whether a gap is a gap. |
 | `continuation-prompt` | Writes the next chat's prompt: the first completion phase's build, or the test audit. |
 | `pre-commit-validation` | The commit boundary for the completion phases and the audit's record commit. |

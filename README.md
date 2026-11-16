@@ -246,7 +246,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `investigate-question` — take one question to an answer with a confidence level
 
 **Implementation**
-- `implementation-lifecycle` — the umbrella: the assumptions philosophy, confidence thresholds and the No Loose Ends session discipline. Reload it to get a drifting session back on track
+- `implementation-lifecycle` — the session discipline every build runs under: decide and proceed, the confidence thresholds and No Loose Ends. Reload it to get a drifting session back on track
 - `implement-from-requirements` — the default build from PRD and technical design
 - `implement-from-discovery` — implement a fix or change found mid-work or raised in a bug report, writing it into the requirements first
 - `phase-split` — size the work before implementation; split it into session-sized, shippable phases only when needed

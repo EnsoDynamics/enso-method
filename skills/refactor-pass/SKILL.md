@@ -156,4 +156,4 @@ This skill is self-contained — the signals and guardrails above are the comple
 | `deliverable-review` | Two steps earlier in the chain. It verifies the deliverable matches intent; this pass never revisits that question. |
 | `prd-writing-standards` | Where an over-the-gate refactor lives if the user wants it done (Step 5): a change directory, created on the user's say-so, whose technical design is the brief a fresh standalone invocation executes. |
 | `pre-commit-validation` | Runs at the commit boundary for the refactor commit exactly as for any other — staging hygiene, secrets scan, diff sanity. |
-| `implementation-lifecycle` | The umbrella methodology — the Materiality Gate and No Loose Ends discipline are the general form of this skill's decline bias and short wrap-up. |
+| `implementation-lifecycle` | The session discipline — the Materiality Gate and No Loose Ends discipline are the general form of this skill's decline bias and short wrap-up. |
