@@ -1,6 +1,6 @@
 ---
 name: build-preflight
-description: Last check before a PRD's build starts, while the user is still there — prove the access the whole plan needs and that it will outlive the run, confirm the machine can build and test the project, confirm what the design says a person provides first, and find every stop left in the plan. Reports "ready" in one line, or a short numbered list where every item is a command to run or one named thing to settle. It changes no file. Not a review — it never comments on the requirements, the design, the criteria, scope or cost. Use after phase-split and before the first implement-from-requirements session, when the user asks whether a build is ready to run unattended, or as the first step of an orchestrator's run.
+description: Last check before a PRD's build starts, while the user is still there — prove the access the whole plan needs and that it will outlive the run, confirm the machine has what it needs to build and test the project, confirm what the design says a person provides first, and find every stop left in the plan. Reports "ready" in one line, or a short numbered list where every item is a command to run or one named thing to settle. It changes no file. Not a review — it never comments on the requirements, the design, the criteria, scope or cost. Use after phase-split and before the first implement-from-requirements session, when the user asks whether a build is ready to run unattended, or as the first step of an orchestrator's run.
 user-invocable: true
 ---
 
@@ -16,17 +16,17 @@ It is optional. Nothing in the method waits on it, and `implement-from-requireme
 
 ## What to Read
 
-The PRD, its technical design (the Delivery section in full), every phase document, the repository's README and its instruction files (`AGENTS.md`, `CLAUDE.md`). Read for the five checks below and nothing else.
+The PRD, its technical design (the Delivery section in full), every phase document, the repository's README and its instruction files (`AGENTS.md`, `CLAUDE.md`). A README is often out of date, so also read what the project itself declares: its package manifest and version files, its example environment file, its test configuration and setup files, and its CI workflow files. Search the code and tests the phases will change, without reading them through, for the credentials, services, tools and settings they name. Read for the five checks below and nothing else.
 
 ---
 
 ## The Checks
 
-Run them in parallel where they don't depend on each other. The checks only read, with three exceptions: refreshing a sign-in, installing a missing tool, and running the project's tests.
+Run them in parallel where they don't depend on each other. The checks only read, with two exceptions: refreshing a sign-in, and installing a missing tool, meaning a runtime or command-line program the project calls, never the project's own dependencies.
 
 1. **Access for the whole plan.** List every external dependency any phase will touch: cloud profiles, source hosting, databases, third-party APIs, paid services, a browser sign-in. Make one cheap read-only call per dependency against the environment the build will use, proving it reaches the specific resource (`implement-from-requirements`, "Preflight external access", has the call patterns). Re-authenticate yourself where a command does it.
 2. **Access that outlives the run.** For each credential, find when it expires. A split PRD's build runs for a day or more, so one that expires sooner will expire mid-build: use the longer-lived alternative the project's credential guidance names, or say the exact command that refreshes it and whether that command needs a person.
-3. **This machine can build and test.** The tools and versions the README names are installed, secrets and local configuration the tests read are present, and the project's test command passes before any change. A suite that is already red here is an item, with the count and the first failure.
+3. **This machine has what it needs to build and test.** The tools and versions the project names are installed, and the secrets and local configuration the tests read are present. Check each with a version command or by confirming a file or variable exists, and run nothing else: no test (not even a single one, which often starts the whole suite anyway), no project script, and nothing that installs dependencies, compiles, lints, type-checks or starts a service. The project's own dependencies are neither installed nor reported, because the build installs them. A suite that is already red is left for the build to find.
 4. **What a person provides first.** Each line under the Delivery section's "Before the build" is done, checked by a call where one exists. Work this PRD builds on (another PRD's branch, a service another team deploys) is merged or running where the build will look for it.
 5. **Stops left in the plan.** Name each of these:
    - Phases marked `**Attended:**`, and each line under Delivery's "Planned stops" and "Early merges" with what the build waits on.
