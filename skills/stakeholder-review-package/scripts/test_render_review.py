@@ -7,7 +7,7 @@ import subprocess
 import sys
 import unittest
 from pathlib import Path
-from render_review import asked_card_words, EmbeddedImages, digest, manifest, render, validate, load_authoring, authoring_digest, embedded_json
+from render_review import asked_card_words, shown_words, EmbeddedImages, digest, manifest, render, validate, load_authoring, authoring_digest, embedded_json
 
 
 class ReviewTests(unittest.TestCase):
@@ -18,7 +18,7 @@ class ReviewTests(unittest.TestCase):
         (self.root / 'class-bookings-prd.md').write_text('# Community classes\nAC-BOOK-01: Show availability.\n')
         (self.root / 'class-bookings-assumptions.md').write_text('# Assumptions\n### RULE-001. Cancellation\nA cancellation frees a place.\n### UI-001. Waiting list\nShow the queue position.\n## Validated Assumptions\n### RULE-002. Already settled\n')
         refs = [{'source': 'assumptions', 'label': 'Source'}]
-        self.data = {'title': 'Community classes', 'subtitle': 'Find a class.', 'scope': 'Bookings only.', 'date': '2026-01-15', 'assumptions_source': 'assumptions', 'sources': {k: {'path':p, 'url':'https://example.org/'+p, 'label':k} for k,p in [('prd','class-bookings-prd.md'), ('assumptions','class-bookings-assumptions.md')]}, 'sections': [{'id':'booking','title':'Book a class','intro':'Choose a place.','rules':[],'mockups':[],'decisions':[{'id':ident,'title':title,'proposal':['Proposed behavior.'],'if_other':'We would build a different booking screen.','impact':'Medium','evidence':'The brief leaves this open.','refs':refs} for ident,title in [('RULE-001','Cancel before the class?'),('UI-001','Show a queue position?')]]}]}
+        self.data = {'title': 'Community classes', 'subtitle': 'Find a class.', 'scope': 'Bookings only.', 'building': [{'text': 'Residents book a class online.', 'refs': [{'source': 'prd', 'label': 'AC-BOOK-01'}]}], 'not_building': ['Payment is outside this release.'], 'date': '2026-01-15', 'assumptions_source': 'assumptions', 'sources': {k: {'path':p, 'url':'https://example.org/'+p, 'label':k} for k,p in [('prd','class-bookings-prd.md'), ('assumptions','class-bookings-assumptions.md')]}, 'sections': [{'id':'booking','title':'Book a class','intro':'Choose a place.','rules':[],'mockups':[],'decisions':[{'id':ident,'title':title,'proposal':['Proposed behavior.'],'if_other':'We would build a different booking screen.','impact':'Medium','evidence':'The brief leaves this open.','refs':refs} for ident,title in [('RULE-001','Cancel before the class?'),('UI-001','Show a queue position?')]]}]}
         self.input = self.root / 'class-bookings-review.json'
         self.input.write_text(json.dumps(self.data))
 
@@ -30,12 +30,13 @@ class ReviewTests(unittest.TestCase):
         self.assertNotIn(' checked', output)
         self.assertIn('No response given:', output)
 
-    def export_feedback(self, answers, notes=None, output=None):
+    def export_feedback(self, answers, notes=None, output=None, building=None):
         """Execute the rendered JavaScript formatter; browser actions are checked separately."""
         output = output or render(self.data, self.root, None)
         data = embedded_json(output, 'review-data')
         state = {'reviewer': 'Example Reviewer', 'answers': answers,
-                 'notes': notes if notes is not None else {'booking': ''}}
+                 'notes': notes if notes is not None else {'booking': ''},
+                 'building': building or {'choice': '', 'comment': ''}}
         start = output.index('function feedbackText()')
         end = output.index("document.getElementById('export-feedback')", start)
         script = ('const data=' + json.dumps(data) + ';\nconst state=()=>('
@@ -158,6 +159,84 @@ class ReviewTests(unittest.TestCase):
         card.update(title='One two', proposal=['three four', 'five'], if_other='six', evidence='not counted at all')
         self.assertEqual(asked_card_words(self.data), [6])
 
+    def test_review_opens_with_what_is_being_built(self):
+        output = render(self.data, self.root, None)
+        opening, first_section = output.index('id="building"'), output.index('id="booking"')
+        self.assertLess(opening, first_section)
+        self.assertIn('Residents book a class online.', output[opening:first_section])
+        self.assertIn('Payment is outside this release.', output[opening:first_section])
+        self.assertIn('name="building" value="confirm"', output)
+        self.assertEqual(output.count('class="decision"'), 2)  # its response is not an assumption
+        for broken in ({'building': []}, {'building': [{'text': 'No source.', 'refs': []}]}, {'not_building': ['']}):
+            with self.assertRaises(ValueError):
+                validate({**self.data, **broken}, self.root)
+        without = dict(self.data)
+        del without['building']
+        with self.assertRaises(ValueError):
+            validate(without, self.root)
+
+    def test_opening_block_refuses_malformed_or_unreadable_input(self):
+        for broken in ({'not_building': 'Payment'}, {'building': 'Residents book online.'}, {'building': ['Residents book online.']},
+                       {'building': [{'text': 'See AC-BOOK-01 in the PRD.', 'refs': [{'source': 'prd', 'label': 'AC-BOOK-01'}]}]},
+                       {'not_building': ['Anything the technical design leaves out.']}):
+            with self.assertRaises(ValueError):
+                validate({**self.data, **broken}, self.root)
+        self.data['sections'][0]['id'] = 'building'
+        with self.assertRaisesRegex(ValueError, 'belongs to the opening block'):
+            validate(self.data, self.root)
+
+    def test_opening_block_text_is_escaped_and_stays_out_of_the_answered_count(self):
+        self.data['building'][0]['text'] = 'Book <b>online</b> @@DATA@@.'
+        self.data['not_building'] = ['No <script>alert(1)</script> payment.']
+        output = render(self.data, self.root, None)
+        self.assertIn('Book &lt;b&gt;online&lt;/b&gt; @@DATA@@.', output)
+        self.assertIn('No &lt;script&gt;alert(1)&lt;/script&gt; payment.', output)
+        self.assertNotIn('<b>online</b>', output)
+        payload = embedded_json(output, 'review-data')
+        self.assertEqual([d['id'] for d in payload['decisions']], ['RULE-001', 'UI-001'])
+        self.assertIn('Assumptions: <strong data-progress>0 of 2 answered</strong>', output)
+
+    def test_reply_always_states_the_response_to_what_is_being_built(self):
+        silent = self.export_feedback({ident: {'choice': '', 'comment': ''} for ident in ('RULE-001', 'UI-001')})
+        self.assertIn("What we're building — No response given", silent)
+        self.assertNotIn('Statements reviewed:', silent)
+        changed = self.export_feedback({ident: {'choice': '', 'comment': ''} for ident in ('RULE-001', 'UI-001')},
+                                       building={'choice': 'change', 'comment': 'Phone booking stays too.'})
+        front, appendix = changed.split('WORDING REVIEWED — REFERENCE ONLY', 1)
+        self.assertIn("What we're building — Change\nPhone booking stays too.", front)
+        self.assertIn('Statements reviewed:\n1. Residents book a class online.', appendix)
+        self.assertIn('Not included:\n- Payment is outside this release.', appendix)
+        self.assertNotIn('No responses or section feedback supplied.', changed)
+        incomplete = self.export_feedback({ident: {'choice': '', 'comment': ''} for ident in ('RULE-001', 'UI-001')},
+                                          building={'choice': 'change', 'comment': ''})
+        self.assertIn("What we're building — Change — INCOMPLETE: explanation needed", incomplete)
+
+    def test_a_review_with_no_assumptions_shows_no_empty_count(self):
+        counted = render(self.data, self.root, None)
+        self.assertIn('Assumptions: <strong data-progress>0 of 2 answered</strong>', counted)
+        self.assertIn('What we’re building: <strong data-opening>unanswered</strong>', counted)
+        (self.root / 'class-bookings-assumptions.md').unlink()
+        self.data['assumptions_source'] = None
+        del self.data['sources']['assumptions']
+        self.data.update(open_assumption_ids=[], inventory_note='No open assumptions.')
+        self.data['sections'][0]['decisions'] = []
+        output = render(self.data, self.root, None)
+        self.assertNotIn('0 of 0', output)
+        self.assertNotIn('<progress', output)
+        self.assertIn('No assumptions need an answer.', output)
+        self.assertIn('What we’re building: <strong data-opening>unanswered</strong>', output)
+
+    def test_no_notice_sits_between_the_title_and_the_opening_statements(self):
+        output = render(self.data, self.root, None)
+        hero = output[output.index('<header class="hero">'):output.index('id="building"')]
+        self.assertNotIn('For business review', hero)
+        self.assertNotIn('technical design', hero)
+        self.assertIn('The full PRD and technical design remain the specification.', output)
+
+    def test_word_report_covers_shown_criteria_and_introductions(self):
+        self.data['sections'][0]['rules'] = [{'text': 'A full class offers a waiting list.', 'refs': [{'source': 'prd', 'label': 'AC-BOOK-01'}]}]
+        self.assertEqual(shown_words(self.data), ([7], [3]))
+
     def test_rule_links_keep_the_criterion_id_off_the_text(self):
         self.data['sections'][0]['rules'] = [{'text': 'A full class offers a waiting list.', 'refs': [{'source': 'prd', 'label': 'AC-BOOK-01'}]}]
         output = render(self.data, self.root, None)
@@ -193,7 +272,7 @@ class ReviewTests(unittest.TestCase):
             '## Technical Assumptions\n### DATA-001. Venue feed has capacity\nBlocked by: no feed access.\n### DATA-002. Feed updates hourly\nBlocked by: no feed access.\n## Validated Assumptions'))
         output = render(self.data, self.root, None)
         self.assertNotIn('id="DATA-001"', output)
-        self.assertIn('2 open business assumptions', output)
+        self.assertIn('Assumptions: <strong data-progress>0 of 2 answered</strong>', output)
         self.assertIn('2 technical assumptions are tracked separately for the build team.', output)
         decisions = self.data['sections'][0]['decisions']
         decisions.append({**decisions[0], 'id': 'DATA-001'})
@@ -259,7 +338,7 @@ class ReviewTests(unittest.TestCase):
         register.write_text(register.read_text().replace('## Validated Assumptions', extra + '## Validated Assumptions'))
         decisions.extend({**decisions[0], 'id': f'RULE-1{i:02}'} for i in range(12))
         self.card(proposal=['word ' * 400], evidence='word ' * 400)
-        self.assertIn('14 open business assumptions', render(self.data, self.root, None))
+        self.assertIn('Assumptions: <strong data-progress>0 of 14 answered</strong>', render(self.data, self.root, None))
 
     def test_build_shorthand_and_unseen_ids_are_refused(self):
         for text in ('The PRD says so.', 'Per the technical design.', 'As acceptance criteria state.', 'See AC-BOOK-01.'):

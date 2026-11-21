@@ -103,6 +103,13 @@ def asked_card_words(data):
     return [len(' '.join([item['title'], *item['proposal'], item['if_other']]).split()) for section in data['sections'] for item in section['decisions']]
 
 
+def shown_words(data):
+    """Words in each shown criterion and each section introduction; SKILL.md sets the targets."""
+    count = lambda text: len(text.split())
+    return ([count(rule['text']) for section in data['sections'] for rule in section['rules']],
+            [count(section['intro']) for section in data['sections']])
+
+
 def register_text(data, root):
     source = data['assumptions_source']
     return '' if source is None else (root / data['sources'][source]['path']).read_text()
@@ -134,12 +141,29 @@ def validate(data, root):
         raise ValueError('A review without an assumptions source requires an explicit empty inventory')
     if technical & set(expected):
         raise ValueError(f'Technical assumptions stay out of a business review: {sorted(technical & set(expected))}')
+    building, excluded = data.get('building'), data.get('not_building', [])
+    if not isinstance(building, list) or not building or not all(isinstance(item, dict) and item.get('text') for item in building):
+        raise ValueError('A review opens with building: a list of the statements that say what is being built')
+    if not isinstance(excluded, list) or not all(isinstance(text, str) and text for text in excluded):
+        raise ValueError('not_building is a list of plain statements')
+    for item in building:
+        if not item.get('refs'):
+            raise ValueError('Every item needs source references')
+        for ref in item['refs']:
+            if ref['source'] not in sources:
+                raise ValueError('Unknown source: ' + ref['source'])
+    # The opening is read by the same stakeholder as the cards, so the same shorthand is refused.
+    shorthand = re.search(BUILD_SHORTHAND, ' '.join([item['text'] for item in building] + excluded))
+    if shorthand:
+        raise ValueError(f'What we are building uses build shorthand a stakeholder cannot look up: "{shorthand[0]}"')
     actual, section_ids, screen_ids = [], [], []
     decided = data.get('decided', [])
     for section in [*data['sections'], {'id': 'also-decided', 'rules': [], 'mockups': [], 'decisions': decided}]:
         sid = section['id']
         if not re.fullmatch('[a-z][a-z0-9-]*', sid):
             raise ValueError('Section IDs must be lowercase slugs')
+        if sid == 'building':
+            raise ValueError('The section id "building" belongs to the opening block; choose another')
         section_ids.append(sid)
         for item in section['rules'] + section['mockups'] + section['decisions']:
             if not item['refs']:
@@ -271,15 +295,39 @@ def render(data, root, images_dir):
     if decided_cards:
         navigation.append('<a href="#also-decided"><span class="nav-number">+</span><span>Also decided</span></a>')
         sections.append(f'''<section class="workflow also-decided" id="also-decided"><header class="section-heading"><span class="eyebrow">OPTIONAL</span><h2>Also decided: no reply needed</h2><p>{esc(DECIDED_INTRO)}</p></header><div class="decided-list">{''.join(decided_cards)}</div></section>''')
+    statements = ''.join(f'<li>{esc(item["text"])} {refs_markup(item["refs"], sources, quiet=True)}</li>' for item in data['building'])
+    excluded = data.get('not_building', [])
+    not_included = '<h3>Not included</h3><ul class="not-included">' + ''.join(f'<li>{esc(text)}</li>' for text in excluded) + '</ul>' if excluded else ''
+    choices = ''.join(f'<label><input type="radio" name="building" value="{value}"><span>{label}</span></label>' for value, label in [('confirm', 'Confirm'), ('change', 'Change')])
+    building = f'''<section class="workflow building" id="building"><header class="section-heading"><span class="eyebrow">START HERE</span><h2>What we’re building</h2><p>If any of these is wrong, say so before reading on. The rest of this review is detail within them.</p></header>
+<ol class="statements">{statements}</ol>{not_included}
+<article class="decision building-response" id="building-response"><div class="decision-top"><span class="answer-status">Unanswered</span><button type="button" class="clear-answer text-button" aria-label="Clear response to What we’re building" hidden>Clear</button></div>
+<fieldset><legend>Is this what you want built?</legend><div class="choices">{choices}</div></fieldset>
+<label class="comment-label" for="comment-building">What is wrong or missing <span>(optional for confirmation)</span></label>
+<textarea id="comment-building" rows="2" placeholder="Name the statement and what it should say, or what is missing."></textarea></article></section>'''
+    navigation.insert(0, '<a href="#building"><span class="nav-number">00</span><span>What we’re building</span></a>')
     technical_count = len(technical_ids(register_text(data, root)))
     technical_note = '' if not technical_count else (
         f' {technical_count} technical assumption{"s are" if technical_count != 1 else " is"} tracked separately for the build team.')
     asked_count = len(decisions) - len(decided)
     decided_note = '' if not decided else (
         f' {len(decided)} more {"are" if len(decided) != 1 else "is"} already decided and listed at the end; no reply needed.')
+    opening_status = '<p class="opening-status">What we’re building: <strong data-opening>unanswered</strong></p>'
+    if asked_count:
+        mobile_progress = f'What we’re building: <span data-opening>unanswered</span> · Assumptions: <span data-progress>0 of {asked_count} answered</span> · '
+        card_progress = (f'{opening_status}<p class="opening-status">Assumptions: <strong data-progress>0 of {asked_count} answered</strong></p>'
+                         f'<progress max="{asked_count}" value="0" aria-label="Assumptions answered"></progress>'
+                         f'<p>Every question is included.{esc(decided_note)} Partial feedback is welcome; unanswered questions stay open.</p>')
+        panel_progress = (f'<p><strong data-progress>0 of {asked_count} answered</strong>. Choose Change if something is wrong or uncertain, and add a short explanation. '
+                          'Questions with no response are listed together in your reply and remain unconfirmed.</p>')
+    else:
+        # Nothing to count: the opening statements and each section's comment box are still asked.
+        mobile_progress = 'What we’re building: <span data-opening>unanswered</span> · '
+        card_progress = f'{opening_status}<p>No assumptions need an answer.{esc(decided_note)} Comment on any section’s criteria or screens.</p>'
+        panel_progress = '<p>This review has no assumptions to answer. Your reply carries your response to What we’re building and any section comments.</p>'
     source_links = ' · '.join(f'<a href="{esc(s["url"])}" target="_blank" rel="noopener">{esc(s["label"])}</a>' for s in sources.values() if s.get('show', True))
-    payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in ordered], 'sources':sources}
-    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'COUNT':str(asked_count), 'DECIDED_NOTE':esc(decided_note), 'TECHNICAL_NOTE':esc(technical_note), 'NAV':''.join(navigation), 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
+    payload = {'title': data['title'], 'version': version, 'date': data['date'], 'decisions': decisions, 'sections': [{'id':s['id'],'title':s['title']} for s in ordered], 'sources':sources, 'building': {'statements': [item['text'] for item in data['building']], 'not_included': excluded}}
+    replacements = {'TITLE': esc(data['title']), 'SUBTITLE': esc(data['subtitle']), 'SCOPE': esc(data['scope']), 'DATE':esc(data['date']), 'VERSION':version, 'MOBILE_PROGRESS': mobile_progress, 'CARD_PROGRESS': card_progress, 'PANEL_PROGRESS': panel_progress, 'TECHNICAL_NOTE':esc(technical_note), 'NAV':''.join(navigation), 'BUILDING': building, 'SECTIONS':''.join(sections), 'SOURCE_LINKS': source_links, 'DATA':json_safe(payload), 'MANIFEST':json_safe(proof), 'AUTHORING':json_safe(data)}
     output = TEMPLATE.read_text()
     # One pass: authored text must never become another template substitution.
     return re.sub(r'@@([A-Z_]+)@@', lambda m: replacements[m[1]], output)
@@ -341,7 +389,10 @@ def main():
         output = render(data, args.repo_root, args.images_dir)
         args.output.write_text(output)
         words = asked_card_words(data)
-        print(f'Built {args.output.name}: {len(output.encode())} bytes; all open assumptions covered; asked cards average {sum(words) // max(len(words), 1)} visible words, longest {max(words, default=0)}.')
+        rules, intros = shown_words(data)
+        print(f'Built {args.output.name}: {len(output.encode())} bytes; all open assumptions covered; asked cards average {sum(words) // max(len(words), 1)} visible words, longest {max(words, default=0)}; '
+              f'{len(data["building"])} opening statements; {len(rules)} criteria shown, averaging {sum(rules) // max(len(rules), 1)} words, longest {max(rules, default=0)}; '
+              f'section introductions average {sum(intros) // max(len(intros), 1)} words, longest {max(intros, default=0)}.')
 
 
 if __name__ == '__main__':
