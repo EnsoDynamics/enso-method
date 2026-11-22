@@ -98,7 +98,7 @@ Flat in one directory is deliberate: a directory listing groups a parent with it
 
 ### What happens to a phase's document when the phase is split
 
-The parent's file stays, and it becomes a **split record**: its summary, its acceptance-criteria labels, its out-of-scope list, its dependencies, and a `## Split into` table listing the children in execution order with one plain-English sentence each and what each depends on. Everything else the parent doc carried — "Carried forward" items, phase-specific notes, work in progress — is moved into the specific child that will build it, and does not stay on the parent. Its title line says it was split, so anyone who opens it sees at once that it is not the thing to implement.
+The parent's file stays, and it becomes a **split record**: its summary, its acceptance-criteria labels, its out-of-scope list, its dependencies, and a `## Split into` table listing the children in execution order with one plain-English sentence each and what each depends on. Everything else the parent doc carried — "Carried forward" items, phase-specific notes, work in progress — is moved into the specific child that will build it, and does not stay on the parent. Its `**Model tier:**` line is dropped, not moved: each child is judged on its own ("Model Tier"). Its title line says it was split, so anyone who opens it sees at once that it is not the thing to implement.
 
 Rules the split record enforces:
 
@@ -205,6 +205,7 @@ The declaration is a structured write-up the user can check at a glance. For eac
 - **Scope** — which acceptance criteria from the PRD (or from the parent phase, when splitting a phase) this phase covers, by label.
 - **Out of scope for this phase** — what's deferred to later phases.
 - **Dependencies** — the earlier phases this one directly needs, by id, each with what it needs (`1 (the notification records)`), or "None". See "Name every dependency, and only real ones" below.
+- **Model tier** — `demanding`, `standard` or `mechanical`, with the reason for a demanding or mechanical phase ("Model Tier").
 - **Brief rationale** — one line on why this cut.
 
 **Every criterion lands in exactly one phase.** Before declaring, check that the phases' lists together hold every criterion in the PRD exactly once, retired labels and fully superseded criteria excepted (when splitting a phase: every label on the parent). A criterion no phase lists is scope the plan has silently dropped, and one listed twice has no phase that must prove it. A criterion that could only be verified once two phases exist means the cut is wrong; re-cut. Two kinds of criterion legitimately cross a seam:
@@ -245,6 +246,7 @@ Each phase doc should contain:
 - **Pointer to parent documents** — explicit paths to the PRD and the technical design. If helpful, name the specific technical-design section headings this phase implements (don't copy them). A child phase also names its parent phase doc.
 - **Repositories it changes** — when the technical design puts any of this phase's work outside the PRD's own repository, a `**Repositories:**` line beside the pointers names every repository the phase changes, separated by commas: `**Repositories:** returns-api, storefront`. Each is named by the folder name of its checkout, which sits beside the PRD's repository; when the design names a repository some other way, check the folder beside the PRD's repository rather than guessing. The PRD's repository is listed only when the phase changes code in it. A phase that changes only the PRD's repository gets no line, so a single-repository PRD's phase docs never carry one. Tools that run a phase across several repositories read this line to set each one up, so it names only the repositories the design puts this phase's work in. A split record keeps its line; each child gets its own line for its own work, because tools don't pass a parent's line to its children.
 - **Attended** — when the phase does hands-on work, or waits on a planned stop, that the technical design's Delivery section lists, an `**Attended:**` line beside the pointers says what needs a person or a desktop application. Tools that run phases unattended read this line to warn the user before the build starts.
+- **Model tier** — a `**Model tier:**` line beside the pointers on every leaf, saying how capable a model its build needs: `demanding`, `standard` or `mechanical`. "Model Tier" below has the test for each and the form of the line. A split record carries none: when a phase is split its line is dropped, not moved to a child, and each child is judged on its own.
 - **Summary** — 1-2 sentences on what this phase delivers, **in plain English**. Write it for a smart reader who wasn't part of the project: no undefined project shorthand, actors and direction named ("the correction package we hand to Vendor X," not "Correction Handoff"), and nothing claimed beyond what the phase's acceptance criteria actually require. This is the same standard as `prd-writing-standards` → "Plain English for Readers Outside the Project"; the Summary is a gloss on the criteria, so check it against them and confirm it neither overclaims nor underclaims.
 - **Acceptance criteria covered** — list which criteria from the parent PRD are in scope, **by label** (e.g., "AC-REV-01, AC-REV-02, AC-GRP-07"). **Don't re-state the full criterion text** — the implementing AI reads the full PRD before building, and duplication invites drift. The implementer's stale-phase-doc check catches drift between these references and the current PRD.
 - **Out of scope for this phase** — what's deferred to later phases.
@@ -262,6 +264,7 @@ Each phase doc should contain:
 **Repositories:** [folder names, comma-separated] — omit when this phase changes only the PRD's repository
 **Early merge:** [target branch, and the criterion it serves] — omit unless this phase finishes work the technical design's Delivery section names for an early merge
 **Attended:** [what needs a person or a desktop application] — omit unless this phase does hands-on work, or waits on a planned stop, that the technical design's Delivery section lists
+**Model tier:** [demanding, standard or mechanical] — [the reason, for demanding or mechanical; see "Model Tier"]
 
 ## Summary
 [1-2 sentences on what this phase delivers — plain English, no undefined project shorthand.]
@@ -286,6 +289,7 @@ Each phase doc should contain:
 
 **Parent PRD:** docs/prds/user-notifications/user-notifications-prd.md
 **Technical design:** docs/prds/user-notifications/technical-design.md — relevant sections: "Event ingestion", "Data Models"
+**Model tier:** standard
 
 ## Summary
 Ingest domain events and persist them as notification records. No delivery channels yet.
@@ -332,11 +336,11 @@ Split 2026-09-12 when its build began: email's retry queue has to be built and v
 [Unchanged.]
 ```
 
-Add an `Owner` column to the `## Split into` table only when different people run different children. Everything the parent carried beyond these sections — "Carried forward" items, notes, work state — moves to the child that will build it.
+Add an `Owner` column to the `## Split into` table only when different people run different children. Everything the parent carried beyond these sections — "Carried forward" items, notes, work state — moves to the child that will build it; its tier line is dropped.
 
 **If the split is also recorded in a cross-phase plan table** (`project-plan.md` or any table that lists every phase), keep that table to top-level ids with a **"What it does"** column of one plain-English sentence each and a **"Depends on"** column — see "The cross-phase plan table" above. A split parent's row gains a clause naming its children ("split into 2a email, 2b in-app").
 
-**Leave out the fluff.** At creation, a phase doc is a pointer, not a document of record. Do **not** include: restated acceptance-criteria text, copied or paraphrased technical-design content, background or motivation (that's the PRD's job), effort or time estimates, status/owner/date boilerplate, or a narrative defending the split (that was the Step 3 declaration; the split record's one dated line is the whole exception). If a section has nothing phase-specific to say, drop the heading — a row of "N/A" is itself fluff. A typical phase doc **starts at** 10-20 lines; if yours is longer at creation, you're probably duplicating a parent document. Growth *after* creation is different: work routed in from other phases ("Carried forward from Phase N" sections, per the No Loose Ends discipline in `implementation-lifecycle`) is legitimate content, and on a long project it can grow the doc considerably — that's the doc doing its job as the ledger for its phase, not fluff.
+**Leave out the fluff.** At creation, a phase doc is a pointer, not a document of record. Do **not** include: restated acceptance-criteria text, copied or paraphrased technical-design content, background or motivation (that's the PRD's job), estimates of human effort or time, status/owner/date boilerplate, or a narrative defending the split (that was the Step 3 declaration; the split record's one dated line is the whole exception). If a section has nothing phase-specific to say, drop the heading — a row of "N/A" is itself fluff. A typical phase doc **starts at** 10-20 lines; if yours is longer at creation, you're probably duplicating a parent document. Growth *after* creation is different: work routed in from other phases ("Carried forward from Phase N" sections, per the No Loose Ends discipline in `implementation-lifecycle`) is legitimate content, and on a long project it can grow the doc considerably — that's the doc doing its job as the ledger for its phase, not fluff.
 
 ### Step 5: Hand Off
 
@@ -364,6 +368,69 @@ What happens after the documents are written depends on who invoked this skill. 
 > > Use the `implement-from-requirements` skill. Implement `docs/prds/user-notifications/phase-1-event-pipeline.md`. The parent PRD is `docs/prds/user-notifications/user-notifications-prd.md` and the technical design is `docs/prds/user-notifications/technical-design.md`. Work in the PRD's worktree `<org directory>/.worktrees/prd-user-notifications/<repo>`, on branch `prd/user-notifications`, creating it if this is the first phase (`engineering-principles`, "One Branch for a Split PRD"). First: read all three, then size the phase.
 >
 > Valid now: the phase docs are committed (`a1b2c3d`).
+
+---
+
+## Model Tier
+
+Every leaf carries a `**Model tier:**` line saying how capable a model its build needs: `demanding`, `standard` or `mechanical`. It is a recommendation to whoever starts the phase's session, a person or a tool that runs phases, and they map each tier to the models they have. The line never names a model, a vendor or an effort setting.
+
+Judge the tier once the cut is final, one phase at a time, in this order: demanding, then mechanical, otherwise standard. The tier never changes the cut: never split or merge phases to get one.
+
+### Demanding
+
+A phase is demanding only when both of these are true. Either one alone does not make it demanding.
+
+**1. It is hard to get right.** One of the acceptance criteria the phase owns or completes requires one of the things below; a criterion listed as `(also applies to this phase's work)` does not count. The criterion is the test: "a payment that is retried charges the card once" is a criterion that requires handling repeated work, and a phase whose code merely uses a queue, with no criterion about work arriving twice, has nothing here.
+
+| Hard thing | A criterion requires it | Not this |
+|---|---|---|
+| **Concurrent or repeated work** | A correct result when two things change the same state at once, or when the same work arrives twice: locking, retries, idempotency, ordering. | A queue or scheduled job used the way the codebase already uses one. |
+| **Rules that interact** | An outcome that depends on several rules combining (precedence, overrides, proration, time zones), where the criteria name outcomes without listing every combination. | One rule applied the same way everywhere. |
+| **A decision the design left open** | A result whose data model, interface or approach the technical design does not settle, so the build has to choose it. | Building what the design already specifies. |
+
+**2. Getting that criterion wrong is costly.** The work the criterion covers does one of these:
+
+- **Money:** it computes or moves what someone is charged, paid or owed. Showing an amount computed elsewhere is not this.
+- **Access:** it decides who may see or change something. A new screen under an access rule that already exists is not this.
+- **Lost or corrupted records:** a wrong result loses or corrupts records the business relies on (a stock count, a booking, a table migrated in place), and running it again does not put them right. Adding a table or a column, or a backfill that can be re-run, is not this.
+- **Built on:** it chooses a data model or an interface the technical design did not specify, and a later phase or a system outside this PRD is written against that choice. A later phase using what the design already specified is not this.
+
+Size is not part of the test. Neither is being the first phase, having many criteria, or using a library new to the codebase.
+
+### Mechanical
+
+A phase is mechanical only when every one of these holds:
+
+1. **It repeats a worked example.** The same kind of thing already exists in the repository, or an earlier phase of this plan builds it first, and this phase is that pattern with new names. You can name the example by path or by phase id.
+2. **Nothing is left to decide.** The example and the technical design settle every structure, name and behavior.
+3. **A direct test proves each criterion** (given this input, expect that output), and none of them requires a hard thing from the table above.
+4. **It only adds.** It changes no behavior that existing code relies on, and whatever a later phase uses from it has the shape the example already set.
+
+### Standard
+
+Everything else, and the answer whenever either test is in doubt. Most phases are standard: one capability built from a settled design and proved by ordinary tests.
+
+### The line
+
+A demanding line names the criterion, the hard thing and what makes it costly; a mechanical line names the example it repeats; a standard line has no reason:
+
+```markdown
+**Model tier:** demanding — AC-PAY-04 requires one charge when a payment is retried (repeated work; money)
+**Model tier:** mechanical — repeats phase 3's table import (`src/imports/orders.py`) for three more tables
+**Model tier:** standard
+```
+
+| Phase | Tier | Why |
+|---|---|---|
+| Charge a card with retries; a criterion says a retried payment charges once | demanding | Repeated work, and it is money |
+| Role rules where a team override beats an organization default; the criteria give outcomes, not every combination | demanding | Rules that interact, and they decide access |
+| An event schema the design leaves to the build, read by three later phases | demanding | A decision left open, and later phases are written against it |
+| Reserve stock at checkout; a criterion says two buyers cannot both get the last item | demanding | Concurrent work, and a wrong result corrupts the stock count |
+| Send notifications by email with a retry queue a later phase reuses; a criterion says an outage never sends twice | standard | Hard, but a duplicate email is cheap, and the design specified the queue |
+| Show an order total that the pricing service computes | standard | Touches money, with nothing hard in it |
+| The first phase, standing up the shared data model the design specifies | standard | Nothing hard: the design made the decisions |
+| Three more table imports, built the way phase 3 built one | mechanical | Same pattern, nothing to decide, direct tests, and the tables have the shape phase 3 set |
 
 ---
 
@@ -407,7 +474,7 @@ Execution-order rules still hold: a child may only depend on phases earlier in t
 
 ## Completion Phases
 
-`delivery-audit` adds completion phases once every planned phase of a PRD has closed and some criterion turns out not fully built, and `test-audit` adds one for a criterion it later finds unbuilt or broken past a small fix. `assumptions-document-feedback` adds one, a **feedback phase**, when stakeholder feedback changes or adds criteria after every planned phase has closed, and `implement-from-discovery` adds one, a **fix phase**, for a fix it was asked to build that is too big for one session (its Phase 4). They exist only once every planned phase is closed; before that, a gap, a feedback change or a fix goes into the next open planned phase as carried-forward work. The one exception is a feedback change or a fix that finds every open planned phase already being built: it gets a feedback or fix phase at the end, because a phase whose session is running would close without it. This section owns their form; the skill that adds one decides what goes in it. A completion phase is an ordinary leaf: `implement-from-requirements` builds it, verifies it and writes its Closed line. It differs from a planned phase in four ways.
+`delivery-audit` adds completion phases once every planned phase of a PRD has closed and some criterion turns out not fully built, and `test-audit` adds one for a criterion it later finds unbuilt or broken past a small fix. `assumptions-document-feedback` adds one, a **feedback phase**, when stakeholder feedback changes or adds criteria after every planned phase has closed, and `implement-from-discovery` adds one, a **fix phase**, for a fix it was asked to build that is too big for one session (its Phase 4). They exist only once every planned phase is closed; before that, a gap, a feedback change or a fix goes into the next open planned phase as carried-forward work. The one exception is a feedback change or a fix that finds every open planned phase already being built: it gets a feedback or fix phase at the end, because a phase whose session is running would close without it. This section owns their form; the skill that adds one decides what goes in it. A completion phase is an ordinary leaf: `implement-from-requirements` builds it, verifies it and writes its Closed line, and it gets a `**Model tier:**` line by the same test as any phase ("Model Tier"). It differs from a planned phase in four ways.
 
 - **It goes at the end, as the next top-level id.** After phases 1 to 6, the first completion phase is phase 7, the next phase 8. Nothing already in the plan changes id. The rule against appending trailing siblings is about a phase's remainder, which a completion phase is not; an unsplit PRD's first completion phase is phase 1, listing each criterion as `AC-RET-03 (completes it)`, and from then on the PRD has a plan and closes like a split one. The phase that owns each criterion keeps its Closed line, because that line records what its session built, and removing it would send the next build back into finished work.
 - **It completes criteria; it does not own them.** Each is listed as `AC-RET-03 (completes it; owned by phase 2)` under "Acceptance criteria covered", or, in a feedback or fix phase whose criterion was amended, `AC-RET-03 (amended 2026-10-27; owned by phase 2)`. The criterion stays with its original phase, so every criterion is still in exactly one phase. The build proves the whole criterion, not only the missing or changed part. The one criterion a completion phase owns outright is one the feedback or the fix added, listed by its label alone.
@@ -425,6 +492,7 @@ Gaps too big for one session are cut into several completion phases by the usual
 **Parent PRD:** docs/prds/customer-returns/customer-returns-prd.md
 **Technical design:** docs/prds/customer-returns/technical-design.md — relevant sections: "Return submission", "Confirm screen"
 **Repositories:** returns-api, storefront
+**Model tier:** standard
 
 ## Summary
 Let one return cover several items, and show the refund method before the customer confirms.
@@ -455,6 +523,7 @@ AC-RET-03 (completes it; owned by phase 2), AC-RET-07 (completes it; owned by ph
 - Number phases in the order they will actually be executed — sequentially, each built and verified before the next starts. Dependencies may only point backward, and the sequence must survive the sequential walkthrough: the natural build order at every step, not just a dependency-valid one.
 - Name each phase's direct dependencies by id, with what it needs from each, or "None" — in its phase doc, its split record's `## Split into` table, and any plan table — so the dependency tree is readable at a glance.
 - Use positional ids (`2`, `2a`, `2a1`) and the filename `phase-{id}-{short-name}.md`, one file per phase at every depth, all flat in the PRD directory.
+- Give every leaf a `**Model tier:**` line, judged after the cut is final: standard unless both demanding tests hold or every mechanical condition holds.
 - Decide the split, declare it in the response, and write the documents in the same turn.
 - When splitting a phase already in the plan, convert its document into a split record and move its carried-forward items and work state into the children that will build them.
 - Keep phase docs as thin scope overlays on the parent PRD and the single technical design **at creation** — later growth from work routed in by other phases is legitimate.
