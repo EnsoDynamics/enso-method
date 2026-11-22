@@ -244,7 +244,12 @@ A phase doc is a **scope-setting overlay** on the parent PRD and the single tech
 Each phase doc should contain:
 
 - **Pointer to parent documents** — explicit paths to the PRD and the technical design. If helpful, name the specific technical-design section headings this phase implements (don't copy them). A child phase also names its parent phase doc.
-- **Repositories it changes** — when the technical design puts any of this phase's work outside the PRD's own repository, a `**Repositories:**` line beside the pointers names every repository the phase changes, separated by commas: `**Repositories:** returns-api, storefront`. Each is named by the folder name of its checkout, which sits beside the PRD's repository; when the design names a repository some other way, check the folder beside the PRD's repository rather than guessing. The PRD's repository is listed only when the phase changes code in it. A phase that changes only the PRD's repository gets no line, so a single-repository PRD's phase docs never carry one. Tools that run a phase across several repositories read this line to set each one up, so it names only the repositories the design puts this phase's work in. A split record keeps its line; each child gets its own line for its own work, because tools don't pass a parent's line to its children.
+- **Repositories it changes** — when the technical design puts any of this phase's work outside the PRD's own repository, a `**Repositories:**` line beside the pointers names every repository the phase changes, separated by commas: `**Repositories:** acme/returns-api, acme-labs/storefront`. Name each by its address path, never a folder name or a path on one computer:
+  - **The address path** is the part of the repository's remote address after the host, without `.git`: `git@github.com:acme-labs/storefront.git` gives `acme-labs/storefront`.
+  - **Read it** from the repository's checkout (`git remote get-url origin`), or else from an address the PRD or technical design writes out. When neither gives it, write the best-supported address and add a technical assumption to the PRD's assumptions register (`assumptions-document-writing`) naming the phase, saying no checkout or written address was available, and saying the checkout's `origin` settles it. The entry rides in the phase documents' commit. Then carry on.
+  - **Put the host in front**, as `<host>:<path>`, only when two of the PRD's repositories share an address path on different hosts. Use the host's real name, never an SSH alias (`ssh -G <alias>` gives the real one).
+
+  The PRD's repository is listed only when the phase changes code in it. A phase that changes only the PRD's repository gets no line, so a single-repository PRD's phase docs never carry one. Tools that run a phase across several repositories read this line to set each one up, so it names only the repositories the design puts this phase's work in. A split record keeps its line; each child gets its own line for its own work, because tools don't pass a parent's line to its children.
 - **Attended** — when the phase does hands-on work, or waits on a planned stop, that the technical design's Delivery section lists, an `**Attended:**` line beside the pointers says what needs a person or a desktop application. Tools that run phases unattended read this line to warn the user before the build starts.
 - **Model tier** — a `**Model tier:**` line beside the pointers on every leaf, saying how capable a model its build needs: `demanding`, `standard` or `mechanical`. "Model Tier" below has the test for each and the form of the line. A split record carries none: when a phase is split its line is dropped, not moved to a child, and each child is judged on its own.
 - **Summary** — 1-2 sentences on what this phase delivers, **in plain English**. Write it for a smart reader who wasn't part of the project: no undefined project shorthand, actors and direction named ("the correction package we hand to Vendor X," not "Correction Handoff"), and nothing claimed beyond what the phase's acceptance criteria actually require. This is the same standard as `prd-writing-standards` → "Plain English for Readers Outside the Project"; the Summary is a gloss on the criteria, so check it against them and confirm it neither overclaims nor underclaims.
@@ -261,7 +266,7 @@ Each phase doc should contain:
 **Parent PRD:** [path to {prd-name}-prd.md]
 **Technical design:** [path to technical-design.md] — relevant sections: [heading(s)]
 **Parent phase:** [path to phase-2-{short-name}.md] — omit unless this phase is a child of a split record
-**Repositories:** [folder names, comma-separated] — omit when this phase changes only the PRD's repository
+**Repositories:** [address paths, comma-separated] — omit when this phase changes only the PRD's repository
 **Early merge:** [target branch, and the criterion it serves] — omit unless this phase finishes work the technical design's Delivery section names for an early merge
 **Attended:** [what needs a person or a desktop application] — omit unless this phase does hands-on work, or waits on a planned stop, that the technical design's Delivery section lists
 **Model tier:** [demanding, standard or mechanical] — [the reason, for demanding or mechanical; see "Model Tier"]
@@ -491,7 +496,7 @@ Gaps too big for one session are cut into several completion phases by the usual
 **Added by delivery audit:** 2026-10-18, after every planned phase closed. It builds what earlier phases left out of the criteria below.
 **Parent PRD:** docs/prds/customer-returns/customer-returns-prd.md
 **Technical design:** docs/prds/customer-returns/technical-design.md — relevant sections: "Return submission", "Confirm screen"
-**Repositories:** returns-api, storefront
+**Repositories:** acme/returns-api, acme-labs/storefront
 **Model tier:** standard
 
 ## Summary
