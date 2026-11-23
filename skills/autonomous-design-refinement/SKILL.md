@@ -130,7 +130,7 @@ An area can be mixed; record it per component ("Salvage for the retry worker; Pr
 Started: {date}   Current pass: {N}   Status: {In progress | Paused: reason}
 Branch: {branch the documents are on}
 Existing code posture: {Preserve | Salvage | per component} (source: {user | PRD | TD | default})
-PRD words: at start {wc -w} · growth baseline {wc -w; reset when the user says continue after a growth pause}
+PRD words: at start {wc -w} · growth baseline {wc -w}, blob {git hash-object -w} (reset by each growth check, and by a feedback amendment applied on a resume)
 Last updated: {date time}
 
 ## Documents
@@ -197,6 +197,7 @@ The orchestrator stays thin. It reads the state file, decides what to do next, l
 | Investigate one question | One `investigate-question` subagent | Verdict, confidence, the answer as document-ready prose, evidence pointers — a few hundred words, not a report |
 | Fold one answer | One writer subagent, never more than one at a time | What changed, where — a few lines |
 | Conformance | One subagent per pass | Issues found and fixed — a short list |
+| Growth check (only when the PRD's growth trips it) | One subagent, which edits nothing; then the fold writer | Each added passage that is a new obligation, decision history or a code-level decision |
 | Convergence, checkpoint | Orchestrator | — |
 | Consolidation (last, once) | One writer subagent per document, one at a time within a document | Repeats replaced, deletions by category, disagreements raised, words before and after |
 | Consolidation check | One subagent | Pass or the hunks that failed, each with its reason |
@@ -218,6 +219,7 @@ If a subagent fails, retry once. If it fails again:
 - **Discovery:** the pass cannot proceed. Set Status to `Paused: discovery failed` with the error and report to the user.
 - **Conflict check:** record `not run` and the error under **Conflict check**, and say so in the completion report. The completion commit then carries no `Conflict check:` line, so the build runs its own full check.
 - **Conformance:** skip it for this pass, note the skip in the state file, and run it at the next checkpoint.
+- **Growth check:** leave the growth baseline as it is and note the skip in the state file. The next checkpoint, or Phase 7, runs it; if it has still not run at completion, say so in the completion report.
 - **Final verification:** report the documents as not verified; do not mark them ready.
 - **Consolidation writer:** leave that document as the completion commit has it and say so in the consolidation summary.
 - **Consolidation check:** do not stage the consolidation; report it as unchecked.
@@ -232,10 +234,10 @@ If a session-limit or context warning appears: finish the in-flight question, up
 
 ### Phase 1: Setup and Re-orientation
 
-**Pending feedback changes come first,** on a fresh start and on every resume. A `{name}-pending-feedback-changes.md` beside the PRD means a stakeholder round has changed what it must say: apply it with `assumptions-document-feedback`, which resumes from that file (its Step 4a, "Resuming"), commit that amendment on its own, then continue.
+**Pending feedback changes come first,** on a fresh start and on every resume. A `{name}-pending-feedback-changes.md` beside the PRD means a stakeholder round has changed what it must say: apply it with `assumptions-document-feedback`, which resumes from that file (its Step 4a, "Resuming"), commit that amendment on its own, then continue. When a state file already exists, reset its growth baseline to the PRD as amended.
 
 1. **Check for a state file** at the expected location. If present, read it, confirm the documents still exist, and continue from **Next action**. Do not restart from discovery unless the state file says the current pass is complete.
-2. **If starting fresh**, locate all requirements documents — PRD, technical design, assumptions (if any), and supporting materials the documents reference — and create the state file from the template. Record the paths, the PRD's word count, and the existing code posture; do not read full contents here (search the PRD and design for a stated posture rather than reading them whole).
+2. **If starting fresh**, locate all requirements documents — PRD, technical design, assumptions (if any), and supporting materials the documents reference — and create the state file from the template. Record the paths, the PRD's growth baseline (`wc -w`, and `git hash-object -w {PRD}`, which keeps the file as it stands, committed or not), and the existing code posture; do not read full contents here (search the PRD and design for a stated posture rather than reading them whole).
 3. **Verify environment access** — databases, APIs, infrastructure, whatever investigation may need. Record limitations up front under Blockers rather than discovering them mid-pass.
 4. **Confirm the repo state** — the documents' branch, and that the tree is clean apart from the requirements documents and state file. Record the branch in the state file.
 
@@ -313,13 +315,20 @@ Conformance also confirms that the Technical Design's Open Questions section, an
 ### Phase 5: Checkpoint
 
 1. Update the Passes table and **Next action** in the state file.
-2. Commit the requirements documents (including any mockups a fold redrew) and the state file — only those files; exploration scripts are the user's to stage — as `docs({feature}): design refinement pass {N} — {one-line summary}`, with a body naming what changed. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"), and then the files are staged and the message presented. Committing at the pass boundary is what protects the work from other sessions' git operations in the same checkout. It never pushes.
-3. Output the checkpoint summary:
+2. **Run the growth check when the PRD (`wc -w`) has grown by more than a quarter and more than 500 words since the growth baseline.** The run does not pause for it. Launch one subagent with the scope gate, the state file and the PRD's diff against the baseline blob (`git diff {blob} -- {PRD}`; if the blob is gone, against the PRD at the parent of the run's first `design refinement pass` commit). It edits nothing. It reads every added passage and returns each one that is:
+   - **A new obligation:** one no statement in the baseline PRD implies, marked when the feature cannot work without it. A `Replaces:` line, and a statement that settles a question the conflict check raised, are never one.
+   - **Decision history.**
+   - **A code-level decision.**
+
+   Every other added passage stays. A writer, serialized with the folds, takes each new obligation out of the PRD and out of whatever in the design, the assumptions and the mockups rests only on it, removes the decision history (git keeps it), and moves each code-level decision to the Technical Design. For an obligation marked as one the feature cannot work without, the writer adds an entry to the design's Open Questions (the scope gate); for every other, the orchestrator writes one line under **Noticed, out of scope**. Add each criterion the writer changed under **Changed after pass 1**, and reset the growth baseline to the PRD as it now stands.
+3. Commit the requirements documents (including any mockups a fold redrew) and the state file — only those files; exploration scripts are the user's to stage — as `docs({feature}): design refinement pass {N} — {one-line summary}`, with a body naming what changed. This is the default; the user's instructions override it (`pre-commit-validation`, "Who Commits"), and then the files are staged and the message presented. Committing at the pass boundary is what protects the work from other sessions' git operations in the same checkout. It never pushes.
+4. Output the checkpoint summary:
 
 ```
 === Pass {N} complete ===
 Surfaced (new) {S} · taken {T} · resolved {R} · assumptions {A} · deferred {D} · blocked {B} · dropped {X}
 Documents: PRD +{n}/-{m} ({start} → {now} words) · TD +{n}/-{m} ({now} words) · Assumptions +{n}/-{m} ({k} entries)
+PRD growth check: {not triggered | {w} words added since the baseline: {t} obligations taken out, {h} passages of history removed, {c} decisions moved to the design | not run: {reason}}
 Exploration scripts this pass: {list or none} (not staged — yours to add)
 Out of scope noticed: {count} (see state file)
 Blockers: {list or none}
@@ -340,13 +349,12 @@ An implementable business assumption written to standard counts as dispositioned
 - A business question genuinely meets the Blocking Open Question standard in `assumptions-document-writing`
 - Three or more questions are blocked by the same missing access or prerequisite
 - Two consecutive passes each resolved fewer than two questions — the run has hit a ceiling worth a human look
-- The PRD (`wc -w` at the checkpoint) has grown by more than a quarter and more than 500 words since the growth baseline. Refinement clarifies requirements, so growth that large usually means scope or decision history is being added. Report what grew and let the user decide; if they say continue, reset the baseline to the current count
 
 The ordinary count of business assumptions awaiting validation is never a reason to pause.
 
 ### Phase 7: Completion
 
-1. **Final conformance pass** (as Phase 4).
+1. **The growth check** when its threshold is tripped (Phase 5, step 2), then the **final conformance pass** (as Phase 4).
 2. **Re-run the conflict check for the criteria listed under Changed after pass 1.** An empty list counts as a check that ran. Fold or raise its findings as in pass 1; a raised question goes to Phase 3 like the final verification's. Record the result under **Conflict check**.
 3. **Final verification** — one more `implementation-readiness-check` subagent, scope-gated, against the finished documents. If it surfaces new questions below the threshold and passes remain, treat them as a new pass and go to Phase 3. If the maximum is reached with questions still below threshold, report `Maximum passes reached` and mark the documents not ready. Never label that result `Converged`.
 4. **Write the completion report** (below) from the state file, while it still exists.
@@ -359,6 +367,7 @@ The ordinary count of business assumptions awaiting validation is never a reason
 
 Passes: {N}   Final status: {Converged | Maximum passes reached}
 Existing code posture: {posture} (source: {source})   PRD words: {start} → {end}
+PRD growth check: {not triggered | ran {n} times, {t} obligations taken out | not run: {reason}}
 Questions across all passes: {total} — resolved {R}, captured as assumptions {A}, still below threshold {W}
 
 Document updates:
