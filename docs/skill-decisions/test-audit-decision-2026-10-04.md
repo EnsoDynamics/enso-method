@@ -109,3 +109,20 @@ A fixing chat's re-grade reads the whole criterion fresh, and that read sometime
 **Revisit when**
 
 - Re-grades keep naming new parts on the same row, chat after chat: the audit's part lists are too thin, and the checklist's steps need tightening.
+
+## Revised 2026-11-23: the audit plans the fixing in batches, and never fixes itself
+
+**The problem.** Each fixing chat chose its own batch when it started, and "usually a group that shares test setup" led it to take one or two rows. Writing and proving a row's tests takes minutes; the full suite, which each chat runs once as its commit gate, can take an hour or more. So a long suite was run again for every row or two, and nobody could say how many more chats were coming, because no chat sized the work as a whole.
+
+**Options considered**
+
+1. **A cap on fixing chats per audit.** Rejected: it leaves found gaps unfixed, and a second limit beside the audit limit is one more thing to explain.
+2. **A fixed number of rows per chat.** Rejected: rows differ too much in size, and `phase-split` already has the sizing test.
+3. **Chosen: the audit chat cuts To fix into batches by `phase-split`'s sizing test** (one batch unless the rows honestly won't fit one session, never a split for safety margin) and lists them at the top of To fix. A fixing chat takes one whole batch. The plan lives in `test-audit.md`, which already exists, so no phase documents are written and nothing is left behind when the rows are fixed.
+
+**The audit chat no longer fixes a short list itself.** The 2026-10-29 exception (about three gaps or fewer) kept momentum for small scopes, but it made the audit chat's time and result a mix of auditing and fixing, and it was the one place this audit differed from `delivery-audit`, which builds nothing. A fresh fixing chat costs a session's start-up; the suite runs once either way.
+
+**Revisit when**
+
+- Fixing chats often re-cut their batch as too large: the audit is sizing too generously, and the sizing sentence needs a tighter test.
+- Audits with one or two trivial gaps are common and the extra chat is felt: bring back a same-chat fix for a single row.

@@ -6,7 +6,7 @@ user-invocable: true
 
 # Test Audit
 
-An independent check, run once a phase or a whole PRD is finished, of how well the tests prove its acceptance criteria, followed by fixing what it finds. The audit chat grades every criterion's test evidence and writes the map to `test-audit.md` in the PRD's directory. When the gaps are few it fixes them in the same chat; otherwise fixing chats fill the gaps in a fixed order until every criterion has credible evidence or the user accepts what remains. Each chat takes a batch it can hold and hands the rest on through that file.
+An independent check, run once a phase or a whole PRD is finished, of how well the tests prove its acceptance criteria, followed by fixing what it finds. The audit chat grades every criterion's test evidence and writes the map to `test-audit.md` in the PRD's directory. It fixes nothing: it plans the fixing in batches, and fixing chats then fill the gaps in a fixed order until every criterion has credible evidence or the user accepts what remains. Each fixing chat takes one batch and hands the rest on through that file.
 
 Unlike `test-hardening`, which each implementation session runs on its own criteria as its implementer describes them, this audit covers the finished whole, takes the criteria from the PRD itself, and breaks code on purpose to see which tests notice.
 
@@ -83,9 +83,11 @@ These limit the work a chat takes on, never what the audit finds: every criterio
 - **No suite runs in the audit.** It assumes the suite passes (Step 1). The only tests it runs are the ones a red check aims at, by name.
 - **About ten red checks of existing evidence per chat,** counting widening checks and red checks still to run. A check whose test takes more than about five minutes a run counts as two. The red check each new test gets in Step 5 is part of writing that test and doesn't count.
 - **Widening stops at three.** A green check adds checks for at most three other criteria resting on the same test file or pattern.
-- **Checks past the cap or the widening limit** go under To fix as **red checks still to run**. When the cap stops a fixing chat partway through them, it goes on to the Weak rows; the cap outranks finishing a tier.
-- **The audit chat closes at Step 4** unless To fix holds about three rows or fewer, none of them a delivery gap.
-- **A fixing chat takes one batch:** the rows it can build and verify in one session, sized the way `phase-split` sizes a phase, usually a group that shares test setup. It finishes work in progress before handing off: no check unrestored, no test half written.
+- **Checks past the cap or the widening limit** go under To fix as **red checks still to run**. When the cap stops a fixing chat partway through them, it goes on to the Weak rows in its batch; the cap outranks finishing a tier.
+- **The audit chat closes at Step 4 and fixes nothing,** however few the gaps; the fixing starts in a fresh chat.
+- **The audit plans the fixing in batches.** A batch is the rows one fixing chat can build and verify, cut by `phase-split`'s sizing test: one batch unless the rows honestly will not fit one session, never a split for safety margin, and never more red checks still to run than the cap above allows a chat. Every fixing chat runs the full suite once, which often costs more than the rows it fixes, so a thin batch spends a session on a suite run. Batches follow the fixing order and are listed at the top of To fix (`**Batch 1 of 2:** AC-…`), so a reader sees how many fixing chats are coming.
+- **A fixing chat takes the first batch listed, whole.** It finishes work in progress before handing off: no check unrestored, no test half written. When it closes, it removes its batch's line; the lines left keep their numbers.
+- **A fixing chat changes the batches in two cases.** One that finds rows under To fix in no batch cuts them into batches before it starts. One that leaves rows of its batch unfinished re-cuts them into the batches after it, adding a batch when they will not fit, and updates the count on every line.
 - **Most significant first,** so what is left is least important. Rows within a tier: high risk, then the most required parts uncovered, then rows sharing setup with others so one fix raises several. Red checks: high-risk criteria, then evidence the most other criteria rest on.
 - **Two short re-grades make a row stuck.** Each re-grade that finds a part this chat worked still not covered adds `tried <date>: <what was done; what the re-grader still found>` to the row's To fix entry. A part the re-grader names that To fix did not list is a new gap: add it to the row's entry to be worked like any other, with no `tried` line. At the second `tried` line, mark it `stuck`, stop working it, and name it in the wrap-up; no chat works it again until the user says how (a different approach, a requirement clarified through the assumptions document, or acceptance). A stuck row never stops the chat early: finish Step 6 (commit, record it as stuck in `test-audit.md`, hand off), and ask about it only in the wrap-up.
 
@@ -140,11 +142,11 @@ A red check breaks the behavior on purpose and watches whether a test notices. R
 
 Consolidate the sub-agents' records and the red-check results into the file (template below). Confirm every Not implemented row and every failing mapped test yourself before writing it down: the user or a build will act on them. Then report in chat in the shape under "What the Chat Shows".
 
-**Then decide whether this chat also fixes.** It goes straight on to Step 5 only when the gaps are few, about three rows under To fix with no delivery gap among them. Otherwise this chat is the audit, and it closes without fixing: write any completion phase or carried-forward section a delivery gap calls for (Step 5, "A delivery gap"), then Step 6's items 4 to 7, committing the record (with any criterion amendment) under a `docs(scope): …` message. There is nothing to re-grade, no tests to commit first, and no changed code to run the suite for. The handoff is to a build when a completion phase is open, and otherwise to the first fixing chat. If the user asked for the audit alone, it closes the same way but writes no completion phase and no prompt unless asked; its Not implemented rows wait for the next run. The report's Next line says which; never ask whether to fix.
+**Then close the audit.** This chat is the audit, and it closes without fixing: cut any rows under To fix into batches (Bounding Each Chat), write any completion phase or carried-forward section a delivery gap calls for (Step 5, "A delivery gap"), then Step 6's items 4 to 7, committing the record (with any criterion amendment) under a `docs(scope): …` message. There is nothing to re-grade, no tests to commit first, and no changed code to run the suite for. The handoff is to a build when a completion phase is open, and otherwise to the first fixing chat. If the user asked for the audit alone, it closes the same way but writes no completion phase and no prompt unless asked; its Not implemented rows wait for the next run. The report's Next line says which; never ask whether to fix.
 
 ### Step 5: Remediate
 
-A fixing chat, or an audit chat with few gaps, works the rows under To fix.
+A fixing chat works the rows under To fix.
 
 **The target is every criterion in scope at Adequate or better, with no red check still to run,** apart from rows the user accepts. Strong is optional: work it only on request, and recommend it for high-risk criteria still below it. A row this chat cannot raise leaves the target and goes under Waiting in the file, and the chat that puts it there tells the user: a blocked row, one this chat could not raise for a stated reason, or a row **waiting on delivery** ("A delivery gap", below). Never for lack of room in this chat: unfinished rows stay under To fix for the next one.
 
@@ -157,7 +159,7 @@ A fixing chat, or an audit chat with few gaps, works the rows under To fix.
 
 Within a tier, rows go in the order "Bounding Each Chat" gives, high risk first, and a tier is finished before the next one starts.
 
-**Take a batch the chat can hold** (Bounding Each Chat); the rest continues in the next one. While iterating on a row, run only its tests; the full suite runs once, in Step 6, as the commit gate. Remediation is planned in `test-audit.md` alone, never in phase documents, a PRD amendment or a change directory.
+**Take the first batch listed under To fix, whole** (Bounding Each Chat); the batches after it go to the chats after this one. While iterating on a row, run only its tests; the full suite runs once, in Step 6, as the commit gate. Remediation is planned in `test-audit.md` alone, never in phase documents, a PRD amendment or a change directory.
 
 **Every test added or strengthened:**
 
@@ -175,10 +177,10 @@ Within a tier, rows go in the order "Bounding Each Chat" gives, high risk first,
 
 ### Step 6: Re-grade, record, hand off
 
-1. **Re-grade with fresh eyes.** Send the rows this chat worked to fresh sub-agents under the Assessment Checklist, batched as in Step 2; the grades come from them, not from the chat that wrote the tests. This replaces a separate `test-hardening` pass. Their findings go back under To fix, and this chat works them only when they fit the batch it took on.
+1. **Re-grade with fresh eyes.** Send the rows this chat worked to fresh sub-agents under the Assessment Checklist, batched as in Step 2; the grades come from them, not from the chat that wrote the tests. This replaces a separate `test-hardening` pass. Their findings go back under To fix as rows of this chat's batch; the ones it leaves unfinished are re-cut into the batches after it (Bounding Each Chat).
 2. **Run the full suite**, the commit gate for the tests and code this chat changed, naming the command: green apart from pre-existing failures, which are named.
 3. **Commit the tests and any code fixes** per `pre-commit-validation`, under `test(scope): …`, or `fix(scope): …` when it fixed code, with the repo named. They go first, in a commit of their own, so the Checked column can name a commit that holds them.
-4. **Update `test-audit.md`:** the table, To fix, Waiting, Accepted and the Status line. A row graded in this chat gets item 3's commit as its Checked commit, or HEAD when this chat committed nothing. The Status line reads `Done <date>` only when nothing is left to fix, no red check is still to run, and no row waits on delivery; accepted rows count as settled, and a blocked row can still be waiting. Otherwise it names every reason it isn't Done, as in `4 to fix (AC-RET-03, …); 2 red checks to run; stuck: AC-RET-06; waiting on delivery: AC-RET-08 (phase 8); 1 not implemented, not phased (audit only)`.
+4. **Update `test-audit.md`:** the table, To fix with its batch lines (Bounding Each Chat), Waiting, Accepted and the Status line. A row graded in this chat gets item 3's commit as its Checked commit, or HEAD when this chat committed nothing. The Status line reads `Done <date>` only when nothing is left to fix, no red check is still to run, and no row waits on delivery; accepted rows count as settled, and a blocked row can still be waiting. Otherwise it names every reason it isn't Done, as in `4 to fix (AC-RET-03, …); 2 red checks to run; stuck: AC-RET-06; waiting on delivery: AC-RET-08 (phase 8); 1 not implemented, not phased (audit only)`.
 5. **Hand off or close.** Write the next chat's prompt with `continuation-prompt` before item 6's commit, so its edits to `test-audit.md` ride in it; the file is the governing document. Which prompt, taking the first case that applies:
    - **A completion phase this audit added is open:** `implement-from-requirements` on it, with that phase's lineage (`This chat: implements it.`). Building comes before proving, whatever is left to fix; when the last open leaf closes, the build hands off by its own wrap-up rule (`implement-from-requirements`, Phase 8), which brings this audit back.
    - **Every phase is closed, but no current clean whole-PRD delivery audit covers the work:** `delivery-audit` on the whole PRD (`delivery-audit` defines currentness). This includes small implementation fixes made in this test audit. After a clean delivery audit, return here and reassess affected rows under Step 1; retain unchanged evidence.
@@ -217,6 +219,8 @@ One per PRD directory, written by this skill and updated in place by every later
 
 ## To fix, in order
 
+**Batch 1 of 1:** AC-RET-03, AC-RET-06, AC-RET-02
+
 **Missing**
 - **AC-RET-03:** neither part is tested (several eligible items in one return; every item listed on it). Fix: submit two eligible items through the returns API against the sandbox, and assert both lines on the created return.
 
@@ -244,7 +248,7 @@ One per PRD directory, written by this skill and updated in place by every later
 
 The file holds the full map; the chat shows only what needs attention. No legend, no list of what passed, no account of how the audit ran.
 
-**After the audit (Step 4):** a headline saying how many criteria have test gaps; a table of just those criteria, in the order they will be fixed, each with what's wrong in one line (past about fifteen rows, the high-risk ones and "and N more in the file"); the user's actions, from blocked Waiting rows, and the phase each delivery gap went to; each criterion amended to match the technical design, one line each; then what happens next and the file's path. With no gaps, the headline, any amendments and the path are the whole report. When this chat closes as the audit, Next names the chat that follows, and its prompt ends the report.
+**After the audit (Step 4):** a headline saying how many criteria have test gaps; a table of just those criteria, in the order they will be fixed, each with what's wrong in one line (past about fifteen rows, the high-risk ones and "and N more in the file"); the user's actions, from blocked Waiting rows, and the phase each delivery gap went to; each criterion amended to match the technical design, one line each; then what happens next, with how many fixing chats are planned, and the file's path. With no gaps, the headline, any amendments and the path are the whole report. When this chat closes as the audit, Next names the chat that follows, and its prompt ends the report.
 
 ```markdown
 **Test audit, Customer Returns (whole PRD): 2 of 6 criteria have test gaps.** 3 are Adequate or better; 1 is blocked.
@@ -256,7 +260,7 @@ The file holds the full map; the chat shows only what needs attention. No legend
 
 **Your action:** ask the shipping carrier for a test account; AC-RET-04 can't be tested without one.
 
-**Next:** writing a test for AC-RET-03. Full map: `docs/prds/customer-returns/test-audit.md`
+**Next:** one fixing chat, for everything under To fix. Full map: `docs/prds/customer-returns/test-audit.md`
 ```
 
 **At the wrap-up (Step 6):** a headline with the gaps fixed out of the gaps found; what is still open and where it goes; how the result was checked; the user's actions, any criterion amended to match the technical design, any stuck row, any offer to accept the rows left, and any Strong recommendation; then the commit and, when gaps remain or rows wait on delivery, the next chat's prompt.
@@ -310,7 +314,7 @@ Report one record per criterion with these fields. Observations outside the crit
 - Take the criteria from the document the user points at, and grade every one by the same question: would the suite notice if it broke?
 - Have the assessors read the requirements from disk themselves and list each criterion's required parts, by the checklist's steps, before opening a test
 - Red-check every high-risk criterion graded Adequate or better and a sample of the rest, and widen the checks when one stays green
-- Close the audit chat at Step 4 unless the gaps are few, and fix in tier order, a batch per chat, until every criterion is Adequate or better or the user accepts it; carry the rest in `test-audit.md`
+- Close the audit chat at Step 4 without fixing, plan the fixing in batches, and fix in tier order, a whole batch per fixing chat, until every criterion is Adequate or better or the user accepts it; carry the rest in `test-audit.md`
 - Assume the suite passes: run only the tests a red check or a fix needs, and the full suite only as a fixing chat's commit gate
 - See every new or strengthened test fail before counting it
 - Re-grade remediation with a fresh sub-agent, never by the chat that wrote the tests
