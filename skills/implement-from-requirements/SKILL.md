@@ -243,17 +243,17 @@ When in doubt, ask the user — but prefer making the call yourself. The directo
 
 ### Phase 5: Tests
 
-After the implementation is in place, run and update tests. This phase runs the suite several
-times; if one run takes more than about two minutes, load `wall-clock-awareness` before the
-second run — the cheap fixes are an afternoon and every later session inherits them.
+After the implementation is in place, run and update tests. In this phase and in deliverable
+review, run the tests that cover the code this session changed. The full suite runs once, on
+the finished code, as the commit gate that ends test hardening (`test-hardening`, Step 4).
 
 **Approach:**
 
-1. **Run existing tests first.** If any fail because of your changes, fix them or fix the implementation that broke them. Changing what an existing test expects goes through the test tripwire (Phase 4).
+1. **Run the existing tests that cover the changed code first.** If any fail because of your changes, fix them or fix the implementation that broke them. Changing what an existing test expects goes through the test tripwire (Phase 4).
 2. **Map verification evidence to acceptance criteria.** Every in-scope criterion must be demonstrably verified, but do not manufacture a separate unit test for each one. One high-value integration or workflow test may verify several criteria; a high-risk criterion may need more than one layer. **If you're implementing a single phase of a multi-phase PRD, map only against the acceptance criteria the phase doc covers** — later phases handle the rest.
 3. **Choose tests by failure risk.** Follow `engineering-principles`: use unit tests for isolated deterministic logic, integration tests for real boundaries and contracts, and end-to-end/workflow checks where several components or a user-visible path must work together. Add a test only when you can name the regression it would catch.
 4. **Use real resources for integration behavior.** Integration tests should hit real databases, APIs, and services in sandbox/dev environments. Use narrowly scoped mocks only for destructive, expensive, or hard-to-trigger conditions allowed by `engineering-principles` (its evidence standard); mock-only coverage does not prove an external integration works. **Anything a test writes, it writes to non-prod — integration tests never mutate production data, no exceptions.**
-5. **Run the full suite again** before moving on.
+5. **Run those tests again**, with the ones you added, before moving on.
 
 **When the service has no non-prod environment yet**, don't drop integration testing entirely: where the project allows it (`engineering-principles`, "Production Data"), production may be used **strictly read-only** — GETs, SELECTs, and production-supported `--dry-run` planning paths. Write paths on such a service are verified at the unit level (with narrow mocks where `engineering-principles` permits) until a non-prod environment exists, and the evidence names the unproved write boundary as a gap. This read-only-prod arrangement is the exception for services without a non-prod counterpart, not a general option — flag the missing environment in the wrap-up rather than treating it as durable.
 
@@ -273,7 +273,7 @@ This matters because the user (and other people on the team) often reach for `de
 
 > "Deliverable review complete. [Brief summary of what was found / fixed / verified.]"
 
-Apply any fixes the review surfaces. Re-run tests after the fixes.
+Apply any fixes the review surfaces. Re-run the tests that cover the fixes.
 
 ---
 

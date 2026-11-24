@@ -166,11 +166,11 @@ Match existing code style. Don't refactor surrounding code unless the change req
 
 ### Phase 5: Test
 
-This phase runs the suite several times. If one run takes more than about two minutes, load
-`wall-clock-awareness` before the second run — the cheap fixes are an afternoon and every
-later session inherits them.
+In this phase and in deliverable review, run the tests that cover the code this session
+changed. The full suite runs once, on the finished code, as the commit gate that ends test
+hardening (`test-hardening`, Step 4).
 
-1. **Run existing tests.** If your change is in covered territory, existing tests verify it. Fix any failures caused by your change; changing what an existing test expects goes through the test tripwire (Phase 4).
+1. **Run the existing tests that cover the changed code.** If your change is in covered territory, existing tests verify it. Fix any failures caused by your change; changing what an existing test expects goes through the test tripwire (Phase 4).
 2. **Add tests for new behavior** where the existing suite doesn't cover what you built. Match the codebase's existing test patterns.
 3. **Use real resources for integration behavior.** Integration tests should hit real databases, APIs, and services in sandbox/dev environments, per the evidence standard in `engineering-principles`; mocks only for isolated logic or the narrow cases it allows.
 4. **For UI/frontend changes**, exercise the change in a browser before reporting done. Type-checking and unit tests don't verify UX.
@@ -183,7 +183,7 @@ Announce it clearly:
 
 > "Tests are passing. Now running deliverable review automatically."
 
-Apply any fixes the review surfaces. Re-run tests after fixes. Announce when complete.
+Apply any fixes the review surfaces. Re-run the tests that cover the fixes. Announce when complete.
 
 ### Phase 7: Test Hardening
 
