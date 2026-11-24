@@ -165,9 +165,14 @@ exist.
 ### Which tests to run
 
 While iterating, run only the tests that cover the code you are changing. The full suite
-is the gate before commit. If a suite will take more than about two minutes, make it
-parallel from day one; `wall-clock-awareness` has the tripwire and the concurrency-safety
-checklist.
+is the gate before commit.
+
+Tests, builds and CI are run again by every later session, and the person waiting pays for
+every run. An agent does not feel that time, so read it from what the runner prints. When
+you add or change a test, a build step or a CI job, run it alone, read how long it took,
+and make it cheaper when it is slower than most tests around it without a reason you can
+name. When you set up a suite or a pipeline, set it up to stay fast.
+`wall-clock-awareness` has both.
 
 ---
 

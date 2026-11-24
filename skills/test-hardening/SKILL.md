@@ -112,6 +112,8 @@ Present the assessment in one short list ("Assessment: AC-3 has no test evidence
 
 Every fix in every tier must trace to an in-scope criterion. Work down the list until the improvement is meaningful, not until it's exhaustive — judgment call, biased toward covering everything in tier 1 and 2. If the assessment comes back clean (every criterion has credible evidence, no unjustified mocks, assertions are real), say so in one line and stop — do not manufacture work to justify the pass.
 
+Check what each test you add costs. Run it alone and read its duration from the runner. One slower than most tests around it needs a reason you can name, or is made cheaper (`wall-clock-awareness`, "What a new test or step costs").
+
 ### Step 4: Run the Full Suite
 
 Run the complete suite, not just the new or changed tests. Triage every failure by cause:
@@ -128,7 +130,7 @@ Re-run after fixes until green (pre-existing unrelated failures noted and exclud
 Keep it brief — no FYIs or observation inventories; dismissed discoveries stay dismissed:
 
 1. One or two sentences on what was hardened (e.g., "Added integration tests for AC-2 and AC-5, converted the mocked email-provider client to its sandbox account, strengthened 3 assertions — full suite green"), not a test-by-test inventory.
-2. Confirm the full suite passes, naming the command that ran.
+2. Confirm the full suite passes, naming the command that ran and how long it took, read from the runner's output.
 3. Stage the test files (and any implementation fixes from Step 4), and update the proposed commit message if one was already presented.
 4. Note explicitly that test hardening was performed, so the user doesn't re-run it.
 

@@ -117,7 +117,7 @@ A warranted refactor that exceeds the small-tidy bound is **deferred, not attemp
 
 ### Step 6: Wrap-Up
 
-When the pass declines, its one-line verdict is the whole wrap-up. Otherwise one paragraph, mirroring the chain's no-loose-ends discipline: what was tidied, confirmation the full suite is green with the command named, and the `refactor(scope):` commit with the repo named and whether it was pushed or held (or the staged change and its message, when the user said not to commit). Note explicitly that the refactor pass was performed, so the user doesn't re-run it. No FYIs, no inventory of dismissed observations, no adjacent-code commentary.
+When the pass declines, its one-line verdict is the whole wrap-up. Otherwise one paragraph, mirroring the chain's no-loose-ends discipline: what was tidied, confirmation the full suite is green with the command and how long it took named, and the `refactor(scope):` commit with the repo named and whether it was pushed or held (or the staged change and its message, when the user said not to commit). Note explicitly that the refactor pass was performed, so the user doesn't re-run it. No FYIs, no inventory of dismissed observations, no adjacent-code commentary.
 
 ---
 

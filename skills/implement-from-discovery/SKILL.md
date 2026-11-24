@@ -174,6 +174,7 @@ hardening (`test-hardening`, Step 4).
 2. **Add tests for new behavior** where the existing suite doesn't cover what you built. Match the codebase's existing test patterns.
 3. **Use real resources for integration behavior.** Integration tests should hit real databases, APIs, and services in sandbox/dev environments, per the evidence standard in `engineering-principles`; mocks only for isolated logic or the narrow cases it allows.
 4. **For UI/frontend changes**, exercise the change in a browser before reporting done. Type-checking and unit tests don't verify UX.
+5. **Check what each new test costs.** Run it alone and read its duration from the runner. One slower than most tests around it needs a reason you can name, or is made cheaper (`wall-clock-awareness`, "What a new test or step costs").
 
 ### Phase 6: Deliverable Review
 

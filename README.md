@@ -259,7 +259,7 @@ directory under `skills/` with a `SKILL.md` is one skill, in the open
 - `test-audit` — once nothing is left to build (or on any finished phase): grade every acceptance criterion's test evidence, then fill the gaps, missing first
 - `pre-commit-validation` — commit-boundary checks for a checkout several sessions share
 - `engineering-principles` — the principles the method depends on: no silent fallbacks, the testing evidence standard, production data, judgment calls
-- `wall-clock-awareness` — cut waiting time in tests, builds and CI
+- `wall-clock-awareness` — keep the loop that proves the work fast: tests, builds, CI and waits
 
 ## Data handling
 
