@@ -167,6 +167,23 @@ exist.
 While iterating, run only the tests that cover the code you are changing. The full suite
 is the gate before commit.
 
+When the full run fails, the next run is the failed tests, not the suite. Run them alone,
+by file or by name, and read the runner's first lines to see that the filter took: a
+command that starts the whole suite anyway is stopped and its filter fixed. Fix what this
+session's work broke and repeat on those tests until they pass; a failure that was there
+before the session's work is named in the wrap-up and left. A test that passes alone with
+nothing changed still failed for a reason: read its failure for the cause (a deadline
+missed on a busy machine, state another test left behind) and name it in the wrap-up,
+fixing it when a test this session wrote or changed left that state. Then:
+
+- **The full run ran every test, and nothing has changed since but the failed tests
+  themselves:** the gate is met. Every other test passed, and nothing it exercises has
+  changed. The wrap-up gives the full run's command and time, and the tests run again
+  after it.
+- **Anything else changed** (implementation code, a helper or fixture other tests share),
+  **or the run stopped before every test ran:** run the tests that cover the change, then
+  the full suite again, on the finished code.
+
 Tests, builds and CI are run again by every later session, and the person waiting pays for
 every run. An agent does not feel that time, so read it from what the runner prints. When
 you add or change a test, a build step or a CI job, run it alone, read how long it took,

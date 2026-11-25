@@ -123,14 +123,14 @@ Run the complete suite, not just the new or changed tests. Triage every failure 
 - **A pre-existing test unrelated to this work was already failing** → out of scope. One-line mention to the user; do not fix it here.
 - **Never** silence, skip, loosen, or delete a failing test just to get green — that inverts the entire purpose of the pass.
 
-Re-run after fixes until green (pre-existing unrelated failures noted and excluded).
+After fixes, re-run the tests that failed, alone, until they pass. Run the full suite again only when a fix changed more than the failed tests themselves, or the run stopped before every test ran (`engineering-principles`, "Which tests to run"). Pre-existing unrelated failures are noted and excluded.
 
 ### Step 5: Wrap-Up
 
 Keep it brief — no FYIs or observation inventories; dismissed discoveries stay dismissed:
 
 1. One or two sentences on what was hardened (e.g., "Added integration tests for AC-2 and AC-5, converted the mocked email-provider client to its sandbox account, strengthened 3 assertions — full suite green"), not a test-by-test inventory.
-2. Confirm the full suite passes, naming the command that ran and how long it took, read from the runner's output.
+2. Confirm the full suite passes, naming the command that ran and how long it took, read from the runner's output, and any failed tests run again after it (Step 4).
 3. Stage the test files (and any implementation fixes from Step 4), and update the proposed commit message if one was already presented.
 4. Note explicitly that test hardening was performed, so the user doesn't re-run it.
 
